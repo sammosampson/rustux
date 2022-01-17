@@ -36,7 +36,11 @@ pub struct AbstractSyntaxTokenizer<I> where I : Iterator<Item=SourceTokenResult>
 impl <'a, I> Iterator for AbstractSyntaxTokenizer<I> where I : Iterator<Item=SourceTokenResult> {
     type Item = AbstractSyntaxTokenResult;
     fn next(&mut self) -> AbstractSyntaxTokenOption {
-        todo!()
+        if let Some(token) = self.source_token_iterator.next() {
+            println!("{:?}", token);
+            return Some(Ok(AbstractSyntaxNode { node_type: AbstractSyntaxNodeType::CompleteControl }))
+        }
+        None
     }
 }
 
