@@ -83,35 +83,93 @@ impl EguiRenderer {
         self.egui.on_event(event);
     }
 
-    pub fn render(
-        &mut self,
-        ast: &mut AbstractSyntaxTree,
-        event_producer: &mut SystemEventProducer,
-        display: &Display,
-        target: &mut Frame
-    ) -> bool {        
-        //if node.editor_visible() {        
-            self.begin_frame(display);
-            self.set_visuals();
-            //self.render_windows(node, event_producer);
-            self.end_frame_and_paint(display, target);
-            return true;
-        //}
-    }
-
-    fn set_visuals(&mut self) {
+    pub fn set_visuals(&mut self) {
         let mut visuals = egui::Visuals::dark();
         visuals.widgets.noninteractive.bg_fill = egui::Color32::from_rgba_premultiplied(0, 0, 0, 220);
         self.egui.ctx().set_visuals(visuals);
     }
 
-    fn begin_frame(&mut self, display: &Display) {
+    pub fn begin_frame(&mut self, display: &Display) {
         self.egui.begin_frame(display);
     }
 
-    fn end_frame_and_paint(&mut self, display: &Display, target: &mut Frame) -> bool {
+    pub fn end_frame_and_paint(&mut self, display: &Display, target: &mut Frame) -> bool {
         let (needs_repaint, shapes) = self.egui.end_frame(&display);
         self.egui.paint(&display, target, shapes);
         needs_repaint
+    }
+
+    pub fn render_left_side_panel(
+        &self, 
+        name: &str
+    ) {
+        egui::SidePanel::left(name)
+            .resizable(false)
+            .show(self.egui.ctx(), |ui | self.add_contents(ui));
+    }
+
+    pub fn render_right_side_panel(
+        &self, 
+        name: &str
+    ) {
+        egui::SidePanel::right(name)
+            .resizable(false)
+            .show(self.egui.ctx(), |ui | self.add_contents(ui));
+    }
+
+    fn add_contents(&self, ui: &mut egui::Ui) {
+
+    }
+}
+
+pub struct AbstractSystaxTreeRenderer<'a> {
+    display: &'a Display,
+    frame: &'a mut Frame,
+    renderer: &'a mut EguiRenderer
+}
+
+impl<'a> AbstractSystaxTreeRenderer<'a> {
+    pub fn new(
+        display: &'a Display,
+        frame: &'a mut Frame,
+        renderer: &'a mut EguiRenderer,
+        
+    ) -> Self {
+        Self {
+            display,
+            frame,
+            renderer
+        }
+    }
+
+   
+    pub fn render(&mut self, ast: &AbstractSyntaxTree) -> bool {
+        if let Some(root) = ast.get_root() {
+            return self.render_root(ast, root)
+        }
+        false     
+    }
+
+    pub fn render_root(&mut self, ast: &AbstractSyntaxTree, root: &AbstractSyntaxTreeNode) -> bool {
+        self.renderer.begin_frame(self.display);
+        self.renderer.set_visuals();
+        self.render_top_levels(ast, ast.get_children(root));
+        self.renderer.end_frame_and_paint(self.display, &mut self.frame)
+    }
+
+    pub fn render_top_levels(&self, ast: &AbstractSyntaxTree, children: Vec<&AbstractSyntaxTreeNode>) {
+        for child in children {
+            self.render_top_level(&child.node_type())
+        }
+    }
+
+    fn render_top_level(&self, node_type: &AbstractSyntaxTokenType) {
+        match node_type {
+            AbstractSyntaxTokenType::LeftSidebar => 
+                self.renderer.render_left_side_panel("test"),
+            AbstractSyntaxTokenType::RightSidebar => 
+                self.renderer.render_right_side_panel("test"),
+            _ => {}
+        }
     }
 }

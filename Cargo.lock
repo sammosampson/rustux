@@ -1772,7 +1772,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "rustux"
+name = "ruxy"
 version = "0.1.0"
 dependencies = [
  "egui",

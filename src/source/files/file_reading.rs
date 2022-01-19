@@ -34,7 +34,7 @@ impl Default for FilePaths {
 
 #[derive(Debug)]
 pub enum Error {
-    FailedToReadZodFile(std::io::Error),
+    FailedToReadRuxFile(std::io::Error),
     FilePathError(FilePathError)
 }
 
@@ -46,7 +46,7 @@ impl From<FilePathError> for Error {
 
 impl From<std::io::Error> for Error {
     fn from(error: std::io::Error) -> Error {
-        Error::FailedToReadZodFile(error)
+        Error::FailedToReadRuxFile(error)
     }
 }
 

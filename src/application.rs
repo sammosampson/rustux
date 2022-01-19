@@ -20,7 +20,7 @@ impl From<RendererError> for RustuxError {
 
 #[derive(Default)]
 pub struct Application {
-    relative_zod_folder_path: &'static str,
+    relative_rux_folder_path: &'static str,
     file_monitor_poll: Duration
 }
 
@@ -31,7 +31,7 @@ impl Application {
     }
 
     pub fn with_file_path(mut self, path: &'static str) -> Self {
-        self.relative_zod_folder_path = path;
+        self.relative_rux_folder_path = path;
         self
     }
 
@@ -43,7 +43,7 @@ impl Application {
     pub fn build(self) -> Result<ApplicationRunner, RustuxError> {
         let mut resources = Resources::default();
 
-        let file_paths = create_file_paths(self.relative_zod_folder_path);
+        let file_paths = create_file_paths(self.relative_rux_folder_path);
         let event_loop = create_system_event_loop();
         let screen_renderer = create_screen_renderer(&event_loop)?;
         let egui_renderer = create_egui_renderer(&screen_renderer.display);
@@ -56,9 +56,8 @@ impl Application {
         resources.insert(monitor_files(file_paths, self.file_monitor_poll)?);
         resources.insert(create_source_file_reader());
         resources.insert(create_source_entity_lookup());
-        resources.insert(create_source_tokens_lookup());
+        resources.insert(create_abstract_syntax_token_stream_lookup());
         resources.insert(create_source_location_lookup());
-        resources.insert(create_relationship_map());
         resources.insert(create_system_event_producer());
         Ok(ApplicationRunner::new(event_loop, build_schedule(), resources))
     }

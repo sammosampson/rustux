@@ -1,7 +1,5 @@
 
-use legion::*;
-use legion::systems::*;
-use zodiac_entities::*;
+use crate::prelude::*;
 
 
 #[system(for_each)]
@@ -32,10 +30,4 @@ pub fn remove_source_file_removal(command_buffer: &mut CommandBuffer, entity: &E
 #[filter(component::<Rebuild>())]
 pub fn remove_rebuild(command_buffer: &mut CommandBuffer, entity: &Entity) {
     command_buffer.remove_component::<Rebuild>(*entity);
-}
-
-#[system(for_each)]
-#[filter(component::<BuildErrorOccurrence>())]
-pub fn remove_build_error(command_buffer: &mut CommandBuffer, entity: &Entity) {
-    command_buffer.remove_component::<BuildErrorOccurrence>(*entity);
 }

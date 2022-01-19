@@ -2,7 +2,9 @@ mod application;
 mod systems;
 mod events;
 mod source;
+mod abstract_syntax;
 mod rendering;
+
 
 mod prelude {
     pub use log::{debug,info}; 
@@ -19,6 +21,7 @@ mod prelude {
     pub use crate::systems::*;
     pub use crate::events::*;
     pub use crate::source::*;
+    pub use crate::abstract_syntax::*;
     pub use crate::rendering::*;
 }
 

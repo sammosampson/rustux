@@ -323,3 +323,35 @@ impl<'a> SourceTokenizer<'a> {
         None
     }    
 }
+
+pub trait SourceTokenVisitor {
+    fn token_error(&mut self, error: SourceTokenError);
+    fn control(&mut self, control_name: &str);
+    fn end_control(&mut self, control_name: &str);
+}
+
+pub struct SourceTokenVisitationNavigator<'a> {
+    tokenizer: SourceTokenizer<'a>
+}
+
+impl<'a> SourceTokenVisitationNavigator<'a> {
+    pub fn from_source(tokenizer: SourceTokenizer<'a>) -> SourceTokenVisitationNavigator {
+        Self {
+            tokenizer
+        }
+    }
+
+    pub fn accept(self, visitor: &mut impl SourceTokenVisitor) {
+        for token_result in self.tokenizer {
+            match token_result {
+                Ok(token) => match token {
+                    SourceToken::Control(control_name) => visitor.control(&control_name),
+                    SourceToken::EndControl(control_name) => visitor.end_control(&control_name),
+                    SourceToken::Property(_property_name) => {},
+                    SourceToken::PropertyValue(_property_value) => {},
+                },
+                Err(error) => visitor.token_error(error),
+            }
+        }
+    }
+}

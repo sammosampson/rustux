@@ -49,13 +49,6 @@ pub fn create_source_entity_lookup() -> SourceEntityLookup {
 
 pub type SourceEntityLookup = HashMap<SourceLocation, Entity>;
 
-pub fn create_source_tokens_lookup() -> SourceTokensLookup {
-    SourceTokensLookup::new()
-}
-
-pub type SourceTokensLookup = HashMap<Entity, Vec<AbstractSyntaxTokenResult>>;
-
-
 #[derive(Clone, Copy, Debug, PartialEq, Default)]
 pub struct SourceFile {
 }
