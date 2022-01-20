@@ -51,6 +51,12 @@ impl AbstractSyntaxTree {
         id
     }
 
+    pub fn add_node_property(&mut self, node_id: AbstractSyntaxTreeNodeId, property: AbstractSyntaxTokenProperty) {
+        if let Some(node) = self.get_node_mut(node_id) {
+            node.add_property(property);
+        }
+    }
+
     fn add_node(&mut self, node: AbstractSyntaxTreeNode) -> AbstractSyntaxTreeNodeId {
         self.id_cursor = self.id_cursor.next();
         self.nodes.push(node);
@@ -92,7 +98,8 @@ impl Deref for AbstractSyntaxTreeNodeId {
 pub struct AbstractSyntaxTreeNode {
     node_type: AbstractSyntaxTokenType,
     parent: AbstractSyntaxTreeNodeId,
-    children: Vec::<AbstractSyntaxTreeNodeId>
+    children: Vec::<AbstractSyntaxTreeNodeId>,
+    properties: Vec::<AbstractSyntaxTokenProperty>
 }
 
 impl AbstractSyntaxTreeNode {
@@ -100,7 +107,8 @@ impl AbstractSyntaxTreeNode {
         Self {
             node_type: AbstractSyntaxTokenType::Root,
             parent: AbstractSyntaxTreeNodeId::default(),
-            children: vec!()
+            children: vec!(),
+            properties: vec!()
         }
     }
 
@@ -108,12 +116,21 @@ impl AbstractSyntaxTreeNode {
         Self {
             node_type: from,
             parent,
-            children: vec!()
+            children: vec!(),
+            properties: vec!()
         }
     }
 
     pub fn node_type(&self) -> AbstractSyntaxTokenType {
         self.node_type
+    }
+
+    pub fn properties(&self) -> &Vec<AbstractSyntaxTokenProperty> {
+        &self.properties
+    }
+
+    pub fn add_property(&mut self, property: AbstractSyntaxTokenProperty) {
+        self.properties.push(property)
     }
 }
 
@@ -143,7 +160,11 @@ impl AbstractSyntaxTokenStreamVisitor for AbstractSyntaxTokenStreamLinker {
         }
     }
 
-    fn end_node(&mut self, node_type: &AbstractSyntaxTokenType) {
+    fn property(&mut self, property: &AbstractSyntaxTokenProperty) {
+        self.ast.add_node_property(self.current_node, property.clone())
+    }
+
+    fn end_node(&mut self, _node_type: &AbstractSyntaxTokenType) {
         self.current_node = self.ast.get_parent(self.current_node);
     }
 }

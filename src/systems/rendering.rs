@@ -31,7 +31,7 @@ fn render_gui(
     target: &mut Frame
 ) {
 
-    let mut renderer = AbstractSystaxTreeRenderer::new(
+    let mut renderer = AbstractSyntaxTreeRenderer::new(
         &screen_renderer.display,
         target,
         egui_renderer

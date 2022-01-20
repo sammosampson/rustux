@@ -20,6 +20,9 @@ pub enum AbstractSyntaxTokenType {
     Root,
     LeftSidebar,
     RightSidebar,
+    Horizontal,
+    Vertical,
+    Label
 }
 
 impl Default for AbstractSyntaxTokenType {
@@ -29,9 +32,16 @@ impl Default for AbstractSyntaxTokenType {
 }
 
 #[derive(Debug, Clone)]
+pub enum AbstractSyntaxTokenProperty {
+    Name(String),
+    Text(String),
+}
+
+#[derive(Debug, Clone)]
 pub enum AbstractSyntaxToken {
-    Start(AbstractSyntaxTokenType),
-    End(AbstractSyntaxTokenType),
+    StartNode(AbstractSyntaxTokenType),
+    Property(AbstractSyntaxTokenProperty),
+    EndNode(AbstractSyntaxTokenType),
 }
 
 pub type AbstractSyntaxTokenResult = Result<AbstractSyntaxToken, AbstractSyntaxTokenError>;

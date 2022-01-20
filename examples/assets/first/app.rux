@@ -1,4 +1,21 @@
 <root>
-    <left-side-bar />
-    <right-side-bar />
+    <left-side-bar name="m">
+        <horizontal>
+            <label text="1"/>
+            <label text="2"/>
+            <label text="3"/>
+        </horizontal>
+    </left-side-bar>
+    <right-side-bar name="m1">
+        <vertical>
+            <label text="4" />
+            <label text="5"/>
+            <label text="6"/>
+            <label text="7"/>
+            <label text="8"/>
+            <label text="9"/>
+            <label text="10"/>
+            <label text="11"/>
+        </vertical>
+    </right-side-bar>
 </root>

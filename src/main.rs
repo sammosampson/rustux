@@ -2,14 +2,13 @@ mod application;
 mod systems;
 mod events;
 mod source;
-mod abstract_syntax;
-mod rendering;
+mod backends;
 
 
 mod prelude {
     pub use log::{debug,info}; 
     pub use std::error::Error; 
-    pub use std::fmt::{ Display, Formatter }; 
+    pub use std::fmt::{ Formatter }; 
     pub use std::ops::*;
     pub use std::collections::*;
     pub use std::marker::PhantomData;
@@ -21,8 +20,7 @@ mod prelude {
     pub use crate::systems::*;
     pub use crate::events::*;
     pub use crate::source::*;
-    pub use crate::abstract_syntax::*;
-    pub use crate::rendering::*;
+    pub use crate::backends::*;
 }
 
 use crate::prelude::*;
