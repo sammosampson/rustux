@@ -2,7 +2,8 @@ use crate::prelude::*;
 
 #[derive(Debug, Default)]
 pub struct BuildAbstractSyntaxSourceTokenVisitor {
-    ast: AbstractSyntaxTokenStream
+    ast: AbstractSyntaxTokenStream,
+    current_property_name: String
 }
 
 impl BuildAbstractSyntaxSourceTokenVisitor {
@@ -20,8 +21,15 @@ impl SourceTokenVisitor for BuildAbstractSyntaxSourceTokenVisitor {
         self.ast.start_node(match_control_name(control_name));
     }
 
-    fn property(&mut self, property_name: &str, property_value: &SourceTokenPropertyValue) {
-        match match_property(property_name, property_value) {
+    fn property(&mut self, property_name: &str) {
+        match match_property_only(property_name) {
+            Some(property) => self.ast.property(property),
+            None => self.current_property_name = property_name.to_string()
+        }
+    }
+
+    fn property_value(&mut self, property_value: &SourceTokenPropertyValue) {
+        match match_property_value(&self.current_property_name, property_value) {
             Ok(property) => self.ast.property(property),
             Err(error) => self.ast.property_error(error),
         }
@@ -35,8 +43,8 @@ impl SourceTokenVisitor for BuildAbstractSyntaxSourceTokenVisitor {
 fn match_control_name(control_name: &str) -> AbstractSyntaxTokenType {
     match control_name {
         "root" => AbstractSyntaxTokenType::Root,
-        "left-side-bar" => AbstractSyntaxTokenType::LeftSidebar,
-        "right-side-bar" => AbstractSyntaxTokenType::RightSidebar,
+        "side-bar" => AbstractSyntaxTokenType::Sidebar,
+        "scroll-area" => AbstractSyntaxTokenType::ScrollArea,
         "horizontal" => AbstractSyntaxTokenType::Horizontal,
         "vertical" => AbstractSyntaxTokenType::Vertical,
         "label" => AbstractSyntaxTokenType::Label,
@@ -44,20 +52,39 @@ fn match_control_name(control_name: &str) -> AbstractSyntaxTokenType {
     }
 }
 
-fn match_property(property_name: &str, value: &SourceTokenPropertyValue) -> Result<AbstractSyntaxTokenProperty, AbstractSyntaxTokenError> {
+fn match_property_value(property_name: &str, value: &SourceTokenPropertyValue) -> Result<AbstractSyntaxTokenProperty, AbstractSyntaxTokenError> {
     match property_name {
         "name" => {
             match value {
                 SourceTokenPropertyValue::String(v) => Ok(AbstractSyntaxTokenProperty::Name(v.clone())),
-                _ => Err(AbstractSyntaxTokenError::UnknownProperty) 
+                _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
         },
         "text" => {
             match value {
                 SourceTokenPropertyValue::String(v) => Ok(AbstractSyntaxTokenProperty::Text(v.clone())),
-                _ => Err(AbstractSyntaxTokenError::UnknownProperty) 
+                _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
         },
-        _ => Err(AbstractSyntaxTokenError::UnknownProperty) 
+        "left" => Ok(AbstractSyntaxTokenProperty::HorizontalOrientation(HorizontalOrientation::Left)),
+        "right" => Ok(AbstractSyntaxTokenProperty::HorizontalOrientation(HorizontalOrientation::Right)),
+        "auto-sized" => Ok(AbstractSyntaxTokenProperty::VerticallySized(VerticalSize::Auto)),
+        "max-height" => {
+            match value {
+                SourceTokenPropertyValue::Float(v) => Ok(AbstractSyntaxTokenProperty::VerticallySized(VerticalSize::MaxHeight(*v as f32))),
+                _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
+            }
+        },
+        _ => Err(AbstractSyntaxTokenError::UnknownProperty(property_name.to_string())) 
+    }
+}
+
+fn match_property_only(property_name: &str) -> Option<AbstractSyntaxTokenProperty> {
+    println!("{:?}", property_name);
+    match property_name {
+        "left" => Some(AbstractSyntaxTokenProperty::HorizontalOrientation(HorizontalOrientation::Left)),
+        "right" => Some(AbstractSyntaxTokenProperty::HorizontalOrientation(HorizontalOrientation::Right)),
+        "auto-sized" => Some(AbstractSyntaxTokenProperty::VerticallySized(VerticalSize::Auto)),
+        _ => None 
     }
 }

@@ -148,7 +148,7 @@ impl AbstractSyntaxTokenStreamLinker {
 
 impl AbstractSyntaxTokenStreamVisitor for AbstractSyntaxTokenStreamLinker {
     fn token_error(&mut self, error: &AbstractSyntaxTokenError) {
-        todo!()
+        panic!("{:?}", error)
     }
 
     fn start_node(&mut self, node_type: &AbstractSyntaxTokenType) {

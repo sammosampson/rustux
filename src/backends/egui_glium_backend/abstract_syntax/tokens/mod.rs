@@ -7,21 +7,21 @@ pub use building::*;
 
 use crate::prelude::*;
 
-#[derive(PartialEq, Eq, Debug, Copy, Clone)]
+#[derive(PartialEq, Eq, Debug, Clone)]
 pub enum AbstractSyntaxTokenError {
     SourceTokenError(SourceTokenError),
-    UnusedPropertyType,
-    UnknownProperty
+    UnknownProperty(String),
+    UnknownPropertyValue(String),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AbstractSyntaxTokenType {
     Unknown,
     Root,
-    LeftSidebar,
-    RightSidebar,
+    Sidebar,
     Horizontal,
     Vertical,
+    ScrollArea,
     Label
 }
 
@@ -35,6 +35,20 @@ impl Default for AbstractSyntaxTokenType {
 pub enum AbstractSyntaxTokenProperty {
     Name(String),
     Text(String),
+    HorizontalOrientation(HorizontalOrientation),
+    VerticallySized(VerticalSize)
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum HorizontalOrientation {
+    Left,
+    Right
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum VerticalSize {
+    Auto,
+    MaxHeight(f32)
 }
 
 #[derive(Debug, Clone)]

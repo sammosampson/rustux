@@ -43,10 +43,11 @@ impl<'a> AbstractSyntaxTreeRenderer<'a> {
 
     fn render_top_level(&self, ast: &AbstractSyntaxTree, node: &AbstractSyntaxTreeNode) {
         match node.node_type() {
-            AbstractSyntaxTokenType::LeftSidebar =>
-                self.renderer.render_left_side_panel( get_name_property(node.properties()), | ui | self.render_children(ui, ast, node)),
-            AbstractSyntaxTokenType::RightSidebar => 
-                self.renderer.render_right_side_panel(get_name_property(node.properties()), | ui | self.render_children(ui, ast, node)),
+            AbstractSyntaxTokenType::Sidebar =>
+                self.renderer.render_side_panel( 
+                    get_name_property(node.properties()),
+                    get_horizontal_orientation_property(node.properties()), 
+                    | ui | self.render_children(ui, ast, node)),
             _ => {}
         }
     }
@@ -59,6 +60,8 @@ impl<'a> AbstractSyntaxTreeRenderer<'a> {
 
     pub fn render_child(&self, ui: &mut egui::Ui, ast: &AbstractSyntaxTree, child: &AbstractSyntaxTreeNode) {
         match child.node_type() {
+            AbstractSyntaxTokenType::ScrollArea => 
+                self.renderer.render_scroll_area(get_vertical_size_property(child.properties()), ui, | ui | self.render_children(ui, ast, child)),
             AbstractSyntaxTokenType::Horizontal => 
                 self.renderer.render_horizontal(ui, | ui | self.render_children(ui, ast, child)),
             AbstractSyntaxTokenType::Vertical => 
@@ -90,4 +93,26 @@ fn get_text_property(properties: &[AbstractSyntaxTokenProperty]) -> &str {
     }
 
     return "";
+}
+
+fn get_horizontal_orientation_property(properties: &[AbstractSyntaxTokenProperty]) -> HorizontalOrientation {
+    for property in properties {
+        match property {
+            AbstractSyntaxTokenProperty::HorizontalOrientation(value) => return *value,
+            _ => {}
+        }
+    }
+
+    return HorizontalOrientation::Left;
+}
+
+fn get_vertical_size_property(properties: &[AbstractSyntaxTokenProperty]) -> VerticalSize {
+    for property in properties {
+        match property {
+            AbstractSyntaxTokenProperty::VerticallySized(value) => return *value,
+            _ => {}
+        }
+    }
+
+    return VerticalSize::Auto;
 }

@@ -33,16 +33,38 @@ impl EguiRenderer {
         needs_repaint
     }
 
-    pub fn render_left_side_panel(&self, name: &str, add_contents: impl FnOnce(&mut egui::Ui) -> ()) {
+    pub fn render_side_panel(&self, name: &str, orientation: HorizontalOrientation, add_contents: impl FnOnce(&mut egui::Ui) -> ()) {
+        match orientation {
+            HorizontalOrientation::Left => self.render_left_side_panel(name, add_contents),
+            HorizontalOrientation::Right => self.render_right_side_panel(name, add_contents),
+        }
+    }
+    
+    fn render_left_side_panel(&self, name: &str, add_contents: impl FnOnce(&mut egui::Ui) -> ()) {
         egui::SidePanel::left(name)
             .resizable(false)
             .show(self.egui.ctx(), add_contents);
     }
 
-    pub fn render_right_side_panel(&self, name: &str, add_contents: impl FnOnce(&mut egui::Ui) -> ()) {
+    fn render_right_side_panel(&self, name: &str, add_contents: impl FnOnce(&mut egui::Ui) -> ()) {
         egui::SidePanel::right(name)
             .resizable(false)
             .show(self.egui.ctx(), add_contents);
+    }
+
+    pub fn render_scroll_area(&self, size: VerticalSize, ui: &mut egui::Ui, add_contents: impl FnOnce(&mut egui::Ui) -> ()) {
+        match size {
+            VerticalSize::Auto => self.render_auto_sized_scroll_area(ui, add_contents),
+            VerticalSize::MaxHeight(height) => self.render_max_height_scroll_area(height, ui, add_contents),
+        }
+    }
+
+    pub fn render_auto_sized_scroll_area(&self, ui: &mut egui::Ui, add_contents: impl FnOnce(&mut egui::Ui) -> ()) {
+        egui::ScrollArea::auto_sized().show(ui, add_contents);
+    }
+
+    pub fn render_max_height_scroll_area(&self, height: f32, ui: &mut egui::Ui, add_contents: impl FnOnce(&mut egui::Ui) -> ()) {
+        egui::ScrollArea::from_max_height(height).show(ui, add_contents);        
     }
 
     pub fn render_horizontal(&self, ui: &mut egui::Ui, add_contents: impl FnOnce(&mut egui::Ui) -> ()) {

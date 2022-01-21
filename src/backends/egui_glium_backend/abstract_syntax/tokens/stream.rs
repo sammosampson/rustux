@@ -31,6 +31,7 @@ impl AbstractSyntaxTokenStream {
     }
 
     pub fn property(&mut self, property: AbstractSyntaxTokenProperty) {
+        println!("{:?}", property);
         self.0.push(Ok(AbstractSyntaxToken::Property(property)));
     }
 
