@@ -23,6 +23,7 @@ impl AbstractSyntaxTokenStream {
     }
 
     pub fn start_node(&mut self, node_type: AbstractSyntaxTokenType) {
+        println!("{:?}", node_type);
         if node_type == AbstractSyntaxTokenType::Root {
             self.1 = true;
         }

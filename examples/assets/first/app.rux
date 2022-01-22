@@ -1,25 +1,42 @@
 <root>
-    <side-bar left name="m">
+    <side-bar left id="b1">
         <horizontal>
             <label text="1"/>
             <label text="2"/>
             <label text="3"/>
         </horizontal>
+        <separator />
+        <vertical>
+            <heading text="1"/>
+            <monospace text="2"/>
+            <code text="3"/>
+        </vertical>
     </side-bar>
-    <side-bar right name="m1">
-        <scroll-area
-            max-height=100.0
-        >
-            <vertical>
+    <side-bar right id="b2">
+        <vertical>
+            <separator />
+            <scroll-area id="s1" max-height=100.0 >
                 <label text="4" />
-                <label text="5"/>
-                <label text="6"/>
-                <label text="7"/>
-                <label text="8"/>
-                <label text="9"/>
-                <label text="10"/>
-                <label text="11"/>
-            </vertical>
-        </scroll-area>
+                <label text="5" />
+                <label text="6" />
+                <label text="7" />
+                <label text="8" />
+                <label text="9" />
+                <label text="10" />
+                <label text="11" />
+            </scroll-area>
+            <separator />
+            <scroll-area id="s2" max-height=100.0 >
+                <selectable-label text="4" selected />
+                <selectable-label text="5" />
+                <selectable-label text="6" selected />
+                <selectable-label text="7" />
+                <selectable-label text="8" />
+                <selectable-label text="9" selected />
+                <selectable-label text="10" />
+                <selectable-label text="11" selected />
+            </scroll-area>
+            <separator />
+        </vertical>
     </side-bar>
 </root>

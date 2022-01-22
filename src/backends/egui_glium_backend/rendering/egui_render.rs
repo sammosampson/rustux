@@ -33,38 +33,42 @@ impl EguiRenderer {
         needs_repaint
     }
 
-    pub fn render_side_panel(&self, name: &str, orientation: HorizontalOrientation, add_contents: impl FnOnce(&mut egui::Ui) -> ()) {
+    pub fn render_side_panel(&self, id: &str, orientation: HorizontalOrientation, add_contents: impl FnOnce(&mut egui::Ui) -> ()) {
         match orientation {
-            HorizontalOrientation::Left => self.render_left_side_panel(name, add_contents),
-            HorizontalOrientation::Right => self.render_right_side_panel(name, add_contents),
+            HorizontalOrientation::Left => self.render_left_side_panel(id, add_contents),
+            HorizontalOrientation::Right => self.render_right_side_panel(id, add_contents),
         }
     }
     
-    fn render_left_side_panel(&self, name: &str, add_contents: impl FnOnce(&mut egui::Ui) -> ()) {
-        egui::SidePanel::left(name)
+    fn render_left_side_panel(&self, id: &str, add_contents: impl FnOnce(&mut egui::Ui) -> ()) {
+        egui::SidePanel::left(id)
             .resizable(false)
             .show(self.egui.ctx(), add_contents);
     }
 
-    fn render_right_side_panel(&self, name: &str, add_contents: impl FnOnce(&mut egui::Ui) -> ()) {
-        egui::SidePanel::right(name)
+    fn render_right_side_panel(&self, id: &str, add_contents: impl FnOnce(&mut egui::Ui) -> ()) {
+        egui::SidePanel::right(id)
             .resizable(false)
             .show(self.egui.ctx(), add_contents);
     }
 
-    pub fn render_scroll_area(&self, size: VerticalSize, ui: &mut egui::Ui, add_contents: impl FnOnce(&mut egui::Ui) -> ()) {
+    pub fn render_separator(&self, ui: &mut egui::Ui) {
+        ui.separator();
+    }
+
+    pub fn render_scroll_area(&self, id: &str, size: VerticalSize, ui: &mut egui::Ui, add_contents: impl FnOnce(&mut egui::Ui) -> ()) {
         match size {
-            VerticalSize::Auto => self.render_auto_sized_scroll_area(ui, add_contents),
-            VerticalSize::MaxHeight(height) => self.render_max_height_scroll_area(height, ui, add_contents),
+            VerticalSize::Auto => self.render_auto_sized_scroll_area(id, ui, add_contents),
+            VerticalSize::MaxHeight(height) => self.render_max_height_scroll_area(id, height, ui, add_contents),
         }
     }
 
-    pub fn render_auto_sized_scroll_area(&self, ui: &mut egui::Ui, add_contents: impl FnOnce(&mut egui::Ui) -> ()) {
-        egui::ScrollArea::auto_sized().show(ui, add_contents);
+    pub fn render_auto_sized_scroll_area(&self, id: &str, ui: &mut egui::Ui, add_contents: impl FnOnce(&mut egui::Ui) -> ()) {
+        egui::ScrollArea::auto_sized().id_source(id).show(ui, add_contents);
     }
 
-    pub fn render_max_height_scroll_area(&self, height: f32, ui: &mut egui::Ui, add_contents: impl FnOnce(&mut egui::Ui) -> ()) {
-        egui::ScrollArea::from_max_height(height).show(ui, add_contents);        
+    pub fn render_max_height_scroll_area(&self, id: &str, height: f32, ui: &mut egui::Ui, add_contents: impl FnOnce(&mut egui::Ui) -> ()) {
+        egui::ScrollArea::from_max_height(height).id_source(id).show(ui, add_contents);        
     }
 
     pub fn render_horizontal(&self, ui: &mut egui::Ui, add_contents: impl FnOnce(&mut egui::Ui) -> ()) {
@@ -78,4 +82,21 @@ impl EguiRenderer {
     pub fn render_label(&self, ui: &mut egui::Ui, text: &str) {
         ui.label(text);
     }
+
+    pub fn render_selectable_label(&self, ui: &mut egui::Ui, text: &str, selected: bool) {
+        ui.selectable_label(selected, text);
+    }
+
+    pub fn render_monospace(&self, ui: &mut egui::Ui, text: &str) {
+        ui.monospace(text);
+    }
+
+    pub fn render_code(&self, ui: &mut egui::Ui, text: &str) {
+        ui.code(text);
+    }
+
+    pub fn render_heading(&self, ui: &mut egui::Ui, text: &str) {
+        ui.heading(text);
+    }
 }
+

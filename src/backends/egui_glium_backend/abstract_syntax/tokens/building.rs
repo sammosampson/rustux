@@ -45,33 +45,35 @@ fn match_control_name(control_name: &str) -> AbstractSyntaxTokenType {
         "root" => AbstractSyntaxTokenType::Root,
         "side-bar" => AbstractSyntaxTokenType::Sidebar,
         "scroll-area" => AbstractSyntaxTokenType::ScrollArea,
+        "separator" => AbstractSyntaxTokenType::Separator,
         "horizontal" => AbstractSyntaxTokenType::Horizontal,
         "vertical" => AbstractSyntaxTokenType::Vertical,
         "label" => AbstractSyntaxTokenType::Label,
+        "selectable-label" => AbstractSyntaxTokenType::SelectableLabel,
+        "heading" => AbstractSyntaxTokenType::Heading,
+        "monospace" => AbstractSyntaxTokenType::Monospace,
+        "code" => AbstractSyntaxTokenType::Code,
         _ => AbstractSyntaxTokenType::Unknown
     }
 }
 
-fn match_property_value(property_name: &str, value: &SourceTokenPropertyValue) -> Result<AbstractSyntaxTokenProperty, AbstractSyntaxTokenError> {
+fn match_property_value(property_name: &str, property_value: &SourceTokenPropertyValue) -> Result<AbstractSyntaxTokenProperty, AbstractSyntaxTokenError> {
     match property_name {
-        "name" => {
-            match value {
-                SourceTokenPropertyValue::String(v) => Ok(AbstractSyntaxTokenProperty::Name(v.clone())),
+        "id" => {
+            match property_value {
+                SourceTokenPropertyValue::String(value) => Ok(AbstractSyntaxTokenProperty::Id(value.clone())),
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
         },
         "text" => {
-            match value {
-                SourceTokenPropertyValue::String(v) => Ok(AbstractSyntaxTokenProperty::Text(v.clone())),
+            match property_value {
+                SourceTokenPropertyValue::String(value) => Ok(AbstractSyntaxTokenProperty::Text(value.clone())),
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
         },
-        "left" => Ok(AbstractSyntaxTokenProperty::HorizontalOrientation(HorizontalOrientation::Left)),
-        "right" => Ok(AbstractSyntaxTokenProperty::HorizontalOrientation(HorizontalOrientation::Right)),
-        "auto-sized" => Ok(AbstractSyntaxTokenProperty::VerticallySized(VerticalSize::Auto)),
         "max-height" => {
-            match value {
-                SourceTokenPropertyValue::Float(v) => Ok(AbstractSyntaxTokenProperty::VerticallySized(VerticalSize::MaxHeight(*v as f32))),
+            match property_value {
+                SourceTokenPropertyValue::Float(value) => Ok(AbstractSyntaxTokenProperty::VerticallySized(VerticalSize::MaxHeight(*value as f32))),
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
         },
@@ -80,8 +82,8 @@ fn match_property_value(property_name: &str, value: &SourceTokenPropertyValue) -
 }
 
 fn match_property_only(property_name: &str) -> Option<AbstractSyntaxTokenProperty> {
-    println!("{:?}", property_name);
     match property_name {
+        "selected" => Some(AbstractSyntaxTokenProperty::Selected(true)),
         "left" => Some(AbstractSyntaxTokenProperty::HorizontalOrientation(HorizontalOrientation::Left)),
         "right" => Some(AbstractSyntaxTokenProperty::HorizontalOrientation(HorizontalOrientation::Right)),
         "auto-sized" => Some(AbstractSyntaxTokenProperty::VerticallySized(VerticalSize::Auto)),

@@ -61,13 +61,25 @@ impl<'a> AbstractSyntaxTreeRenderer<'a> {
     pub fn render_child(&self, ui: &mut egui::Ui, ast: &AbstractSyntaxTree, child: &AbstractSyntaxTreeNode) {
         match child.node_type() {
             AbstractSyntaxTokenType::ScrollArea => 
-                self.renderer.render_scroll_area(get_vertical_size_property(child.properties()), ui, | ui | self.render_children(ui, ast, child)),
+                self.renderer.render_scroll_area(
+                    get_name_property(child.properties()),
+                get_vertical_size_property(child.properties()), ui, | ui | self.render_children(ui, ast, child)),
+            AbstractSyntaxTokenType::Separator => 
+                self.renderer.render_separator(ui),
             AbstractSyntaxTokenType::Horizontal => 
                 self.renderer.render_horizontal(ui, | ui | self.render_children(ui, ast, child)),
             AbstractSyntaxTokenType::Vertical => 
                 self.renderer.render_vertical(ui, | ui | self.render_children(ui, ast, child)),
             AbstractSyntaxTokenType::Label => 
                 self.renderer.render_label(ui, get_text_property(child.properties())),
+            AbstractSyntaxTokenType::SelectableLabel => 
+                self.renderer.render_selectable_label(ui, get_text_property(child.properties()), get_selected_property(child.properties())),
+            AbstractSyntaxTokenType::Heading => 
+                self.renderer.render_heading(ui, get_text_property(child.properties())),
+            AbstractSyntaxTokenType::Monospace => 
+                self.renderer.render_monospace(ui, get_text_property(child.properties())),
+            AbstractSyntaxTokenType::Code => 
+                self.renderer.render_code(ui, get_text_property(child.properties())),
             _ => {}
         }
     }
@@ -76,7 +88,7 @@ impl<'a> AbstractSyntaxTreeRenderer<'a> {
 fn get_name_property(properties: &[AbstractSyntaxTokenProperty]) -> &str {
     for property in properties {
         match property {
-            AbstractSyntaxTokenProperty::Name(value) => return value,
+            AbstractSyntaxTokenProperty::Id(value) => return value,
             _ => {}
         }
     }
@@ -93,6 +105,17 @@ fn get_text_property(properties: &[AbstractSyntaxTokenProperty]) -> &str {
     }
 
     return "";
+}
+
+fn get_selected_property(properties: &[AbstractSyntaxTokenProperty]) -> bool {
+    for property in properties {
+        match property {
+            AbstractSyntaxTokenProperty::Selected(value) => return *value,
+            _ => {}
+        }
+    }
+
+    return false;
 }
 
 fn get_horizontal_orientation_property(properties: &[AbstractSyntaxTokenProperty]) -> HorizontalOrientation {

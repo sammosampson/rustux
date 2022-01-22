@@ -22,7 +22,12 @@ pub enum AbstractSyntaxTokenType {
     Horizontal,
     Vertical,
     ScrollArea,
-    Label
+    Separator,
+    Label,
+    SelectableLabel,
+    Heading,
+    Monospace,
+    Code
 }
 
 impl Default for AbstractSyntaxTokenType {
@@ -33,8 +38,9 @@ impl Default for AbstractSyntaxTokenType {
 
 #[derive(Debug, Clone)]
 pub enum AbstractSyntaxTokenProperty {
-    Name(String),
+    Id(String),
     Text(String),
+    Selected(bool),
     HorizontalOrientation(HorizontalOrientation),
     VerticallySized(VerticalSize)
 }
