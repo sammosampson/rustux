@@ -1,8 +1,8 @@
 mod screen;
-mod egui_render;
+mod abstract_syntax;
 
 pub use screen::*;
-pub use egui_render::*;
+pub use abstract_syntax::*;
 
 pub use glium:: {
     Frame,

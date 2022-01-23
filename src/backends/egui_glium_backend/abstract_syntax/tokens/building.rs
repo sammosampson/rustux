@@ -43,7 +43,11 @@ impl SourceTokenVisitor for BuildAbstractSyntaxSourceTokenVisitor {
 fn match_control_name(control_name: &str) -> AbstractSyntaxTokenType {
     match control_name {
         "root" => AbstractSyntaxTokenType::Root,
-        "side-bar" => AbstractSyntaxTokenType::Sidebar,
+        "central-panel" => AbstractSyntaxTokenType::CentralPanel,
+        "top-panel" => AbstractSyntaxTokenType::TopPanel,
+        "bottom-panel" => AbstractSyntaxTokenType::BottomPanel,
+        "left-side-bar" => AbstractSyntaxTokenType::LeftSidebar,
+        "right-side-bar" => AbstractSyntaxTokenType::RightSidebar,
         "scroll-area" => AbstractSyntaxTokenType::ScrollArea,
         "separator" => AbstractSyntaxTokenType::Separator,
         "horizontal" => AbstractSyntaxTokenType::Horizontal,
@@ -71,6 +75,29 @@ fn match_property_value(property_name: &str, property_value: &SourceTokenPropert
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
         },
+        "default-width" => {
+            match property_value {
+                SourceTokenPropertyValue::Float(value) => Ok(AbstractSyntaxTokenProperty::DefaultWidth(*value as f32)),
+                _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
+            }
+        },
+        "default-height" => {
+            match property_value {
+                SourceTokenPropertyValue::Float(value) => Ok(AbstractSyntaxTokenProperty::DefaultHeight(*value as f32)),
+                _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
+            }
+        },
+        "height-range" => {
+            match property_value {
+                SourceTokenPropertyValue::Tuple(value) => {
+                    match collect_tuple_floats(value, 2) {
+                        Ok(range) => Ok(AbstractSyntaxTokenProperty::HeightRange(values.into())),
+                        Err(error) => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())),
+                    }
+                },
+                _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
+            }
+        },
         "max-height" => {
             match property_value {
                 SourceTokenPropertyValue::Float(value) => Ok(AbstractSyntaxTokenProperty::VerticallySized(VerticalSize::MaxHeight(*value as f32))),
@@ -84,8 +111,7 @@ fn match_property_value(property_name: &str, property_value: &SourceTokenPropert
 fn match_property_only(property_name: &str) -> Option<AbstractSyntaxTokenProperty> {
     match property_name {
         "selected" => Some(AbstractSyntaxTokenProperty::Selected(true)),
-        "left" => Some(AbstractSyntaxTokenProperty::HorizontalOrientation(HorizontalOrientation::Left)),
-        "right" => Some(AbstractSyntaxTokenProperty::HorizontalOrientation(HorizontalOrientation::Right)),
+        "resizable" => Some(AbstractSyntaxTokenProperty::Resizable(true)),
         "auto-sized" => Some(AbstractSyntaxTokenProperty::VerticallySized(VerticalSize::Auto)),
         _ => None 
     }

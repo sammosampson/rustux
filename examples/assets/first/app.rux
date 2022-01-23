@@ -1,5 +1,8 @@
 <root>
-    <side-bar left id="b1">
+    <top-panel id="top-panel" />
+    <bottom-panel id="bottom-panel" />
+    <central-panel />
+    <left-side-bar id="b1">
         <horizontal>
             <label text="1"/>
             <label text="2"/>
@@ -11,8 +14,8 @@
             <monospace text="2"/>
             <code text="3"/>
         </vertical>
-    </side-bar>
-    <side-bar right id="b2">
+    </left-side-bar>
+    <right-side-bar id="b2">
         <vertical>
             <separator />
             <scroll-area id="s1" max-height=100.0 >
@@ -38,5 +41,5 @@
             </scroll-area>
             <separator />
         </vertical>
-    </side-bar>
+    </right-side-bar>
 </root>

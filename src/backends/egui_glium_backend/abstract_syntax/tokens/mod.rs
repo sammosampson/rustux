@@ -18,7 +18,11 @@ pub enum AbstractSyntaxTokenError {
 pub enum AbstractSyntaxTokenType {
     Unknown,
     Root,
-    Sidebar,
+    CentralPanel,
+    TopPanel,
+    BottomPanel,
+    LeftSidebar,
+    RightSidebar,
     Horizontal,
     Vertical,
     ScrollArea,
@@ -41,14 +45,32 @@ pub enum AbstractSyntaxTokenProperty {
     Id(String),
     Text(String),
     Selected(bool),
-    HorizontalOrientation(HorizontalOrientation),
+    Resizable(bool),
+    DefaultWidth(f32),
+    DefaultHeight(f32),
+    WidthRange(FloatRange),
+    HeightRange(FloatRange),
     VerticallySized(VerticalSize)
 }
 
-#[derive(Debug, Clone, Copy)]
-pub enum HorizontalOrientation {
-    Left,
-    Right
+#[derive(Debug, Clone)]
+pub struct FloatRange(RangeInclusive<f32>);
+
+impl Deref for FloatRange {
+    type Target = RangeInclusive<f32>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl FloatRange {
+    pub fn parse(value: &str) -> Result<FloatRange, SpecificCollectionError> {
+        match collect_tuple_floats(value, 2) {
+            Ok(values) => Ok(FloatRange(RangeInclusive::new(values[0], values[1]))),
+            Err(err) => Err(err)
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy)]

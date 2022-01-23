@@ -46,7 +46,7 @@ impl Application {
         let file_paths = create_file_paths(self.relative_rux_folder_path);
         let event_loop = create_system_event_loop();
         let screen_renderer = create_screen_renderer(&event_loop)?;
-        let egui_renderer = create_egui_renderer(&screen_renderer.display);
+        let egui_renderer = create_ast_renderer(&screen_renderer.display);
     
         resources.insert(create_system_event_channel());
         resources.insert(file_paths);
@@ -94,7 +94,7 @@ impl ApplicationRunner {
     fn process_events(&mut self) {
         let mut event_producer = &mut self.resources.get_mut::<SystemEventProducer>().unwrap();
         let mut event_channel = &mut self.resources.get_mut::<SystemEventChannel>().unwrap();
-        let mut editor_renderer = &mut self.resources.get_mut::<EguiRenderer>().unwrap();
+        let mut editor_renderer = &mut self.resources.get_mut::<AbstractSyntaxTreeRenderer>().unwrap();
         
         self.event_loop.run(
             &mut event_producer,

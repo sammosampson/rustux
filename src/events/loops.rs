@@ -19,13 +19,13 @@ impl SystemEventLoop {
         &mut self,
         event_producer: &mut SystemEventProducer,
         event_channel: &mut SystemEventChannel,
-        editor_renderer: &mut EguiRenderer,
+        ast_renderer: &mut AbstractSyntaxTreeRenderer,
         
     ) {
         self.inner.run_return(|event, _, flow| {
             match event {
                 Event::WindowEvent { window_id: _, event} => {
-                    editor_renderer.process_event(&event);
+                    ast_renderer.process_event(&event);
                     match event {
                         WindowEvent::CloseRequested => event_producer.push(SystemEvent::CloseRequested),
                         _ => {} 

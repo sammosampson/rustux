@@ -1,3 +1,5 @@
+use crate::prelude::*;
+
 use std::iter::Enumerate;
 use std::str::Chars;
 
@@ -24,6 +26,11 @@ enum TupleState {
 pub enum TupleTokenError<'a> {
     TupleError(&'a str, usize, char),
     ValueError(&'a str, usize, &'a str),
+}
+
+pub fn collect_tuple_floats(from: &str, amount: usize) -> Result<Vec::<f32>, SpecificCollectionError> {
+    let tuple_tokenizer = TupleTokenizer::from_string(from);
+    TupleTokenFloatIterator::from_iterator(tuple_tokenizer).collect_specific_amount(amount)
 }
 
 impl<'a> TupleTokenError<'a> {
