@@ -23,14 +23,25 @@ impl AbstractSyntaxTreeRenderer {
             .show(self.egui.ctx(), contents);
     }
 
-    pub fn render_top_panel(&self, id: &str, contents: impl FnOnce(&mut egui::Ui) -> ()) {
-        egui::TopBottomPanel::top(id)
-            .show(self.egui.ctx(), contents);
+    pub fn render_top_panel(&self, props: TopBottomPanelProperties, contents: impl FnOnce(&mut egui::Ui) -> ()) {
+        self.render_top_bottom_panel(&props, egui::TopBottomPanel::top(&props.id), contents);
     }
 
-    pub fn render_bottom_panel(&self, id: &str, contents: impl FnOnce(&mut egui::Ui) -> ()) {
-        egui::TopBottomPanel::bottom(id)
-            .resizable(false)
+    pub fn render_bottom_panel(&self, props: TopBottomPanelProperties, contents: impl FnOnce(&mut egui::Ui) -> ()) {
+        self.render_top_bottom_panel(&props, egui::TopBottomPanel::bottom(&props.id), contents);
+    }
+
+    fn render_top_bottom_panel(
+        &self,
+        props: &TopBottomPanelProperties,
+        mut panel: egui::TopBottomPanel,
+        contents: impl FnOnce(&mut egui::Ui)
+    ) {
+        if let Some(default_height) = props.default_height {
+            panel = panel.default_height(default_height)
+        }
+        panel
+            .height_range(props.height_range.clone())
             .show(self.egui.ctx(), contents);
     }
 }
@@ -61,7 +72,7 @@ impl From<&Vec<AbstractSyntaxTokenProperty>> for TopBottomPanelProperties {
                 AbstractSyntaxTokenProperty::Id(value) => to.id = value.clone(),
                 AbstractSyntaxTokenProperty::Resizable(value) => to.resizable = *value,
                 AbstractSyntaxTokenProperty::DefaultHeight(value) => to.default_height = Some(*value),
-                AbstractSyntaxTokenProperty::HeightRange(value) => to.height_range = **value,
+                AbstractSyntaxTokenProperty::HeightRange(value) => to.height_range = RangeInclusive::<f32>::from(value),
                 _ => {}
             }
         }
@@ -95,7 +106,7 @@ impl From<&Vec<AbstractSyntaxTokenProperty>> for SidePanelProperties {
                 AbstractSyntaxTokenProperty::Id(value) => to.id = value.clone(),
                 AbstractSyntaxTokenProperty::Resizable(value) => to.resizable = *value,
                 AbstractSyntaxTokenProperty::DefaultWidth(value) => to.default_width = *value,
-                AbstractSyntaxTokenProperty::WidthRange(value) => to.width_range = value.clone(),
+                AbstractSyntaxTokenProperty::WidthRange(value) => to.width_range = RangeInclusive::<f32>::from(value),
                 _ => {}
             }
         }

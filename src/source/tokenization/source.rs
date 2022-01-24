@@ -17,7 +17,8 @@ pub enum SourceTokenPropertyValue {
     Int(i128),
     UnsignedInt(u128),
     Float(f64), 
-    Tuple(String)
+    Tuple(String), 
+    Code(String)
 }
 
 #[derive(PartialEq, PartialOrd, Debug)]
@@ -40,6 +41,7 @@ enum State {
     InUnsignedNumberPropertyValue(usize),
     InSignedNumberPropertyValue(usize),
     InTuplePropertyValue(usize),
+    InCodePropertyValue(usize),
     StartPropertyValue,
     InWhitespace
 } 
@@ -115,6 +117,9 @@ impl<'a> SourceTokenizer<'a> {
             },
             State::InTuplePropertyValue(start) => {
                 self.handle_inside_tuple_property_value(start, index, character)
+            },
+            State::InCodePropertyValue(start) => {
+                self.handle_inside_code_property_value(start, index, character)
             },
             State::InWhitespace => {
                 self.handle_inside_whitespace(index, character)
@@ -212,6 +217,10 @@ impl<'a> SourceTokenizer<'a> {
             self.state = State::InTuplePropertyValue(index);
             return None;
         }
+        if character == '{' {
+            self.state = State::InCodePropertyValue(index);
+            return None;
+        }
         Some(Err(SourceTokenError::CouldNotFindPropertyStartSymbol(index)))
     }  
 
@@ -245,6 +254,10 @@ impl<'a> SourceTokenizer<'a> {
     fn produce_tuple_property_value_result(&mut self, start: usize, index: usize) -> SourceTokenOption {
         Some(Ok(SourceToken::PropertyValue(SourceTokenPropertyValue::Tuple(String::from(self.splice_input(start, index))))))
     }
+
+    fn produce_code_property_value_result(&mut self, start: usize, index: usize) -> SourceTokenOption {
+        Some(Ok(SourceToken::PropertyValue(SourceTokenPropertyValue::Code(String::from(self.splice_input(start, index))))))
+    }
     
     fn handle_inside_string_property_value(&mut self, start: usize, index: usize, character: char)  -> SourceTokenOption {
         if character == '"' {
@@ -274,6 +287,14 @@ impl<'a> SourceTokenizer<'a> {
         if character == ')' {
             self.state = State::InWhitespace;
             return self.produce_tuple_property_value_result(start, index + 1);
+        }
+        None
+    }
+
+    fn handle_inside_code_property_value(&mut self, start: usize, index: usize, character: char)  -> SourceTokenOption {
+        if character == '}' {
+            self.state = State::InWhitespace;
+            return self.produce_code_property_value_result(start, index + 1);
         }
         None
     }
@@ -519,6 +540,16 @@ fn property_with_tuple_value_produces_property_and_value_result_inside_control()
     assert_eq!(SourceToken::Control(String::from("rect")), tokenizer.next().unwrap().unwrap());
     assert_eq!(SourceToken::Property(String::from("size")), tokenizer.next().unwrap().unwrap());
     assert_eq!(SourceToken::PropertyValue(SourceTokenPropertyValue::Tuple(String::from("(1.0, 1.0)"))), tokenizer.next().unwrap().unwrap());
+    assert_eq!(SourceToken::EndControl(String::from("rect")), tokenizer.next().unwrap().unwrap());
+    assert_eq!(None, tokenizer.next());
+}
+
+#[test]
+fn property_with_code_value_produces_property_and_value_result_inside_control() {
+    let mut tokenizer = SourceTokenizer::from_string("<rect on-click={click_it(1)} />");
+    assert_eq!(SourceToken::Control(String::from("rect")), tokenizer.next().unwrap().unwrap());
+    assert_eq!(SourceToken::Property(String::from("on-click")), tokenizer.next().unwrap().unwrap());
+    assert_eq!(SourceToken::PropertyValue(SourceTokenPropertyValue::Code(String::from("{click_it(1)}"))), tokenizer.next().unwrap().unwrap());
     assert_eq!(SourceToken::EndControl(String::from("rect")), tokenizer.next().unwrap().unwrap());
     assert_eq!(None, tokenizer.next());
 }

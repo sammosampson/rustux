@@ -33,6 +33,11 @@ pub fn collect_tuple_floats(from: &str, amount: usize) -> Result<Vec::<f32>, Spe
     TupleTokenFloatIterator::from_iterator(tuple_tokenizer).collect_specific_amount(amount)
 }
 
+pub fn collect_tuple_unsigned_shorts(from: &str, amount: usize) -> Result<Vec::<u16>, SpecificCollectionError> {
+    let tuple_tokenizer = TupleTokenizer::from_string(from);
+    TupleTokenUnsignedShortIterator::from_iterator(tuple_tokenizer).collect_specific_amount(amount)
+}
+
 impl<'a> TupleTokenError<'a> {
     pub fn could_not_find_opening_parentheses(index: usize, character: char) -> Self {
         TupleTokenError::TupleError("could not find opening parentheses '('", index, character)

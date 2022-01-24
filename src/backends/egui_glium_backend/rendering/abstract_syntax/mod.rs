@@ -54,9 +54,9 @@ impl AbstractSyntaxTreeRenderer {
             AbstractSyntaxTokenType::CentralPanel =>
                 self.render_central_panel(| ui | self.render_children(ui, ast, node)),
             AbstractSyntaxTokenType::TopPanel =>
-                self.render_top_panel(get_name_property(node.properties()), | ui | self.render_children(ui, ast, node)),
+                self.render_top_panel(node.properties().into(), | ui | self.render_children(ui, ast, node)),
             AbstractSyntaxTokenType::BottomPanel =>
-                self.render_bottom_panel(get_name_property(node.properties()), | ui | self.render_children(ui, ast, node)),
+                self.render_bottom_panel(node.properties().into(), | ui | self.render_children(ui, ast, node)),
             AbstractSyntaxTokenType::LeftSidebar =>
                 self.render_left_side_panel(node.properties().into(), | ui | self.render_children(ui, ast, node)),
             AbstractSyntaxTokenType::RightSidebar =>
@@ -84,15 +84,17 @@ impl AbstractSyntaxTreeRenderer {
             AbstractSyntaxTokenType::Vertical => 
                 self.render_vertical(ui, | ui | self.render_children(ui, ast, child)),
             AbstractSyntaxTokenType::Label => 
-                self.render_label(ui, get_text_property(child.properties())),
+                self.render_label(ui, child.properties().into()),
+            AbstractSyntaxTokenType::ColouredLabel => 
+                self.render_coloured_label(ui, child.properties().into()),
             AbstractSyntaxTokenType::SelectableLabel => 
-                self.render_selectable_label(ui, get_text_property(child.properties()), get_selected_property(child.properties())),
+                self.render_selectable_label(ui, child.properties().into()),
             AbstractSyntaxTokenType::Heading => 
-                self.render_heading(ui, get_text_property(child.properties())),
+                self.render_heading(ui, child.properties().into()),
             AbstractSyntaxTokenType::Monospace => 
-                self.render_monospace(ui, get_text_property(child.properties())),
+                self.render_monospace(ui, child.properties().into()),
             AbstractSyntaxTokenType::Code => 
-                self.render_code(ui, get_text_property(child.properties())),
+                self.render_code(ui, child.properties().into()),
             _ => {}
         }
     }

@@ -53,6 +53,7 @@ fn match_control_name(control_name: &str) -> AbstractSyntaxTokenType {
         "horizontal" => AbstractSyntaxTokenType::Horizontal,
         "vertical" => AbstractSyntaxTokenType::Vertical,
         "label" => AbstractSyntaxTokenType::Label,
+        "coloured-label" => AbstractSyntaxTokenType::ColouredLabel,
         "selectable-label" => AbstractSyntaxTokenType::SelectableLabel,
         "heading" => AbstractSyntaxTokenType::Heading,
         "monospace" => AbstractSyntaxTokenType::Monospace,
@@ -89,13 +90,37 @@ fn match_property_value(property_name: &str, property_value: &SourceTokenPropert
         },
         "height-range" => {
             match property_value {
-                SourceTokenPropertyValue::Tuple(value) => {
-                    match collect_tuple_floats(value, 2) {
-                        Ok(range) => Ok(AbstractSyntaxTokenProperty::HeightRange(values.into())),
-                        Err(error) => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())),
-                    }
-                },
+                SourceTokenPropertyValue::Tuple(value) => 
+                    Ok(AbstractSyntaxTokenProperty::HeightRange(FloatRange::parse(value)?)),
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
+            }
+        },
+        "width-range" => {
+            match property_value {
+                SourceTokenPropertyValue::Tuple(value) => 
+                    Ok(AbstractSyntaxTokenProperty::WidthRange(FloatRange::parse(value)?)),
+                _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
+            }
+        },
+        "colour" => {
+            match property_value {
+                SourceTokenPropertyValue::Tuple(value) => 
+                    Ok(AbstractSyntaxTokenProperty::Colour(Colour::parse(value)?)),
+                _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
+            }
+        },
+        "background-colour" => {
+            match property_value {
+                SourceTokenPropertyValue::Tuple(value) => 
+                    Ok(AbstractSyntaxTokenProperty::BackgroundColour(Colour::parse(value)?)),
+                _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
+            }
+        },
+        "text-style" => {
+            match property_value {
+                SourceTokenPropertyValue::String(value)
+                    => Ok(AbstractSyntaxTokenProperty::TextStyle(TextStyle::parse(value)?)),
+                _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string()))
             }
         },
         "max-height" => {
@@ -112,6 +137,14 @@ fn match_property_only(property_name: &str) -> Option<AbstractSyntaxTokenPropert
     match property_name {
         "selected" => Some(AbstractSyntaxTokenProperty::Selected(true)),
         "resizable" => Some(AbstractSyntaxTokenProperty::Resizable(true)),
+        "wrap" => Some(AbstractSyntaxTokenProperty::Wrap(true)),
+        "code" => Some(AbstractSyntaxTokenProperty::Code(true)),
+        "strong" => Some(AbstractSyntaxTokenProperty::Strong(true)),
+        "weak" => Some(AbstractSyntaxTokenProperty::Weak(true)),
+        "strike-through" => Some(AbstractSyntaxTokenProperty::Strikethrough(true)),
+        "underline" => Some(AbstractSyntaxTokenProperty::Underline(true)),
+        "italics" => Some(AbstractSyntaxTokenProperty::Italics(true)),
+        "raised" => Some(AbstractSyntaxTokenProperty::Raised(true)),
         "auto-sized" => Some(AbstractSyntaxTokenProperty::VerticallySized(VerticalSize::Auto)),
         _ => None 
     }
