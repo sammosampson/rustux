@@ -16,7 +16,7 @@ pub enum SourceTokenPropertyValue {
     String(String),
     Int(i128),
     UnsignedInt(u128),
-    Float(f64),
+    Float(f64), 
     Tuple(String)
 }
 
