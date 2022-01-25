@@ -31,7 +31,7 @@
             </scroll-area>
             <separator />
             <scroll-area id="scroll-area2" max-height=100.0 >
-                <selectable-label text="selectable-label4" selected on-select={select_item(1)} />
+                <selectable-label text="selectable-label4" selected on-select={ruxy::examples::first::select_item(1)} />
                 <selectable-label text="selectable-label5" selected on-select={select_item(2)} />
                 <selectable-label text="selectable-label6" selected on-select={select_item(3)} />
                 <selectable-label text="selectable-label7" selected on-select={select_item(4)} />

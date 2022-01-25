@@ -49,7 +49,7 @@ impl AbstractSyntaxTreeRenderer {
     }
 
     pub fn render_selectable_label(&self, ui: &mut egui::Ui, props: SelectableLabelProperties) {
-        ui.selectable_label(props.selected, props.text);
+        let selectable_label = ui.selectable_label(props.selected, props.text);
     }
 
     pub fn render_monospace(&self, ui: &mut egui::Ui, props: MonospaceProperties) {

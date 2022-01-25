@@ -3,7 +3,8 @@ mod systems;
 mod events;
 mod source;
 mod backends;
-
+mod state;
+mod examples;
 
 mod prelude {
     pub use log::{debug,info}; 
@@ -21,11 +22,16 @@ mod prelude {
     pub use crate::events::*;
     pub use crate::source::*;
     pub use crate::backends::*;
+    pub use crate::state::*;
 }
 
 use crate::prelude::*;
 
 fn main() {
+    let mut ctx = StateContext;
+    examples::first::register_actions(&mut ctx);
+
+    /*
     Application::default()
         .use_logging()
         .with_file_path("examples/assets/first")
@@ -33,4 +39,6 @@ fn main() {
         .build()
         .expect("Build error")
         .run();
+    */
+
 }

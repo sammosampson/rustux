@@ -66,7 +66,8 @@ pub enum AbstractSyntaxTokenProperty {
     HeightRange(FloatRange),
     VerticallySized(VerticalSize), 
     Colour(Colour), 
-    BackgroundColour(Colour)
+    BackgroundColour(Colour),
+    OnClick(ActionPointer)
 }
 
 #[derive(Debug, Clone)]

@@ -25,7 +25,7 @@ pub fn build_schedule() -> Schedule {
         .add_system(recurisve_source_location_build_system())
         .add_thread_local(source_file_monitoring_system())
         .flush()
-        .add_system(source_token_removal_system())
+        .add_thread_local(source_token_removal_system())
         .add_thread_local(source_parse_system())
         .flush()
         .add_thread_local(render_system())
