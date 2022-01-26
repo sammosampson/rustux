@@ -90,28 +90,28 @@ fn match_property_value(property_name: &str, property_value: &SourceTokenPropert
         },
         "height-range" => {
             match property_value {
-                SourceTokenPropertyValue::Tuple(value) => 
+                SourceTokenPropertyValue::Array(value) => 
                     Ok(AbstractSyntaxTokenProperty::HeightRange(FloatRange::parse(value)?)),
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
         },
         "width-range" => {
             match property_value {
-                SourceTokenPropertyValue::Tuple(value) => 
+                SourceTokenPropertyValue::Array(value) => 
                     Ok(AbstractSyntaxTokenProperty::WidthRange(FloatRange::parse(value)?)),
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
         },
         "colour" => {
             match property_value {
-                SourceTokenPropertyValue::Tuple(value) => 
+                SourceTokenPropertyValue::Array(value) => 
                     Ok(AbstractSyntaxTokenProperty::Colour(Colour::parse(value)?)),
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
         },
         "background-colour" => {
             match property_value {
-                SourceTokenPropertyValue::Tuple(value) => 
+                SourceTokenPropertyValue::Array(value) => 
                     Ok(AbstractSyntaxTokenProperty::BackgroundColour(Colour::parse(value)?)),
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
@@ -126,6 +126,18 @@ fn match_property_value(property_name: &str, property_value: &SourceTokenPropert
         "max-height" => {
             match property_value {
                 SourceTokenPropertyValue::Float(value) => Ok(AbstractSyntaxTokenProperty::VerticallySized(VerticalSize::MaxHeight(*value as f32))),
+                _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
+            }
+        },
+        "scroll_offset" => {
+            match property_value {
+                SourceTokenPropertyValue::Float(value) => Ok(AbstractSyntaxTokenProperty::ScrollOffset(*value as f32)),
+                _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
+            }
+        },
+        "on-select" => {
+            match property_value {
+                SourceTokenPropertyValue::Code(value) => Ok(AbstractSyntaxTokenProperty::OnSelect(ActionFunction::parse(value)?)),
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
         },
@@ -146,6 +158,8 @@ fn match_property_only(property_name: &str) -> Option<AbstractSyntaxTokenPropert
         "italics" => Some(AbstractSyntaxTokenProperty::Italics(true)),
         "raised" => Some(AbstractSyntaxTokenProperty::Raised(true)),
         "auto-sized" => Some(AbstractSyntaxTokenProperty::VerticallySized(VerticalSize::Auto)),
+        "always_show_scroll" => Some(AbstractSyntaxTokenProperty::AlwaysShowScroll(true)),
+        "enable_scrolling" => Some(AbstractSyntaxTokenProperty::EnableScrolling(true)),
         _ => None 
     }
 }

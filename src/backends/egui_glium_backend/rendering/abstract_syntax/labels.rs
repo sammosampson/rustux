@@ -48,8 +48,11 @@ impl AbstractSyntaxTreeRenderer {
         ui.colored_label(props.colour, props.text);
     }
 
-    pub fn render_selectable_label(&self, ui: &mut egui::Ui, props: SelectableLabelProperties) {
-        let selectable_label = ui.selectable_label(props.selected, props.text);
+    pub fn render_selectable_label(&self, ui: &mut egui::Ui, context: &mut StateContext, props: SelectableLabelProperties) {
+        let response = ui.selectable_label(props.selected, props.text);
+        if response.clicked() {
+            context.run_action_function(&props.on_selected);
+        }
     }
 
     pub fn render_monospace(&self, ui: &mut egui::Ui, props: MonospaceProperties) {
@@ -150,18 +153,11 @@ impl From<&Vec<AbstractSyntaxTokenProperty>> for ColouredLabelProperties {
     }
 }
 
+#[derive(Default)]
 pub struct SelectableLabelProperties {
     pub text: String,
-    pub selected: bool
-}
-
-impl Default for SelectableLabelProperties {
-    fn default() -> Self {
-        Self { 
-            text: "".to_string(),
-            selected: false,
-        }
-    }
+    pub selected: bool,
+    pub on_selected: ActionFunction
 }
 
 impl From<&Vec<AbstractSyntaxTokenProperty>> for SelectableLabelProperties {
@@ -171,6 +167,7 @@ impl From<&Vec<AbstractSyntaxTokenProperty>> for SelectableLabelProperties {
             match property {
                 AbstractSyntaxTokenProperty::Text(value) => to.text = value.clone(),
                 AbstractSyntaxTokenProperty::Selected(value) => to.selected = *value,
+                AbstractSyntaxTokenProperty::OnSelect(value) => to.on_selected = value.clone(),
                 _ => {}
             }
         }

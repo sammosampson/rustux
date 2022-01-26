@@ -5,8 +5,7 @@ pub enum Actions {
 }
 
 pub fn register_actions(ctx: &mut StateContext) {
-    let module_path= module_path!();
-    ctx.register_action(ActionsSelectItemActionContainer::default(), | arg_0 | Actions::SelectItem(arg_0));
+    ctx.register_action(ActionsSelectItemActionContainer::default());
 }
 
 pub struct ActionsSelectItemActionContainer {
@@ -16,5 +15,11 @@ pub struct ActionsSelectItemActionContainer {
 impl Default for ActionsSelectItemActionContainer {
     fn default() -> Self {
         Self { path: format!("{}::select_item", module_path!()) }
+    }
+}
+
+impl ActionContainer for ActionsSelectItemActionContainer {
+    fn path(&self) -> &str {
+        &self.path
     }
 }

@@ -29,66 +29,64 @@ impl AbstractSyntaxTreeRenderer {
         self.egui.on_event(event);
     }
    
-    pub fn render(&mut self, ast: &AbstractSyntaxTree, display: &Display, frame: &mut Frame) -> bool {
+    pub fn render(&mut self, context: &mut StateContext, ast: &AbstractSyntaxTree, display: &Display, frame: &mut Frame) -> bool {
         if let Some(root) = ast.get_root() {
-            return self.render_root(ast, root, display, frame);
+            return self.render_root(context, ast, root, display, frame);
         }
         false     
     }
 
-    pub fn render_root(&mut self, ast: &AbstractSyntaxTree, root: &AbstractSyntaxTreeNode, display: &Display, frame: &mut Frame) -> bool {
+    pub fn render_root(&mut self, context: &mut StateContext, ast: &AbstractSyntaxTree, root: &AbstractSyntaxTreeNode, display: &Display, frame: &mut Frame) -> bool {
         self.begin_frame(display);
         self.set_visuals();
-        self.render_top_levels(ast, ast.get_children(root));
+        self.render_top_levels(context, ast, ast.get_children(root));
         self.end_frame_and_paint(display, frame)
     }
 
-    fn render_top_levels(&self, ast: &AbstractSyntaxTree, children: Vec<&AbstractSyntaxTreeNode>) {
+    fn render_top_levels(&self, context: &mut StateContext, ast: &AbstractSyntaxTree, children: Vec<&AbstractSyntaxTreeNode>) {
         for child in children {
-            self.render_top_level(ast, child)
+            self.render_top_level(context, ast, child)
         }
     }
 
-    fn render_top_level(&self, ast: &AbstractSyntaxTree, node: &AbstractSyntaxTreeNode) {
+    fn render_top_level(&self, context: &mut StateContext, ast: &AbstractSyntaxTree, node: &AbstractSyntaxTreeNode) {
         match node.node_type() {
             AbstractSyntaxTokenType::CentralPanel =>
-                self.render_central_panel(| ui | self.render_children(ui, ast, node)),
+                self.render_central_panel(| ui | self.render_children(ui, context, ast, node)),
             AbstractSyntaxTokenType::TopPanel =>
-                self.render_top_panel(node.properties().into(), | ui | self.render_children(ui, ast, node)),
+                self.render_top_panel(node.properties().into(), | ui | self.render_children(ui, context, ast, node)),
             AbstractSyntaxTokenType::BottomPanel =>
-                self.render_bottom_panel(node.properties().into(), | ui | self.render_children(ui, ast, node)),
+                self.render_bottom_panel(node.properties().into(), | ui | self.render_children(ui, context, ast, node)),
             AbstractSyntaxTokenType::LeftSidebar =>
-                self.render_left_side_panel(node.properties().into(), | ui | self.render_children(ui, ast, node)),
+                self.render_left_side_panel(node.properties().into(), | ui | self.render_children(ui, context, ast, node)),
             AbstractSyntaxTokenType::RightSidebar =>
-                self.render_right_side_panel(node.properties().into(), | ui | self.render_children(ui, ast, node)),
+                self.render_right_side_panel(node.properties().into(), | ui | self.render_children(ui, context, ast, node)),
             _ => {}
         }
     }
 
-    fn render_children(&self, ui: &mut egui::Ui, ast: &AbstractSyntaxTree, parent: &AbstractSyntaxTreeNode) {
+    fn render_children(&self, ui: &mut egui::Ui, context: &mut StateContext, ast: &AbstractSyntaxTree, parent: &AbstractSyntaxTreeNode) {
         for child in ast.get_children(parent) {
-            self.render_child(ui, ast, child)
+            self.render_child(ui, context, ast, child)
         }
     }
 
-    fn render_child(&self, ui: &mut egui::Ui, ast: &AbstractSyntaxTree, child: &AbstractSyntaxTreeNode) {
+    fn render_child(&self, ui: &mut egui::Ui, context: &mut StateContext, ast: &AbstractSyntaxTree, child: &AbstractSyntaxTreeNode) {
         match child.node_type() {
             AbstractSyntaxTokenType::ScrollArea => 
-                self.render_scroll_area(
-                    get_name_property(child.properties()),
-                get_vertical_size_property(child.properties()), ui, | ui | self.render_children(ui, ast, child)),
+                self.render_scroll_area(ui, child.properties().into(), | ui | self.render_children(ui, context, ast, child)),
             AbstractSyntaxTokenType::Separator => 
                 self.render_separator(ui),
             AbstractSyntaxTokenType::Horizontal => 
-                self.render_horizontal(ui, | ui | self.render_children(ui, ast, child)),
+                self.render_horizontal(ui, | ui | self.render_children(ui, context, ast, child)),
             AbstractSyntaxTokenType::Vertical => 
-                self.render_vertical(ui, | ui | self.render_children(ui, ast, child)),
+                self.render_vertical(ui, | ui | self.render_children(ui, context, ast, child)),
             AbstractSyntaxTokenType::Label => 
                 self.render_label(ui, child.properties().into()),
             AbstractSyntaxTokenType::ColouredLabel => 
                 self.render_coloured_label(ui, child.properties().into()),
             AbstractSyntaxTokenType::SelectableLabel => 
-                self.render_selectable_label(ui, child.properties().into()),
+                self.render_selectable_label(ui, context, child.properties().into()),
             AbstractSyntaxTokenType::Heading => 
                 self.render_heading(ui, child.properties().into()),
             AbstractSyntaxTokenType::Monospace => 
@@ -114,48 +112,4 @@ impl AbstractSyntaxTreeRenderer {
         self.egui.paint(&display, target, shapes);
         needs_repaint
     }
-}
-
-fn get_name_property(properties: &[AbstractSyntaxTokenProperty]) -> &str {
-    for property in properties {
-        match property {
-            AbstractSyntaxTokenProperty::Id(value) => return value,
-            _ => {}
-        }
-    }
-
-    return "";
-}
-
-fn get_text_property(properties: &[AbstractSyntaxTokenProperty]) -> &str {
-    for property in properties {
-        match property {
-            AbstractSyntaxTokenProperty::Text(value) => return value,
-            _ => {}
-        }
-    }
-
-    return "";
-}
-
-fn get_selected_property(properties: &[AbstractSyntaxTokenProperty]) -> bool {
-    for property in properties {
-        match property {
-            AbstractSyntaxTokenProperty::Selected(value) => return *value,
-            _ => {}
-        }
-    }
-
-    return false;
-}
-
-fn get_vertical_size_property(properties: &[AbstractSyntaxTokenProperty]) -> VerticalSize {
-    for property in properties {
-        match property {
-            AbstractSyntaxTokenProperty::VerticallySized(value) => return *value,
-            _ => {}
-        }
-    }
-
-    return VerticalSize::Auto;
 }

@@ -11,10 +11,11 @@ use crate::prelude::*;
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub enum AbstractSyntaxTokenError {
     SourceTokenError(SourceTokenError),
+    CodeTokenError(CodeTokenError),
     UnknownProperty(String),
     UnknownPropertyValue(String),
-    RangeValueParseError(String),
-    ColourValueParseError(String),
+    RangeValueParseError,
+    ColourValueParseError,
     TextStyleValueParseError(String)
 }
 
@@ -65,15 +66,12 @@ pub enum AbstractSyntaxTokenProperty {
     WidthRange(FloatRange),
     HeightRange(FloatRange),
     VerticallySized(VerticalSize), 
+    AlwaysShowScroll(bool),
+    ScrollOffset(f32),
+    EnableScrolling(bool),
     Colour(Colour), 
     BackgroundColour(Colour),
-    OnClick(ActionPointer)
-}
-
-#[derive(Debug, Clone)]
-pub struct FloatRange {
-    from: f32,
-    to: f32
+    OnSelect(ActionFunction)
 }
 
 #[derive(Debug, Clone)]
@@ -110,11 +108,17 @@ impl From<&TextStyle> for egui::TextStyle {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct FloatRange {
+    from: f32,
+    to: f32
+}
+
 impl FloatRange {
-    pub fn parse(value: &str) -> Result<FloatRange, AbstractSyntaxTokenError> {
-        match collect_tuple_floats(value, 2) {
+    pub fn parse(value: &Vec<ArrayTokenResult>) -> Result<FloatRange, AbstractSyntaxTokenError> {
+        match collect_array_floats(value, 2) {
             Ok(values) => Ok(FloatRange { from: values[0], to: values[1] }),
-            Err(_err) => Err(AbstractSyntaxTokenError::RangeValueParseError(value.to_string()))
+            Err(_) => Err(AbstractSyntaxTokenError::RangeValueParseError)
         }
     }
 }
@@ -134,8 +138,8 @@ pub struct Colour {
 }
 
 impl Colour {
-    pub fn parse(value: &str) -> Result<Colour, AbstractSyntaxTokenError> {
-        match collect_tuple_unsigned_shorts(value, 4) {
+    pub fn parse(value: &Vec<ArrayTokenResult>) -> Result<Colour, AbstractSyntaxTokenError> {
+        match collect_array_unsigned_shorts(value, 4) {
             Ok(values) => Ok(
                 Colour { 
                     r: values[0] as u8,
@@ -144,7 +148,7 @@ impl Colour {
                     a: values[3] as u8 
                 }
             ),
-            Err(_err) => Err(AbstractSyntaxTokenError::ColourValueParseError(value.to_string()))
+            Err(_err) => Err(AbstractSyntaxTokenError::ColourValueParseError)
         }
     }
 }

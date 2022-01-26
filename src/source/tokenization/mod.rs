@@ -1,7 +1,9 @@
 mod source;
-mod tuple;
+mod arrays;
 mod collection;
+mod code;
 
 pub use source::*;
-pub use tuple::*;
+pub use arrays::*;
 pub use collection::*;
+pub use code::*;

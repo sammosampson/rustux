@@ -18,10 +18,20 @@ impl From<RendererError> for RustuxError {
     }
 }
 
-#[derive(Default)]
 pub struct Application {
     relative_rux_folder_path: &'static str,
-    file_monitor_poll: Duration
+    file_monitor_poll: Duration,
+    on_context: Box<dyn FnOnce(&mut StateContext) -> ()>
+}
+
+impl Default for Application {
+    fn default() -> Self {
+        Self {
+            relative_rux_folder_path: "",
+            file_monitor_poll: Duration::default(),
+            on_context: Box::new(|_| {})
+        }
+    }
 }
 
 impl Application {
@@ -40,6 +50,11 @@ impl Application {
         self
     }
 
+    pub fn with_context(mut self, on_context: impl FnOnce(&mut StateContext) -> () + 'static) -> Self {
+        self.on_context = Box::new(on_context);
+        self
+    }
+
     pub fn build(self) -> Result<ApplicationRunner, RustuxError> {
         let mut resources = Resources::default();
 
@@ -47,6 +62,8 @@ impl Application {
         let event_loop = create_system_event_loop();
         let screen_renderer = create_screen_renderer(&event_loop)?;
         let egui_renderer = create_ast_renderer(&screen_renderer.display);
+        let mut state_context= create_state_context();
+        (self.on_context)(&mut state_context);
     
         resources.insert(create_system_event_channel());
         resources.insert(file_paths);
@@ -59,6 +76,7 @@ impl Application {
         resources.insert(create_abstract_syntax_token_stream_lookup());
         resources.insert(create_source_location_lookup());
         resources.insert(create_system_event_producer());
+        resources.insert(state_context);
         Ok(ApplicationRunner::new(event_loop, build_schedule(), resources))
     }
 }

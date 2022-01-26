@@ -28,17 +28,12 @@ mod prelude {
 use crate::prelude::*;
 
 fn main() {
-    let mut ctx = StateContext;
-    examples::first::register_actions(&mut ctx);
-
-    /*
     Application::default()
         .use_logging()
         .with_file_path("examples/assets/first")
         .with_file_monitor_poll(Duration::from_secs(1))
+        .with_context(|ctx| examples::first::register_actions(ctx))
         .build()
         .expect("Build error")
         .run();
-    */
-
 }

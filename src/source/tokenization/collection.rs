@@ -1,20 +1,36 @@
+use crate::prelude::*;
 
 pub enum SpecificCollectionError {
-    NotEnoughItems(usize)
+    NotEnoughItems(usize),
+    WrongType
 }
 
-pub trait SpecificAmountCollector<IT, I> where IT: Iterator<Item=I> {
-    fn collect_specific_amount(&mut self, sepecific_amount: usize) -> Result<Vec::<I>, SpecificCollectionError>;
-}
-
-impl<IT, I> SpecificAmountCollector<IT, I> for IT where IT: Iterator<Item=I> {
-    fn collect_specific_amount(&mut self, specific_amount: usize) -> Result<Vec::<I>, SpecificCollectionError> {
-        let items:Vec::<I> = self.collect();
-        let count = items.len();
-        if count == specific_amount {
-            Ok(items) 
+pub fn collect_array_unsigned_shorts(from: &Vec<ArrayTokenResult>, amount: usize) -> Result<Vec::<u16>, SpecificCollectionError> {
+    let mut collected = vec!();
+    if from.len() != amount {
+        return Err(SpecificCollectionError::NotEnoughItems(from.len()));
+    }
+    for token in from {
+        if let Ok(SourceTokenPropertyValue::UnsignedInt(value)) = token {
+            collected.push(*value as u16)
         } else {
-            Err(SpecificCollectionError::NotEnoughItems(count))
+            return Err(SpecificCollectionError::WrongType)
         }
     }
+    Ok(collected)
+}
+
+pub fn collect_array_floats(from: &Vec<ArrayTokenResult>, amount: usize) -> Result<Vec::<f32>, SpecificCollectionError> {
+    let mut collected = vec!();
+    if from.len() != amount {
+        return Err(SpecificCollectionError::NotEnoughItems(from.len()));
+    }
+    for token in from {
+        if let Ok(SourceTokenPropertyValue::Float(value)) = token {
+            collected.push(*value as f32)
+        } else {
+            return Err(SpecificCollectionError::WrongType)
+        }
+    }
+    Ok(collected)
 }

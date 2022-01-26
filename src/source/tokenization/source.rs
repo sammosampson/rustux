@@ -11,14 +11,14 @@ pub enum SourceTokenError {
     ClosingWrongTag(usize)
 }
 
-#[derive(PartialEq, PartialOrd, Debug)]
+#[derive(PartialEq, PartialOrd, Debug, Clone)]
 pub enum SourceTokenPropertyValue {
     String(String),
     Int(i128),
     UnsignedInt(u128),
     Float(f64), 
-    Tuple(String), 
-    Code(String)
+    Array(Vec<ArrayTokenResult>), 
+    Code(Vec<CodeTokenResult>)
 }
 
 #[derive(PartialEq, PartialOrd, Debug)]
@@ -40,7 +40,7 @@ enum State {
     InStringPropertyValue(usize),
     InUnsignedNumberPropertyValue(usize),
     InSignedNumberPropertyValue(usize),
-    InTuplePropertyValue(usize),
+    InArrayPropertyValue(usize),
     InCodePropertyValue(usize),
     StartPropertyValue,
     InWhitespace
@@ -115,8 +115,8 @@ impl<'a> SourceTokenizer<'a> {
             State::InSignedNumberPropertyValue(start) => {
                 self.handle_inside_signed_number_property_value(start, index, character)
             },
-            State::InTuplePropertyValue(start) => {
-                self.handle_inside_tuple_property_value(start, index, character)
+            State::InArrayPropertyValue(start) => {
+                self.handle_inside_array_property_value(start, index, character)
             },
             State::InCodePropertyValue(start) => {
                 self.handle_inside_code_property_value(start, index, character)
@@ -214,7 +214,7 @@ impl<'a> SourceTokenizer<'a> {
             return None;
         }
         if character == '(' {
-            self.state = State::InTuplePropertyValue(index);
+            self.state = State::InArrayPropertyValue(index);
             return None;
         }
         if character == '{' {
@@ -251,12 +251,14 @@ impl<'a> SourceTokenizer<'a> {
         }
     }
 
-    fn produce_tuple_property_value_result(&mut self, start: usize, index: usize) -> SourceTokenOption {
-        Some(Ok(SourceToken::PropertyValue(SourceTokenPropertyValue::Tuple(String::from(self.splice_input(start, index))))))
+    fn produce_array_property_value_result(&mut self, start: usize, index: usize) -> SourceTokenOption {
+        let code_content = self.splice_input(start, index);
+        Some(Ok(SourceToken::PropertyValue(SourceTokenPropertyValue::Array(tokenize_array(code_content)))))
     }
 
     fn produce_code_property_value_result(&mut self, start: usize, index: usize) -> SourceTokenOption {
-        Some(Ok(SourceToken::PropertyValue(SourceTokenPropertyValue::Code(String::from(self.splice_input(start, index))))))
+        let code_content = self.splice_input(start, index);
+        Some(Ok(SourceToken::PropertyValue(SourceTokenPropertyValue::Code(tokenize_code(code_content)))))
     }
     
     fn handle_inside_string_property_value(&mut self, start: usize, index: usize, character: char)  -> SourceTokenOption {
@@ -283,10 +285,10 @@ impl<'a> SourceTokenizer<'a> {
         None
     }
 
-    fn handle_inside_tuple_property_value(&mut self, start: usize, index: usize, character: char)  -> SourceTokenOption {
+    fn handle_inside_array_property_value(&mut self, start: usize, index: usize, character: char)  -> SourceTokenOption {
         if character == ')' {
             self.state = State::InWhitespace;
-            return self.produce_tuple_property_value_result(start, index + 1);
+            return self.produce_array_property_value_result(start, index + 1);
         }
         None
     }
@@ -430,7 +432,18 @@ fn multiple_nested_controls_with_properties_with_values_produces_correct_tokens(
     let mut tokenizer = SourceTokenizer::from_string("<canvas offset=(200, 100)><circle other></circle></canvas>");
     assert_eq!(SourceToken::Control(String::from("canvas")),  tokenizer.next().unwrap().unwrap());
     assert_eq!(SourceToken::Property(String::from("offset")), tokenizer.next().unwrap().unwrap());
-    assert_eq!(SourceToken::PropertyValue(SourceTokenPropertyValue::Tuple(String::from("(200, 100)"))), tokenizer.next().unwrap().unwrap());
+    
+    assert_eq!(
+        SourceToken::PropertyValue(
+            SourceTokenPropertyValue::Array(
+                vec!(
+                    Ok(SourceTokenPropertyValue::UnsignedInt(200)),
+                    Ok(SourceTokenPropertyValue::UnsignedInt(100)),
+                )
+            )
+        ),
+        tokenizer.next().unwrap().unwrap()
+    );
     assert_eq!(SourceToken::Control(String::from("circle")),  tokenizer.next().unwrap().unwrap());
     assert_eq!(SourceToken::Property(String::from("other")), tokenizer.next().unwrap().unwrap());
     assert_eq!(SourceToken::EndControl(String::from("circle")), tokenizer.next().unwrap().unwrap());
@@ -535,21 +548,50 @@ fn property_with_positive_float_value_produces_property_and_value_result_inside_
 }
 
 #[test]
-fn property_with_tuple_value_produces_property_and_value_result_inside_control() {
-    let mut tokenizer = SourceTokenizer::from_string("<rect size=(1.0, 1.0) />");
+fn property_with_array_value_produces_property_and_value_result_inside_control() {
+    let mut tokenizer = SourceTokenizer::from_string("<rect size=(1.0, 2, -5, \"xxx\") />");
     assert_eq!(SourceToken::Control(String::from("rect")), tokenizer.next().unwrap().unwrap());
     assert_eq!(SourceToken::Property(String::from("size")), tokenizer.next().unwrap().unwrap());
-    assert_eq!(SourceToken::PropertyValue(SourceTokenPropertyValue::Tuple(String::from("(1.0, 1.0)"))), tokenizer.next().unwrap().unwrap());
+    
+    assert_eq!(
+        SourceToken::PropertyValue(
+            SourceTokenPropertyValue::Array(
+                vec!(
+                    Ok(SourceTokenPropertyValue::Float(1.0)),
+                    Ok(SourceTokenPropertyValue::UnsignedInt(2)),
+                    Ok(SourceTokenPropertyValue::Int(-5)),
+                    Ok(SourceTokenPropertyValue::String(String::from("xxx")))
+                )
+            )
+        ),
+        tokenizer.next().unwrap().unwrap()
+    );
+
     assert_eq!(SourceToken::EndControl(String::from("rect")), tokenizer.next().unwrap().unwrap());
     assert_eq!(None, tokenizer.next());
 }
 
 #[test]
-fn property_with_code_value_produces_property_and_value_result_inside_control() {
-    let mut tokenizer = SourceTokenizer::from_string("<rect on-click={click_it(1)} />");
+fn property_with_function_value_produces_property_and_value_result_inside_control() {
+    let mut tokenizer = SourceTokenizer::from_string("<rect on-click={click_it(1, 2)} />");
     assert_eq!(SourceToken::Control(String::from("rect")), tokenizer.next().unwrap().unwrap());
     assert_eq!(SourceToken::Property(String::from("on-click")), tokenizer.next().unwrap().unwrap());
-    assert_eq!(SourceToken::PropertyValue(SourceTokenPropertyValue::Code(String::from("{click_it(1)}"))), tokenizer.next().unwrap().unwrap());
+    
+    assert_eq!(
+        SourceToken::PropertyValue(
+            SourceTokenPropertyValue::Code(
+                vec!(
+                    Ok(CodeTokenPropertyValue::StartFunction(String::from("click_it"))),
+                    Ok(CodeTokenPropertyValue::PropertyValue(SourceTokenPropertyValue::UnsignedInt(1))),
+                    Ok(CodeTokenPropertyValue::PropertyValue(SourceTokenPropertyValue::UnsignedInt(2))),
+                    Ok(CodeTokenPropertyValue::EndFunction),
+
+                )
+            )
+        ),
+        tokenizer.next().unwrap().unwrap()
+    );
+
     assert_eq!(SourceToken::EndControl(String::from("rect")), tokenizer.next().unwrap().unwrap());
     assert_eq!(None, tokenizer.next());
 }
