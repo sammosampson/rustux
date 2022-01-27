@@ -1,5 +1,6 @@
 use crate::prelude::*;
 
+#[derive(Debug)]
 pub enum SpecificCollectionError {
     NotEnoughItems(usize),
     WrongType
@@ -33,4 +34,16 @@ pub fn collect_array_floats(from: &Vec<ArrayTokenResult>, amount: usize) -> Resu
         }
     }
     Ok(collected)
+}
+
+pub fn collect_properties_unsigned_int(from: &Vec<SourceTokenPropertyValue>, position: usize) -> Result<u16, SpecificCollectionError> {
+    if from.len() < position + 1 {
+        return Err(SpecificCollectionError::NotEnoughItems(from.len()));
+    }
+
+    if let SourceTokenPropertyValue::UnsignedInt(value) = from[position] {
+        return Ok(value as u16);
+    }
+    
+    Err(SpecificCollectionError::WrongType)
 }

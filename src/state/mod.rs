@@ -1,25 +1,36 @@
 use crate::prelude::*;
 
 pub fn create_state_context() -> StateContext {
-    StateContext
+    StateContext::default()
 }
 
-pub struct StateContext;
+#[derive(Default)]
+pub struct StateContext {
+    actions: HashMap<String, Box<dyn ActionContainer>>
+}
 
 impl StateContext {
-    pub fn run_action_function(function: &ActionFunction) {
+    pub fn run_action_function(&mut self, function: &ActionFunction) {
+        if let Some(container) = self.get_action_container(&function.name) {
+            container.run(&function.arguments);
+        }
     }
 
-    pub fn register_action(&mut self, _action: impl ActionContainer) {
+    pub fn register_action(&mut self, action: impl ActionContainer + 'static) {
+        self.actions.insert(action.function_name().to_string(), Box::new(action));
+    }
+
+    pub(crate) fn get_action_container(&self, function_name: &str) -> Option<&Box<dyn ActionContainer>> {
+        self.actions.get(function_name)
     }
 }
 
 pub trait ActionContainer {
-    fn path(&self) -> &str;
+    fn function_name(&self) -> &str;
+    fn run(&self, arguments: &Vec<SourceTokenPropertyValue>);
 }
 
-
-
+        
 #[derive(Debug, Clone, Default)]
 pub struct ActionFunction {
     name: String,
