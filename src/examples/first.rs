@@ -1,15 +1,18 @@
 use crate::prelude::*;
 
+// #[actions]
 #[derive(Debug)]
 pub enum Actions {
     SelectItem(u16)
 }
 
+// #[state]
 #[derive(Debug, Default)]
 pub struct SelectedClickState {
     selected: Option<u16>
 }
 
+// #[reducer]
 impl SelectedClickState {
     fn process(&self, action: Actions) -> Self {
         match action {
@@ -18,11 +21,16 @@ impl SelectedClickState {
     }
 }
 
+// #[selector]
+pub fn is_selected(state: &SelectedClickState, item_id: u16) -> bool {
+    state.selected == Some(item_id)
+}
 
-
+//---------------------------------------------
+// derived code from here down
 impl Actions {
     pub fn register(ctx: &mut StateContext) {
-        ctx.register_action(SelectItemActionContainer::default());
+        ctx.actions_mut().register_action(SelectItemActionContainer::default());
     }
 }
 
@@ -41,11 +49,9 @@ impl ActionContainer for SelectItemActionContainer {
         &self.path
     }
 
-    fn run(&self, arguments: &Vec<SourceTokenPropertyValue>) {
+    fn run(&self, state: &mut State, arguments: &Vec<SourceTokenPropertyValue>) {
         let action = Actions::SelectItem(collect_properties_unsigned_int(arguments, 0).unwrap());
         println!("Running action {:?}", action);
-        let state = SelectedClickState::default();
-        let state = state.process(action);
-        println!("State {:?}", state);
+        state.process(1, Box::new(| local_state: &SelectedClickState | local_state.process(action)));
     }
 }

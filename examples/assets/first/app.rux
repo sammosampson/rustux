@@ -30,16 +30,15 @@
                 <label text="label11" />
             </scroll-area>
             <separator />
-            <scroll-area id="scroll-area2" max-height=100.0 >
-                <selectable-label text="selectable-label4" selected on-select={ruxy::examples::first::select_item(1)} />
-                <selectable-label text="selectable-label5" selected on-select={ruxy::examples::first::select_item(2)} />
-                <selectable-label text="selectable-label6" selected on-select={ruxy::examples::first::select_item(3)} />
-                <selectable-label text="selectable-label7" selected on-select={ruxy::examples::first::select_item(4)} />
-                <selectable-label text="selectable-label8" selected on-select={ruxy::examples::first::select_item(5)} />
-                <selectable-label text="selectable-label9" selected on-select={ruxy::examples::first::select_item(6)} />
-                <selectable-label text="selectable-label10" selected on-select={ruxy::examples::first::select_item(7)} />
-                <selectable-label text="selectable-label11" selected on-select={ruxy::examples::first::select_item(8)} />
-            </scroll-area>
+            <let $local_state={get_local_state()}> 
+                <scroll-area id="scroll-area2" max-height=100.0 >
+                    <for $item_id=(1, 10)>
+                        <let $selected={is_selected($local_state, 1)}>
+                            <selectable-label text="selectable-label4" selected={selected} on-select={ruxy::examples::first::select_item($item_id)} />1
+                        </let>
+                    </for>
+                </scroll-area>
+            </let>
             <separator />
         </vertical>
     </right-side-bar>
