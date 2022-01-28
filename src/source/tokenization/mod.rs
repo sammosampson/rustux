@@ -1,9 +1,56 @@
 mod source;
-mod arrays;
+mod collections;
 mod collection;
 mod code;
+mod tests;
 
 pub use source::*;
-pub use arrays::*;
+pub use collections::*;
 pub use collection::*;
 pub use code::*;
+
+pub const FUNCTION_OPENING_BRACE: char = '(';
+pub const FUNCTION_CLOSING_BRACE: char = ')';
+pub const ARRAY_OPENING_CHAR: char = '[';
+pub const ARRAY_CLOSING_CHAR: char = ']';
+pub const CODE_OPENING_CHAR: char = '{';
+pub const CODE_CLOSING_CHAR: char = '}';
+
+#[derive(PartialEq, Eq, Debug, Copy, Clone)]
+pub enum SourceTokenError {
+    CouldNotFindStartTag(usize),
+    CouldNotParseNumberValue(usize),
+    CouldNotFindControlName(usize),
+    CouldNotFindPropertyStartSymbol(usize),
+    CouldNotFindControlToClose(usize),
+    CouldNotFindControlCloseSymbol(usize),
+    ClosingWrongTag(usize)
+}
+
+#[derive(PartialEq, PartialOrd, Debug, Clone)]
+pub enum SourceTokenPropertyValue {
+    String(String),
+    Int(i128),
+    UnsignedInt(u128),
+    Float(f64), 
+    Array(Vec<ArrayTokenResult>), 
+    Code(Vec<CodeTokenResult>)
+}
+
+
+#[derive(PartialEq, PartialOrd, Debug)]
+pub enum SourceTokenPropertyType {
+    Standard,
+    Variable
+}
+
+#[derive(PartialEq, PartialOrd, Debug)]
+pub enum SourceToken {
+    Control(String),
+    EndControl(String),
+    Property(SourceTokenPropertyType, String),
+    PropertyValue(SourceTokenPropertyValue)
+}
+
+pub type SourceTokenResult = Result<SourceToken, SourceTokenError>;
+pub type SourceTokenOption = Option<SourceTokenResult>;

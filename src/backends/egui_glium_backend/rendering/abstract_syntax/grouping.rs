@@ -7,8 +7,8 @@ impl AbstractSyntaxTreeRenderer {
 
     pub fn render_scroll_area(&self, ui: &mut egui::Ui, props: ScrollAreaProperties, add_contents: impl FnOnce(&mut egui::Ui) -> ()) {
         let scroll_area = match props.size {
-            VerticalSize::Auto => self.render_auto_sized_scroll_area(ui),
-            VerticalSize::MaxHeight(height) => self.render_max_height_scroll_area(ui, height),
+            VerticalSize::Auto => render_auto_sized_scroll_area(),
+            VerticalSize::MaxHeight(height) => render_max_height_scroll_area(height),
         };
 
         scroll_area
@@ -19,14 +19,6 @@ impl AbstractSyntaxTreeRenderer {
             .show(ui, add_contents);
     }
 
-    pub fn render_auto_sized_scroll_area(&self, ui: &mut egui::Ui) -> egui::ScrollArea {
-        egui::ScrollArea::auto_sized()
-    }
-
-    pub fn render_max_height_scroll_area(&self, ui: &mut egui::Ui, height: f32) -> egui::ScrollArea {
-        egui::ScrollArea::from_max_height(height)   
-    }
-
     pub fn render_horizontal(&self, ui: &mut egui::Ui, add_contents: impl FnOnce(&mut egui::Ui) -> ()) {
         ui.horizontal(add_contents);
     }
@@ -34,7 +26,16 @@ impl AbstractSyntaxTreeRenderer {
     pub fn render_vertical(&self, ui: &mut egui::Ui, add_contents: impl FnOnce(&mut egui::Ui) -> ()) {
         ui.vertical(add_contents);
     }
-} 
+}
+
+fn render_auto_sized_scroll_area() -> egui::ScrollArea {
+    egui::ScrollArea::auto_sized()
+}
+
+fn render_max_height_scroll_area(height: f32) -> egui::ScrollArea {
+    egui::ScrollArea::from_max_height(height)   
+}
+
 
 pub struct ScrollAreaProperties {
     pub id: String,

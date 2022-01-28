@@ -157,7 +157,7 @@ impl From<&Vec<AbstractSyntaxTokenProperty>> for ColouredLabelProperties {
 pub struct SelectableLabelProperties {
     pub text: String,
     pub selected: bool,
-    pub on_selected: ActionFunction
+    pub on_selected: Function
 }
 
 impl From<&Vec<AbstractSyntaxTokenProperty>> for SelectableLabelProperties {

@@ -33,7 +33,7 @@ pub struct ArrayTokenizer<'a>{
     input: &'a str,
     characters: Enumerate<Chars<'a>>,
     state: ArrayState
-}
+} 
 
 impl<'a> ArrayTokenizer<'a> {
     pub fn from_string(input: &'a str) -> Self {
@@ -49,7 +49,7 @@ impl<'a> ArrayTokenizer<'a> {
     }
 
     fn start_if_possible(&mut self, index: usize, character: char) -> ArrayTokenOption {
-        if character == '(' {
+        if character == ARRAY_OPENING_CHAR {
             self.state = ArrayState::StartValue;
             return None;
         }
@@ -57,7 +57,7 @@ impl<'a> ArrayTokenizer<'a> {
     }
 
     fn start_value_if_possible(&mut self, index: usize, character: char) -> ArrayTokenOption {
-        if character == ')' {
+        if character == ARRAY_CLOSING_CHAR {
             self.state = ArrayState::EndArray;
             return None;
         }
@@ -109,7 +109,7 @@ impl<'a> ArrayTokenizer<'a> {
     }
 
     fn handle_inside_unsigned_number_value(&mut self, start: usize, index: usize, character: char) -> ArrayTokenOption {
-        if character == ')' {
+        if character == ARRAY_CLOSING_CHAR {
             self.state = ArrayState::EndArray;
             return self.produce_unsigned_number_value_result(start, index);
         }
@@ -121,7 +121,7 @@ impl<'a> ArrayTokenizer<'a> {
     }
 
     fn handle_inside_signed_number_value(&mut self, start: usize, index: usize, character: char) -> ArrayTokenOption {
-        if character == ')' {
+        if character == ARRAY_CLOSING_CHAR {
             self.state = ArrayState::EndArray;
             return self.produce_signed_number_value_result(start, index);
         }

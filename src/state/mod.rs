@@ -26,28 +26,17 @@ pub struct State {
 
 impl State {
     pub fn process<T:std::any::Any + Default>(&mut self, id: usize, processor: Box<dyn FnOnce(&T) -> T>) {
-        if let Some(item) = self.get(id) {
-            self.set(id, processor(item.downcast_ref::<T>().unwrap()));
+        let processed_state = if let Some(item) = self.get(id) {
+            processor(item.downcast_ref::<T>().unwrap())
         } else {
-            self.set(id, processor(&T::default()));
-        }
-    }
+            processor(&T::default())
+        };
 
-    fn get_or_default<T:std::any::Any + Default>(&mut self, id: usize) -> &T {
-        if !self.contains(id) {
-            self.set(id, T::default());
-        }
-
-        let item = self.get(id).unwrap();
-        item.downcast_ref::<T>().unwrap()
+        self.set(id, processed_state)
     }
 
     pub fn set<T:std::any::Any + Default>(&mut self, id: usize, to_set: T) {
         self.items.insert(id, Box::new(to_set));
-    }
-
-    fn contains(&self, id: usize) -> bool {
-        self.items.contains_key(&id)
     }
 
     fn get(&self, id: usize) -> Option<&Box<dyn std::any::Any>> {
@@ -62,7 +51,7 @@ pub struct StateContext {
 }
 
 impl StateContext {
-    pub fn run_action_function(&mut self, function: &ActionFunction) {
+    pub fn run_action_function(&mut self, function: &Function) {
         let container = self.actions.get_action_container(&function.name).unwrap();
         container.run(&mut self.state, &function.arguments);
     }
@@ -79,13 +68,13 @@ pub trait ActionContainer {
 
         
 #[derive(Debug, Clone, Default)]
-pub struct ActionFunction {
+pub struct Function {
     name: String,
     arguments: Vec<SourceTokenPropertyValue>
 }
 
-impl ActionFunction {
-    pub fn parse(value: &Vec<CodeTokenResult>) -> Result<ActionFunction, AbstractSyntaxTokenError> {
+impl Function {
+    pub fn parse(value: &Vec<CodeTokenResult>) -> Result<Function, AbstractSyntaxTokenError> {
         let mut function = Self::default();
         for result in value {
             match result {

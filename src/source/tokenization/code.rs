@@ -62,7 +62,7 @@ impl<'a> CodeTokenizer<'a> {
     }
 
     fn start_if_possible(&mut self, index: usize, character: char) -> CodeTokenOption {
-        if character == '{' {
+        if character == CODE_OPENING_CHAR {
             self.state = CodeState::StartFunction;
             return None;
         }
@@ -70,7 +70,7 @@ impl<'a> CodeTokenizer<'a> {
     }
 
     fn end_if_possible(&mut self, index: usize, character: char) -> CodeTokenOption {
-        if character == '}' {
+        if character == CODE_CLOSING_CHAR {
             self.state = CodeState::End;
             return Some(Ok(CodeTokenPropertyValue::EndFunction));
         }
@@ -78,7 +78,7 @@ impl<'a> CodeTokenizer<'a> {
     }
 
     fn start_function_if_possible(&mut self, index: usize, character: char) -> CodeTokenOption {
-        if character == '(' {
+        if character == FUNCTION_OPENING_BRACE {
             self.state = CodeState::StartValue;
         } else {
             self.state = CodeState::InFunction(index);
@@ -87,7 +87,7 @@ impl<'a> CodeTokenizer<'a> {
     }
 
     fn start_value_if_possible(&mut self, index: usize, character: char) -> CodeTokenOption {
-        if character == ')' {
+        if character == FUNCTION_CLOSING_BRACE {
             self.state = CodeState::EndFunction;
             return None;
         }
@@ -145,7 +145,7 @@ impl<'a> CodeTokenizer<'a> {
 
     
     fn handle_inside_function(&mut self, start: usize, index: usize, character: char) -> CodeTokenOption {
-        if character == '(' {
+        if character == FUNCTION_OPENING_BRACE {
             self.state = CodeState::StartValue;
             return self.produce_function_name_result(start, index);
         }
@@ -154,7 +154,7 @@ impl<'a> CodeTokenizer<'a> {
 
 
     fn handle_inside_unsigned_number_value(&mut self, start: usize, index: usize, character: char) -> CodeTokenOption {
-        if character == ')' {
+        if character == FUNCTION_CLOSING_BRACE {
             self.state = CodeState::EndFunction;
             return self.produce_unsigned_number_value_result(start, index);
         }
@@ -166,7 +166,7 @@ impl<'a> CodeTokenizer<'a> {
     }
 
     fn handle_inside_signed_number_value(&mut self, start: usize, index: usize, character: char) -> CodeTokenOption {
-        if character == ')' {
+        if character == FUNCTION_CLOSING_BRACE {
             self.state = CodeState::EndFunction;
             return self.produce_signed_number_value_result(start, index);
         }

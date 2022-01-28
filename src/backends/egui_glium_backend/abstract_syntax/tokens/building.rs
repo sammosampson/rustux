@@ -1,9 +1,23 @@
 use crate::prelude::*;
 
+
+#[derive(Debug)]
+enum CurrentProperty {
+    None,
+    Standard(String),
+    Variable(String)
+}
+
+impl Default for CurrentProperty {
+    fn default() -> Self {
+        Self::None
+    }
+}
+
 #[derive(Debug, Default)]
 pub struct BuildAbstractSyntaxSourceTokenVisitor {
     ast: AbstractSyntaxTokenStream,
-    current_property_name: String
+    current_property: CurrentProperty
 }
 
 impl BuildAbstractSyntaxSourceTokenVisitor {
@@ -24,17 +38,28 @@ impl SourceTokenVisitor for BuildAbstractSyntaxSourceTokenVisitor {
     fn property(&mut self, property_name: &str) {
         match match_property_only(property_name) {
             Some(property) => self.ast.property(property),
-            None => self.current_property_name = property_name.to_string()
+            None => self.current_property = CurrentProperty::Standard(property_name.to_string())
         }
+    }
+
+    fn variable_property(&mut self, variable_name: &str) {
+        self.current_property = CurrentProperty::Variable(variable_name.to_string());
     }
 
     fn property_value(&mut self, property_value: &SourceTokenPropertyValue) {
-        match match_property_value(&self.current_property_name, property_value) {
-            Ok(property) => self.ast.property(property),
-            Err(error) => self.ast.property_error(error),
+        match &self.current_property {
+            CurrentProperty::None => {},
+            CurrentProperty::Standard(current_property_name) => {
+                match match_property_value(&current_property_name, property_value) {
+                    Ok(property) => self.ast.property(property),
+                    Err(error) => self.ast.property_error(error),
+                }
+            },
+            CurrentProperty::Variable(current_variable_name) =>
+                self.ast.variable_property(current_variable_name.to_string(), property_value.clone()),
         }
     }
-
+    
     fn end_control(&mut self, control_name: &str) {
         self.ast.end_node(match_control_name(control_name));
     }
@@ -43,6 +68,8 @@ impl SourceTokenVisitor for BuildAbstractSyntaxSourceTokenVisitor {
 fn match_control_name(control_name: &str) -> AbstractSyntaxTokenType {
     match control_name {
         "root" => AbstractSyntaxTokenType::Root,
+        "for" => AbstractSyntaxTokenType::For,
+        "let" => AbstractSyntaxTokenType::Let,
         "central-panel" => AbstractSyntaxTokenType::CentralPanel,
         "top-panel" => AbstractSyntaxTokenType::TopPanel,
         "bottom-panel" => AbstractSyntaxTokenType::BottomPanel,
@@ -137,7 +164,7 @@ fn match_property_value(property_name: &str, property_value: &SourceTokenPropert
         },
         "on-select" => {
             match property_value {
-                SourceTokenPropertyValue::Code(value) => Ok(AbstractSyntaxTokenProperty::OnSelect(ActionFunction::parse(value)?)),
+                SourceTokenPropertyValue::Code(value) => Ok(AbstractSyntaxTokenProperty::OnSelect(Function::parse(value)?)),
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
         },

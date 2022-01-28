@@ -65,7 +65,6 @@ impl Application {
         let mut state_context= create_state_context();
         (self.on_context)(&mut state_context);
     
-        resources.insert(create_system_event_channel());
         resources.insert(file_paths);
         resources.insert(screen_renderer);
         resources.insert(egui_renderer);
@@ -75,7 +74,6 @@ impl Application {
         resources.insert(create_source_entity_lookup());
         resources.insert(create_abstract_syntax_token_stream_lookup());
         resources.insert(create_source_location_lookup());
-        resources.insert(create_system_event_producer());
         resources.insert(state_context);
         Ok(ApplicationRunner::new(event_loop, build_schedule(), resources))
     }
@@ -100,25 +98,23 @@ impl ApplicationRunner {
 
     pub fn run(&mut self) {
         loop {
-            self.run_loop();
+            if !self.run_loop() {
+                return
+            }
         }
     }
 
-    fn run_loop(&mut self) {
-        self.process_events();
+    fn run_loop(&mut self) -> bool {
+        if !self.process_events() {
+            return false;
+        }
         self.execute_schedule();
+        return true;
     }
 
-    fn process_events(&mut self) {
-        let mut event_producer = &mut self.resources.get_mut::<SystemEventProducer>().unwrap();
-        let mut event_channel = &mut self.resources.get_mut::<SystemEventChannel>().unwrap();
+    fn process_events(&mut self) -> bool {
         let mut editor_renderer = &mut self.resources.get_mut::<AbstractSyntaxTreeRenderer>().unwrap();
-        
-        self.event_loop.run(
-            &mut event_producer,
-            &mut event_channel,
-            &mut editor_renderer,
-        );
+        self.event_loop.run(&mut editor_renderer)
     }
 
     fn execute_schedule(&mut self) {

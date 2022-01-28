@@ -11,6 +11,7 @@ pub trait AbstractSyntaxTokenStreamVisitor {
     fn token_error(&mut self, error: &AbstractSyntaxTokenError);
     fn start_node(&mut self, node_type: &AbstractSyntaxTokenType);
     fn property(&mut self, property: &AbstractSyntaxTokenProperty);
+    fn variable_property(&mut self, variable: &str);
     fn end_node(&mut self, node_type: &AbstractSyntaxTokenType);
 }
 
@@ -32,8 +33,14 @@ impl AbstractSyntaxTokenStream {
     }
 
     pub fn property(&mut self, property: AbstractSyntaxTokenProperty) {
-        println!("{:?}", property);
+        println!("prop {:?}", property);
         self.0.push(Ok(AbstractSyntaxToken::Property(property)));
+    }
+
+    pub fn variable_property(&mut self, variable_name: String, property_value: SourceTokenPropertyValue) {
+        println!("var {:?}", variable_name);
+        println!("val {:?}", property_value);
+        self.0.push(Ok(AbstractSyntaxToken::VariableProperty(variable_name)));
     }
 
     pub fn property_error(&mut self, error: AbstractSyntaxTokenError) {
@@ -54,6 +61,7 @@ impl AbstractSyntaxTokenStream {
                 Ok(node) => match node {
                     AbstractSyntaxToken::StartNode(node_type) => visitor.start_node(node_type),
                     AbstractSyntaxToken::Property(property) => visitor.property(property),
+                    AbstractSyntaxToken::VariableProperty(variable) => visitor.variable_property(variable),
                     AbstractSyntaxToken::EndNode(node_type) => visitor.end_node(node_type),
                 },
                 Err(error) => visitor.token_error(error),

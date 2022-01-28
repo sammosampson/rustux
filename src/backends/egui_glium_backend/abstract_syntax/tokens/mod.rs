@@ -23,6 +23,8 @@ pub enum AbstractSyntaxTokenError {
 pub enum AbstractSyntaxTokenType {
     Unknown,
     Root,
+    For,
+    Let,
     CentralPanel,
     TopPanel,
     BottomPanel,
@@ -71,7 +73,7 @@ pub enum AbstractSyntaxTokenProperty {
     EnableScrolling(bool),
     Colour(Colour), 
     BackgroundColour(Colour),
-    OnSelect(ActionFunction)
+    OnSelect(Function)
 }
 
 #[derive(Debug, Clone)]
@@ -169,6 +171,7 @@ pub enum VerticalSize {
 pub enum AbstractSyntaxToken {
     StartNode(AbstractSyntaxTokenType),
     Property(AbstractSyntaxTokenProperty),
+    VariableProperty(String),
     EndNode(AbstractSyntaxTokenType),
 }
 

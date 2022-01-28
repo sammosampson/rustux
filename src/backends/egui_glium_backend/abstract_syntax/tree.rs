@@ -56,6 +56,12 @@ impl AbstractSyntaxTree {
             node.add_property(property);
         }
     }
+    
+    pub fn add_node_variable_assignment(&mut self, node_id: AbstractSyntaxTreeNodeId, variable: String) {
+        if let Some(node) = self.get_node_mut(node_id) {
+            
+        }
+    }
 
     fn add_node(&mut self, node: AbstractSyntaxTreeNode) -> AbstractSyntaxTreeNodeId {
         self.id_cursor = self.id_cursor.next();
@@ -162,6 +168,10 @@ impl AbstractSyntaxTokenStreamVisitor for AbstractSyntaxTokenStreamLinker {
 
     fn property(&mut self, property: &AbstractSyntaxTokenProperty) {
         self.ast.add_node_property(self.current_node, property.clone())
+    }
+
+    fn variable_property(&mut self, variable: &str) {
+        self.ast.add_node_variable_assignment(self.current_node, variable.to_string())
     }
 
     fn end_node(&mut self, _node_type: &AbstractSyntaxTokenType) {

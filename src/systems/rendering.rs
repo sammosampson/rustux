@@ -6,7 +6,6 @@ use crate::prelude::*;
 pub fn render(
     entity: &Entity,
     #[resource] abstract_syntax_token_stream_lookup: &mut AbstractSyntaxTokenStreamLookup,
-    #[resource] event_producer: &mut SystemEventProducer,
     #[resource] ast_renderer: &mut AbstractSyntaxTreeRenderer,
     #[resource] screen_renderer: &mut ScreenRenderer,
     #[resource] context: &mut StateContext, 
@@ -16,7 +15,7 @@ pub fn render(
     ast_stream.accept(&mut linker);
 
     let mut target = start_rendering(screen_renderer);
-    render_gui(context, ast_renderer, &linker.ast(), event_producer, screen_renderer, &mut target);   
+    render_gui(context, ast_renderer, &linker.ast(), screen_renderer, &mut target);   
     complete_render(target);
 }
 
@@ -28,7 +27,6 @@ fn render_gui(
     context: &mut StateContext,
     ast_renderer: &mut AbstractSyntaxTreeRenderer,
     ast: &AbstractSyntaxTree,
-    event_producer: &mut SystemEventProducer,
     screen_renderer: &mut ScreenRenderer,
     target: &mut Frame
 ) {

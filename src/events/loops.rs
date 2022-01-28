@@ -17,17 +17,16 @@ impl SystemEventLoop {
 
     pub fn run(
         &mut self,
-        event_producer: &mut SystemEventProducer,
-        event_channel: &mut SystemEventChannel,
         ast_renderer: &mut AbstractSyntaxTreeRenderer,
         
-    ) {
+    ) -> bool {
+        let mut close = false;
         self.inner.run_return(|event, _, flow| {
             match event {
                 Event::WindowEvent { window_id: _, event} => {
                     ast_renderer.process_event(&event);
                     match event {
-                        WindowEvent::CloseRequested => event_producer.push(SystemEvent::CloseRequested),
+                        WindowEvent::CloseRequested => close = true,
                         _ => {} 
                     }
                     
@@ -37,6 +36,6 @@ impl SystemEventLoop {
             *flow = glium::glutin::event_loop::ControlFlow::Exit;
         });
 
-        event_producer.drain_to(event_channel);
+        return !close;
     }
 }
