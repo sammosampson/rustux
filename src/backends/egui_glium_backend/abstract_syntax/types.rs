@@ -1,80 +1,6 @@
 
-mod stream;
-mod building;
-
 use egui::Color32;
-pub use stream::*;
-pub use building::*;
-
 use crate::prelude::*;
-
-#[derive(PartialEq, Eq, Debug, Clone)]
-pub enum AbstractSyntaxTokenError {
-    SourceTokenError(SourceTokenError),
-    CodeTokenError(CodeTokenError),
-    UnknownProperty(String),
-    UnknownPropertyValue(String),
-    RangeValueParseError,
-    ColourValueParseError,
-    TextStyleValueParseError(String)
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AbstractSyntaxTokenType {
-    Unknown,
-    Root,
-    For,
-    Let,
-    CentralPanel,
-    TopPanel,
-    BottomPanel,
-    LeftSidebar,
-    RightSidebar,
-    Horizontal,
-    Vertical,
-    ScrollArea,
-    Separator,
-    Label,
-    ColouredLabel,
-    SelectableLabel,
-    Heading,
-    Monospace,
-    Code
-}
-
-impl Default for AbstractSyntaxTokenType {
-    fn default() -> Self {
-        Self::Unknown
-    }
-}
-
-#[derive(Debug, Clone)]
-pub enum AbstractSyntaxTokenProperty {
-    Id(String),
-    Text(String),
-    Selected(bool),
-    Resizable(bool),
-    Wrap(bool),
-    Code(bool),
-    Strong(bool),
-    Weak(bool),
-    Strikethrough(bool),
-    Underline(bool),
-    Italics(bool),
-    Raised(bool),
-    TextStyle(TextStyle),
-    DefaultWidth(f32),
-    DefaultHeight(f32),
-    WidthRange(FloatRange),
-    HeightRange(FloatRange),
-    VerticallySized(VerticalSize), 
-    AlwaysShowScroll(bool),
-    ScrollOffset(f32),
-    EnableScrolling(bool),
-    Colour(Colour), 
-    BackgroundColour(Colour),
-    OnSelect(Function)
-}
 
 #[derive(Debug, Clone)]
 pub enum TextStyle {
@@ -132,6 +58,28 @@ impl From<&FloatRange> for RangeInclusive<f32> {
 }
 
 #[derive(Debug, Clone)]
+pub struct UnsignedIntRange {
+    from: u32,
+    to: u32
+}
+
+impl UnsignedIntRange {
+    pub fn parse(value: &Vec<ArrayTokenResult>) -> Result<UnsignedIntRange, AbstractSyntaxTokenError> {
+        match collect_array_unsigned_ints(value, 2) {
+            Ok(values) => Ok(UnsignedIntRange { from: values[0], to: values[1] }),
+            Err(_) => Err(AbstractSyntaxTokenError::RangeValueParseError)
+        }
+    }
+}
+
+impl From<&UnsignedIntRange> for RangeInclusive<u32> {
+    fn from(from: &UnsignedIntRange) -> Self {
+        Self::new(from.from, from.to)
+    }
+}
+
+
+#[derive(Debug, Clone)]
 pub struct Colour {
     r: u8,
     g: u8,
@@ -167,12 +115,3 @@ pub enum VerticalSize {
     MaxHeight(f32)
 }
 
-#[derive(Debug, Clone)]
-pub enum AbstractSyntaxToken {
-    StartNode(AbstractSyntaxTokenType),
-    Property(AbstractSyntaxTokenProperty),
-    VariableProperty(String),
-    EndNode(AbstractSyntaxTokenType),
-}
-
-pub type AbstractSyntaxTokenResult = Result<AbstractSyntaxToken, AbstractSyntaxTokenError>;

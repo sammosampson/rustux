@@ -1,4 +1,8 @@
 
+mod building;
+
+pub use building::*;
+
 use crate::prelude::*;
 
 pub fn create_abstract_syntax_token_stream_lookup() -> AbstractSyntaxTokenStreamLookup {

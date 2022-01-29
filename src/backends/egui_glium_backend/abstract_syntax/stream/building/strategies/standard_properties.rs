@@ -1,91 +1,40 @@
 use crate::prelude::*;
 
+pub struct StandardBuildPropertyStrategy(pub AbstractSyntaxTokenType);
 
-#[derive(Debug)]
-enum CurrentProperty {
-    None,
-    Standard(String),
-    Variable(String)
-}
-
-impl Default for CurrentProperty {
-    fn default() -> Self {
-        Self::None
-    }
-}
-
-#[derive(Debug, Default)]
-pub struct BuildAbstractSyntaxSourceTokenVisitor {
-    ast: AbstractSyntaxTokenStream,
-    current_property: CurrentProperty
-}
-
-impl BuildAbstractSyntaxSourceTokenVisitor {
-    pub fn ast(self) -> AbstractSyntaxTokenStream {
-        self.ast
-    }
-}
-
-impl SourceTokenVisitor for BuildAbstractSyntaxSourceTokenVisitor {
-    fn token_error(&mut self, error: SourceTokenError) {
-        self.ast.add_error(AbstractSyntaxTokenError::SourceTokenError(error))
+impl BuildPropertyStrategy for StandardBuildPropertyStrategy {
+    fn control(&self, ast: &mut AbstractSyntaxTokenStream) {
+        ast.start_node(self.0);
     }
 
-    fn control(&mut self, control_name: &str) {
-        self.ast.start_node(match_control_name(control_name));
-    }
-
-    fn property(&mut self, property_name: &str) {
-        match match_property_only(property_name) {
-            Some(property) => self.ast.property(property),
-            None => self.current_property = CurrentProperty::Standard(property_name.to_string())
+    fn property(&self, property: &CurrentProperty, ast: &mut AbstractSyntaxTokenStream) {
+        match property {
+            CurrentProperty::None => {},
+            CurrentProperty::Standard(property_name) => {
+                if let Some(property) = match_property_only(&property_name) {
+                    ast.property(property);
+                }
+            },
+            CurrentProperty::Variable(_) => {}
         }
     }
 
-    fn variable_property(&mut self, variable_name: &str) {
-        self.current_property = CurrentProperty::Variable(variable_name.to_string());
-    }
-
-    fn property_value(&mut self, property_value: &SourceTokenPropertyValue) {
-        match &self.current_property {
+    fn property_value(&self, property: &CurrentProperty, property_value: &SourceTokenPropertyValue, ast: &mut AbstractSyntaxTokenStream) {
+        match property {
             CurrentProperty::None => {},
             CurrentProperty::Standard(current_property_name) => {
                 match match_property_value(&current_property_name, property_value) {
-                    Ok(property) => self.ast.property(property),
-                    Err(error) => self.ast.property_error(error),
+                    Ok(property) => ast.property(property),
+                    Err(error) => ast.property_error(error),
                 }
             },
             CurrentProperty::Variable(current_variable_name) =>
-                self.ast.variable_property(current_variable_name.to_string(), property_value.clone()),
+                ast.variable_property(current_variable_name.to_string(), property_value.clone()),
         }
     }
-    
-    fn end_control(&mut self, control_name: &str) {
-        self.ast.end_node(match_control_name(control_name));
-    }
-}
 
-fn match_control_name(control_name: &str) -> AbstractSyntaxTokenType {
-    match control_name {
-        "root" => AbstractSyntaxTokenType::Root,
-        "for" => AbstractSyntaxTokenType::For,
-        "let" => AbstractSyntaxTokenType::Let,
-        "central-panel" => AbstractSyntaxTokenType::CentralPanel,
-        "top-panel" => AbstractSyntaxTokenType::TopPanel,
-        "bottom-panel" => AbstractSyntaxTokenType::BottomPanel,
-        "left-side-bar" => AbstractSyntaxTokenType::LeftSidebar,
-        "right-side-bar" => AbstractSyntaxTokenType::RightSidebar,
-        "scroll-area" => AbstractSyntaxTokenType::ScrollArea,
-        "separator" => AbstractSyntaxTokenType::Separator,
-        "horizontal" => AbstractSyntaxTokenType::Horizontal,
-        "vertical" => AbstractSyntaxTokenType::Vertical,
-        "label" => AbstractSyntaxTokenType::Label,
-        "coloured-label" => AbstractSyntaxTokenType::ColouredLabel,
-        "selectable-label" => AbstractSyntaxTokenType::SelectableLabel,
-        "heading" => AbstractSyntaxTokenType::Heading,
-        "monospace" => AbstractSyntaxTokenType::Monospace,
-        "code" => AbstractSyntaxTokenType::Code,
-        _ => AbstractSyntaxTokenType::Unknown
+    fn end_control(&self, ast: &mut AbstractSyntaxTokenStream) {
+        ast.end_node(self.0);
     }
 }
 
