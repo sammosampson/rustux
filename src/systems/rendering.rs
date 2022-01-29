@@ -11,7 +11,7 @@ pub fn render(
     #[resource] context: &mut StateContext, 
 ) {
     let ast_stream = abstract_syntax_token_stream_lookup.get_mut(entity).unwrap(); 
-    let mut linker = AbstractSyntaxTokenStreamLinker::default();
+    let mut linker = AbstractSyntaxGraphBuilder::default();
     ast_stream.accept(&mut linker);
 
     let mut target = start_rendering(screen_renderer);
@@ -26,7 +26,7 @@ fn start_rendering(screen_renderer: &mut ScreenRenderer) -> Frame {
 fn render_gui(
     context: &mut StateContext,
     ast_renderer: &mut AbstractSyntaxTreeRenderer,
-    ast: &AbstractSyntaxTree,
+    ast: &AbstractSyntaxGraph,
     screen_renderer: &mut ScreenRenderer,
     target: &mut Frame
 ) {

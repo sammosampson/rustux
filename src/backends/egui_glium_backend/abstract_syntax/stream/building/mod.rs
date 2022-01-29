@@ -13,7 +13,7 @@ pub enum CurrentProperty {
 pub struct BuildAbstractSyntaxSourceTokenVisitor {
     ast: AbstractSyntaxTokenStream,
     current_property: CurrentProperty,
-    current_property_strategy: Box<dyn BuildPropertyStrategy + 'static>
+    current_property_strategy: Box<dyn BuildAbstractSyntaxTokenStreamStrategy + 'static>
 }
 
 impl Default for BuildAbstractSyntaxSourceTokenVisitor {
@@ -21,7 +21,7 @@ impl Default for BuildAbstractSyntaxSourceTokenVisitor {
         Self {
             ast: AbstractSyntaxTokenStream::default(),
             current_property: CurrentProperty::None,
-            current_property_strategy: Box::new(EmptyBuildPropertyStrategy)
+            current_property_strategy: Box::new(EmptyBuildAbstractSyntaxTokenStreamStrategy)
         }
     }
 }
@@ -61,26 +61,26 @@ impl SourceTokenVisitor for BuildAbstractSyntaxSourceTokenVisitor {
     }
 }
 
-fn match_control_name(control_name: &str) -> Box<dyn BuildPropertyStrategy> {
+fn match_control_name(control_name: &str) -> Box<dyn BuildAbstractSyntaxTokenStreamStrategy> {
     match control_name {
-        "root" => Box::new(StandardBuildPropertyStrategy(AbstractSyntaxTokenType::Root)),
-        "for" => Box::new(ForBuildPropertyStrategy),
-        "let" => Box::new(LetBuildPropertyStrategy),
-        "central-panel" => Box::new(StandardBuildPropertyStrategy(AbstractSyntaxTokenType::CentralPanel)),
-        "top-panel" => Box::new(StandardBuildPropertyStrategy(AbstractSyntaxTokenType::TopPanel)),
-        "bottom-panel" => Box::new(StandardBuildPropertyStrategy(AbstractSyntaxTokenType::BottomPanel)),
-        "left-side-bar" => Box::new(StandardBuildPropertyStrategy(AbstractSyntaxTokenType::LeftSidebar)),
-        "right-side-bar" => Box::new(StandardBuildPropertyStrategy(AbstractSyntaxTokenType::RightSidebar)),
-        "scroll-area" => Box::new(StandardBuildPropertyStrategy(AbstractSyntaxTokenType::ScrollArea)),
-        "separator" => Box::new(StandardBuildPropertyStrategy(AbstractSyntaxTokenType::Separator)),
-        "horizontal" => Box::new(StandardBuildPropertyStrategy(AbstractSyntaxTokenType::Horizontal)),
-        "vertical" => Box::new(StandardBuildPropertyStrategy(AbstractSyntaxTokenType::Vertical)),
-        "label" => Box::new(StandardBuildPropertyStrategy(AbstractSyntaxTokenType::Label)),
-        "coloured-label" => Box::new(StandardBuildPropertyStrategy(AbstractSyntaxTokenType::ColouredLabel)),
-        "selectable-label" => Box::new(StandardBuildPropertyStrategy(AbstractSyntaxTokenType::SelectableLabel)),
-        "heading" => Box::new(StandardBuildPropertyStrategy(AbstractSyntaxTokenType::Heading)),
-        "monospace" => Box::new(StandardBuildPropertyStrategy(AbstractSyntaxTokenType::Monospace)),
-        "code" => Box::new(StandardBuildPropertyStrategy(AbstractSyntaxTokenType::Code)),
-        _ => Box::new(StandardBuildPropertyStrategy(AbstractSyntaxTokenType::Unknown))
+        "root" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::Root)),
+        "for" => Box::new(ForBuildAbstractSyntaxTokenStreamStrategy),
+        "let" => Box::new(LetBuildAbstractSyntaxTokenStreamStrategy),
+        "central-panel" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::CentralPanel)),
+        "top-panel" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::TopPanel)),
+        "bottom-panel" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::BottomPanel)),
+        "left-side-bar" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::LeftSidebar)),
+        "right-side-bar" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::RightSidebar)),
+        "scroll-area" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::ScrollArea)),
+        "separator" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::Separator)),
+        "horizontal" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::Horizontal)),
+        "vertical" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::Vertical)),
+        "label" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::Label)),
+        "coloured-label" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::ColouredLabel)),
+        "selectable-label" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::SelectableLabel)),
+        "heading" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::Heading)),
+        "monospace" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::Monospace)),
+        "code" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::Code)),
+        _ => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::Unknown))
     }
 }

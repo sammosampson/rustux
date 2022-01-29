@@ -1,8 +1,8 @@
 use crate::prelude::*;
 
-pub struct StandardBuildPropertyStrategy(pub AbstractSyntaxTokenType);
+pub struct StandardBuildAbstractSyntaxTokenStreamStrategy(pub AbstractSyntaxTokenType);
 
-impl BuildPropertyStrategy for StandardBuildPropertyStrategy {
+impl BuildAbstractSyntaxTokenStreamStrategy for StandardBuildAbstractSyntaxTokenStreamStrategy {
     fn control(&self, ast: &mut AbstractSyntaxTokenStream) {
         ast.start_node(self.0);
     }
@@ -28,8 +28,8 @@ impl BuildPropertyStrategy for StandardBuildPropertyStrategy {
                     Err(error) => ast.property_error(error),
                 }
             },
-            CurrentProperty::Variable(current_variable_name) =>
-                ast.variable_property(current_variable_name.to_string(), property_value.clone()),
+            CurrentProperty::Variable(variable_name) =>
+                ast.property_error(AbstractSyntaxTokenError::UnknownProperty(variable_name.to_string())),
         }
     }
 

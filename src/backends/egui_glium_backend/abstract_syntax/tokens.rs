@@ -75,7 +75,6 @@ pub enum AbstractSyntaxTokenProperty {
 pub enum AbstractSyntaxToken {
     StartNode(AbstractSyntaxTokenType),
     Property(AbstractSyntaxTokenProperty),
-    VariableProperty(String),
     EndNode(AbstractSyntaxTokenType),
 }
 

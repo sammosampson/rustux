@@ -1,8 +1,8 @@
 use crate::prelude::*;
 
-pub struct LetBuildPropertyStrategy;
+pub struct LetBuildAbstractSyntaxTokenStreamStrategy;
 
-impl BuildPropertyStrategy for LetBuildPropertyStrategy {
+impl BuildAbstractSyntaxTokenStreamStrategy for LetBuildAbstractSyntaxTokenStreamStrategy {
     fn control(&self, ast: &mut AbstractSyntaxTokenStream) {
         ast.start_node(AbstractSyntaxTokenType::Let);
     }
