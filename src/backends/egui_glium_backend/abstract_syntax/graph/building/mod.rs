@@ -1,6 +1,6 @@
 
 mod strategies;
-use strategies::*;
+pub use strategies::*;
 
 use crate::prelude::*;
 
@@ -32,14 +32,7 @@ impl AbstractSyntaxTokenStreamVisitor for AbstractSyntaxGraphBuilder {
     }
 
     fn start_node(&mut self, node_type: &AbstractSyntaxTokenType) {
-        match node_type {
-            AbstractSyntaxTokenType::Root =>
-                self.strategy = Box::new(RootBuildAbstractSyntaxGraphStreamStrategy),
-            AbstractSyntaxTokenType::For => 
-                self.strategy = Box::new(ForBuildAbstractSyntaxGraphStreamStrategy),
-            node_type => 
-                self.strategy = Box::new(StandardBuildAbstractSyntaxGraphStreamStrategy(*node_type)),
-        }
+        self.strategy = get_strategy(node_type);
         self.current_node = self.strategy.start_node(self.current_node, &mut self.ast);
     }
 
@@ -49,5 +42,16 @@ impl AbstractSyntaxTokenStreamVisitor for AbstractSyntaxGraphBuilder {
 
     fn end_node(&mut self, _node_type: &AbstractSyntaxTokenType) {
         self.current_node = self.strategy.end_node(self.current_node, &mut self.ast);
+    }
+}
+
+fn get_strategy(node_type: &AbstractSyntaxTokenType) -> Box<dyn BuildAbstractSyntaxGraphStreamStrategy> {
+    match node_type {
+        AbstractSyntaxTokenType::Root =>
+            Box::new(RootBuildAbstractSyntaxGraphStreamStrategy),
+        AbstractSyntaxTokenType::For => 
+            Box::new(ForBuildAbstractSyntaxGraphStreamStrategy),
+        node_type => 
+            Box::new(StandardBuildAbstractSyntaxGraphStreamStrategy(*node_type)),
     }
 }

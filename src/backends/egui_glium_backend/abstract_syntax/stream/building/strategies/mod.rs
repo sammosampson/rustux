@@ -1,10 +1,10 @@
-mod standard_properties;
-mod for_properties;
-mod let_properties;
+mod standard;
+mod looping;
+mod variable_assigment;
 
-pub use standard_properties::*;
-pub use for_properties::*;
-pub use let_properties::*;
+pub use standard::*;
+pub use looping::*;
+pub use variable_assigment::*;
 
 use crate::prelude::*;
 
