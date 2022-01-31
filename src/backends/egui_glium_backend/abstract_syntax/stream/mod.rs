@@ -11,11 +11,17 @@ pub fn create_abstract_syntax_token_stream_lookup() -> AbstractSyntaxTokenStream
 
 pub type AbstractSyntaxTokenStreamLookup = HashMap<Entity, AbstractSyntaxTokenStream>;
 
+#[derive(PartialEq, Eq)]
+pub enum EndNodeAction {
+    Continue,
+    Repeat
+}
+
 pub trait AbstractSyntaxTokenStreamVisitor {
     fn token_error(&mut self, error: &AbstractSyntaxTokenError);
     fn start_node(&mut self, node_type: &AbstractSyntaxTokenType);
     fn property(&mut self, property: &AbstractSyntaxTokenProperty);
-    fn end_node(&mut self, node_type: &AbstractSyntaxTokenType);
+    fn end_node(&mut self, node_type: &AbstractSyntaxTokenType) -> EndNodeAction;
 }
 
 #[derive(Debug, Clone, Default)]
@@ -58,7 +64,10 @@ impl AbstractSyntaxTokenStream {
                 Ok(node) => match node {
                     AbstractSyntaxToken::StartNode(node_type) => visitor.start_node(node_type),
                     AbstractSyntaxToken::Property(property) => visitor.property(property),
-                    AbstractSyntaxToken::EndNode(node_type) => visitor.end_node(node_type),
+                    AbstractSyntaxToken::EndNode(node_type) =>
+                        if visitor.end_node(node_type) == EndNodeAction::Repeat {
+
+                        },
                 },
                 Err(error) => visitor.token_error(error),
             }

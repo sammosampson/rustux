@@ -6,7 +6,7 @@ use crate::prelude::*;
 
 pub struct AbstractSyntaxGraphBuilder {
     ast: AbstractSyntaxGraph,
-    strategy: Box<dyn BuildAbstractSyntaxGraphStreamStrategy>,
+    strategies: Vec<Box<dyn BuildAbstractSyntaxGraphStreamStrategy>>,
     current_node: AbstractSyntaxGraphNodeId
 }
 
@@ -14,7 +14,7 @@ impl Default for AbstractSyntaxGraphBuilder {
     fn default() -> Self {
         Self { 
             ast: Default::default(),
-            strategy: Box::new(EmptyBuildAbstractSyntaxGraphStreamStrategy), 
+            strategies: vec!(), 
             current_node: Default::default()
         }
     }
@@ -32,16 +32,18 @@ impl AbstractSyntaxTokenStreamVisitor for AbstractSyntaxGraphBuilder {
     }
 
     fn start_node(&mut self, node_type: &AbstractSyntaxTokenType) {
-        self.strategy = get_strategy(node_type);
-        self.current_node = self.strategy.start_node(self.current_node, &mut self.ast);
+        let strategy = get_strategy(node_type);
+        self.current_node = strategy.start_node(self.current_node, &mut self.ast);
+        self.strategies.push(strategy);
     }
 
     fn property(&mut self, property: &AbstractSyntaxTokenProperty) {
-        self.strategy.property(self.current_node, property.clone(), &mut self.ast);
+        self.strategies.last().unwrap().property(self.current_node, property.clone(), &mut self.ast);
     }
 
     fn end_node(&mut self, _node_type: &AbstractSyntaxTokenType) {
-        self.current_node = self.strategy.end_node(self.current_node, &mut self.ast);
+        let strategy = self.strategies.pop().unwrap();
+        self.current_node = strategy.end_node(self.current_node, &mut self.ast);
     }
 }
 
