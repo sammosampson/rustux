@@ -58,22 +58,37 @@ impl From<&FloatRange> for RangeInclusive<f32> {
 }
 
 #[derive(Debug, Clone)]
-pub struct UnsignedIntRange {
-    from: u32,
-    to: u32
+pub struct USizeRange {
+    from: usize,
+    to: usize
 }
 
-impl UnsignedIntRange {
-    pub fn parse(value: &Vec<ArrayTokenResult>) -> Result<UnsignedIntRange, AbstractSyntaxTokenError> {
-        match collect_array_unsigned_ints(value, 2) {
-            Ok(values) => Ok(UnsignedIntRange { from: values[0], to: values[1] }),
+impl USizeRange {
+    pub fn new(from: usize, to: usize) -> Self {
+        Self {
+            from,
+            to 
+        }
+    }
+
+    pub fn parse(value: &Vec<ArrayTokenResult>) -> Result<USizeRange, AbstractSyntaxTokenError> {
+        match collect_array_usizes(value, 2) {
+            Ok(values) => Ok(USizeRange { from: values[0], to: values[1] }),
             Err(_) => Err(AbstractSyntaxTokenError::RangeValueParseError)
         }
     }
+
+    pub fn lower_bound(&self) -> usize {
+        self.from
+    }
+
+    pub fn upper_bound(&self) -> usize {
+        self.to
+    }
 }
 
-impl From<&UnsignedIntRange> for RangeInclusive<u32> {
-    fn from(from: &UnsignedIntRange) -> Self {
+impl From<&USizeRange> for RangeInclusive<usize> {
+    fn from(from: &USizeRange) -> Self {
         Self::new(from.from, from.to)
     }
 }

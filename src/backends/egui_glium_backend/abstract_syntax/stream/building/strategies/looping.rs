@@ -29,7 +29,7 @@ impl BuildAbstractSyntaxTokenStreamStrategy for ForBuildAbstractSyntaxTokenStrea
 fn match_property_value(variable_name: &str, property_value: &SourceTokenPropertyValue) -> Result<AbstractSyntaxTokenProperty, AbstractSyntaxTokenError> {
     match property_value {
         SourceTokenPropertyValue::Array(token_result) => 
-        Ok(AbstractSyntaxTokenProperty::UnsignedIntRangeVariable(variable_name.to_string(), UnsignedIntRange::parse(token_result)?)),
+        Ok(AbstractSyntaxTokenProperty::USizeRangeVariable(variable_name.to_string(), USizeRange::parse(token_result)?)),
         _ => Err(AbstractSyntaxTokenError::UnknownProperty(variable_name.to_string())) 
     }
 }

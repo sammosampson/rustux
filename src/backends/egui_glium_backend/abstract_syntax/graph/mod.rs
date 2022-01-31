@@ -53,7 +53,8 @@ impl AbstractSyntaxGraph {
         parent: AbstractSyntaxGraphNodeId,
         node_type: AbstractSyntaxTokenType
     ) -> AbstractSyntaxGraphNodeId {
-        let id = self.add_node(AbstractSyntaxGraphNode::new(node_type, parent));
+        let node = AbstractSyntaxGraphNode::new(node_type, parent);
+        let id = self.add_node(node);
         if let Some(parent_node) = self.get_node_mut(parent) {
             parent_node.children.push(id);
         }        

@@ -15,6 +15,7 @@ pub enum AbstractSyntaxTokenError {
 pub enum AbstractSyntaxTokenType {
     Unknown,
     Root,
+    Container,
     For,
     Let,
     CentralPanel,
@@ -66,7 +67,7 @@ pub enum AbstractSyntaxTokenProperty {
     Colour(Colour), 
     BackgroundColour(Colour),
     OnSelect(Function),
-    UnsignedIntRangeVariable(String, UnsignedIntRange),
+    USizeRangeVariable(String, USizeRange),
     FunctionVariable(String, Function)
 }
 

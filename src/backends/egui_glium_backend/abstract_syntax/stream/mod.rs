@@ -18,10 +18,26 @@ pub enum EndNodeAction {
 }
 
 pub trait AbstractSyntaxTokenStreamVisitor {
-    fn token_error(&mut self, error: &AbstractSyntaxTokenError);
+    fn start_node_with_repeat_possibility(&mut self, position: usize, node_type: &AbstractSyntaxTokenType) {
+        self.push_last_node_position(position);
+        self.start_node(node_type)
+    }
+
+    fn end_node_with_repeat_check(&mut self, position: usize, node_type: &AbstractSyntaxTokenType) -> Option<USizeRange> {
+        if let Some(last_node_position) = self.pop_last_node_position() {
+            if self.end_node(node_type) == EndNodeAction::Repeat {
+                return Some(USizeRange::new(last_node_position, position));
+            }
+        }
+        None
+    }
+
+    fn push_last_node_position(&mut self, position: usize);
+    fn pop_last_node_position(&mut self) -> Option<usize>;
     fn start_node(&mut self, node_type: &AbstractSyntaxTokenType);
     fn property(&mut self, property: &AbstractSyntaxTokenProperty);
     fn end_node(&mut self, node_type: &AbstractSyntaxTokenType) -> EndNodeAction;
+    fn token_error(&mut self, error: &AbstractSyntaxTokenError);
 }
 
 #[derive(Debug, Clone, Default)]
@@ -59,18 +75,27 @@ impl AbstractSyntaxTokenStream {
     }
 
     pub fn accept(&self, visitor: &mut impl AbstractSyntaxTokenStreamVisitor) {
-        for node_result in &self.0 {
-            match node_result {
-                Ok(node) => match node {
-                    AbstractSyntaxToken::StartNode(node_type) => visitor.start_node(node_type),
-                    AbstractSyntaxToken::Property(property) => visitor.property(property),
-                    AbstractSyntaxToken::EndNode(node_type) =>
-                        if visitor.end_node(node_type) == EndNodeAction::Repeat {
+        for position in 0..self.0.len() {
+            self.accept_node(position, visitor);
+        }
+    }
 
-                        },
-                },
-                Err(error) => visitor.token_error(error),
-            }
+    fn accept_node(&self, position: usize, visitor: &mut impl AbstractSyntaxTokenStreamVisitor) {
+        let node_result = &self.0[position];
+
+        match node_result {
+            Ok(node) => match node {
+                AbstractSyntaxToken::StartNode(node_type) => visitor.start_node_with_repeat_possibility(position, node_type),
+                AbstractSyntaxToken::Property(property) => visitor.property(property),
+                AbstractSyntaxToken::EndNode(node_type) =>
+                    if let Some(range) = visitor.end_node_with_repeat_check(position, node_type) {
+                        for child_position in RangeInclusive::<usize>::from(&range) {
+                            self.accept_node(child_position, visitor);
+                        }
+                    },
+            },
+            Err(error) => visitor.token_error(error),
         }
     }
 }
+

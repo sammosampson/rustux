@@ -73,6 +73,8 @@ impl AbstractSyntaxTreeRenderer {
 
     fn render_child(&self, ui: &mut egui::Ui, context: &mut StateContext, ast: &AbstractSyntaxGraph, child: &AbstractSyntaxGraphNode) {
         match child.node_type() {
+            AbstractSyntaxTokenType::Container => 
+                self.render_children(ui, context, ast, child),
             AbstractSyntaxTokenType::ScrollArea => 
                 self.render_scroll_area(ui, child.properties().into(), | ui | self.render_children(ui, context, ast, child)),
             AbstractSyntaxTokenType::Separator => 

@@ -36,14 +36,14 @@ pub fn collect_array_floats(from: &Vec<ArrayTokenResult>, amount: usize) -> Resu
     Ok(collected)
 }
 
-pub fn collect_array_unsigned_ints(from: &Vec<ArrayTokenResult>, amount: usize) -> Result<Vec::<u32>, SpecificCollectionError> {
+pub fn collect_array_usizes(from: &Vec<ArrayTokenResult>, amount: usize) -> Result<Vec::<usize>, SpecificCollectionError> {
     let mut collected = vec!();
     if from.len() != amount {
         return Err(SpecificCollectionError::NotEnoughItems(from.len()));
     }
     for token in from {
         if let Ok(SourceTokenPropertyValue::UnsignedInt(value)) = token {
-            collected.push(*value as u32)
+            collected.push(*value as usize)
         } else {
             return Err(SpecificCollectionError::WrongType)
         }
