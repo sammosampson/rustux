@@ -34,6 +34,10 @@ impl AbstractSyntaxTokenStreamVisitor for AbstractSyntaxGraphBuilder {
     }
 
     fn start_node(&mut self, node_type: &AbstractSyntaxTokenType) {
+        if let Some(parent_strategy) = self.strategies.last_mut() {
+            parent_strategy.start_child_node(&mut self.ast);
+        }
+        
         let mut strategy = get_strategy(node_type);
         self.current_node = strategy.start_node(self.current_node, &mut self.ast);
         self.strategies.push(strategy);

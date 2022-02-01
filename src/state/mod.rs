@@ -90,3 +90,19 @@ impl Function {
         Ok(function)
     }
 }
+
+
+#[derive(Debug, Clone)]
+pub enum VariablePropertyType {
+    Usize(usize)
+}
+
+
+#[derive(Default)]
+pub struct DataContext(HashMap<String, VariablePropertyType>);
+
+impl DataContext {
+    pub fn set_variable(&mut self, variable: String, variable_value: VariablePropertyType) {
+        self.0.insert(variable, variable_value);
+    }
+}

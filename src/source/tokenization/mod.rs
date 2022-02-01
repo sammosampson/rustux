@@ -34,7 +34,8 @@ pub enum SourceTokenPropertyValue {
     UnsignedInt(u128),
     Float(f64), 
     Array(Vec<ArrayTokenResult>), 
-    Code(Vec<CodeTokenResult>)
+    Code(Vec<CodeTokenResult>),
+    Variable(String)
 }
 
 

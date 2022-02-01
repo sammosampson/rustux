@@ -3,13 +3,13 @@ use crate::prelude::*;
 // #[actions]
 #[derive(Debug)]
 pub enum Actions {
-    SelectItem(u16)
+    SelectItem(usize)
 }
 
 // #[state]
 #[derive(Debug, Default)]
 pub struct SelectedClickState {
-    selected: Option<u16>
+    selected: Option<usize>
 }
 
 // #[reducer]
@@ -22,7 +22,7 @@ impl SelectedClickState {
 }
 
 // #[selector]
-pub fn is_selected(state: &SelectedClickState, item_id: u16) -> bool {
+pub fn is_selected(state: &SelectedClickState, item_id: usize) -> bool {
     state.selected == Some(item_id)
 }
 
@@ -50,7 +50,7 @@ impl ActionContainer for SelectItemActionContainer {
     }
 
     fn run(&self, state: &mut State, arguments: &Vec<SourceTokenPropertyValue>) {
-        let action = Actions::SelectItem(collect_properties_unsigned_int(arguments, 0).unwrap());
+        let action = Actions::SelectItem(collect_properties_usize(arguments, 0).unwrap());
         println!("Running action {:?}", action);
         state.process(1, Box::new(| local_state: &SelectedClickState | local_state.process(action)));
     }

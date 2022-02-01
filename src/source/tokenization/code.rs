@@ -12,6 +12,7 @@ enum CodeState {
     InSignedNumberValue(usize),
     InUnsignedNumberValue(usize),
     InStringValue(usize),
+    InVariableValue(usize),
     EndValue,
     EndFunction,
     End,
@@ -103,6 +104,10 @@ impl<'a> CodeTokenizer<'a> {
             self.state = CodeState::InStringValue(index + 1);
             return None;
         }
+        if character == '$' {
+            self.state = CodeState::InVariableValue(index + 1);
+            return None;
+        }
         if character == ' ' {
             self.state = CodeState::InWhitespace;
             return None;
@@ -141,6 +146,11 @@ impl<'a> CodeTokenizer<'a> {
     fn produce_string_value_result(&mut self, start: usize, index: usize) -> CodeTokenOption {
         let value = self.splice_input(start, index);
         return Some(Ok(CodeTokenPropertyValue::PropertyValue(SourceTokenPropertyValue::String(value.to_string()))));
+    }
+
+    fn produce_variable_value_result(&mut self, start: usize, index: usize) -> CodeTokenOption {
+        let value = self.splice_input(start, index);
+        return Some(Ok(CodeTokenPropertyValue::PropertyValue(SourceTokenPropertyValue::Variable(value.to_string()))));
     }
 
     
@@ -185,6 +195,18 @@ impl<'a> CodeTokenizer<'a> {
         None
     }
 
+    fn handle_inside_variable_value(&mut self, start: usize, index: usize, character: char) -> CodeTokenOption {
+        if character == FUNCTION_CLOSING_BRACE {
+            self.state = CodeState::EndFunction;
+            return self.produce_variable_value_result(start, index);
+        }
+        if character == ',' {
+            self.state = CodeState::EndValue;
+            return self.produce_variable_value_result(start, index);
+        }
+        None
+    }
+
     fn transition(&mut self, index: usize, character: char) -> CodeTokenOption {
         match self.state {
             CodeState::Start => {
@@ -207,6 +229,9 @@ impl<'a> CodeTokenizer<'a> {
             },
             CodeState::InStringValue(start) => {
                 self.handle_inside_string_value(start, index, character)
+            },
+            CodeState::InVariableValue(start) => {
+                self.handle_inside_variable_value(start, index, character)
             },
             CodeState::EndValue => {
                 self.start_value_if_possible(index, character)

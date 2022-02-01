@@ -71,7 +71,6 @@ pub enum AbstractSyntaxTokenProperty {
     FunctionVariable(String, Function)
 }
 
-
 #[derive(Debug, Clone)]
 pub enum AbstractSyntaxToken {
     StartNode(AbstractSyntaxTokenType),

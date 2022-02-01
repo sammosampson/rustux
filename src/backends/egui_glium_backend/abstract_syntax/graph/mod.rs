@@ -3,12 +3,18 @@ mod building;
 pub use building::*;
 use crate::prelude::*;
 
+
 pub struct AbstractSyntaxGraph {
     nodes: Vec<AbstractSyntaxGraphNode>,
-    id_cursor: AbstractSyntaxGraphNodeId
+    id_cursor: AbstractSyntaxGraphNodeId,
+    data_context: DataContext
 }
 
 impl AbstractSyntaxGraph {
+    pub fn data_context(&mut self) -> &mut DataContext {
+        &mut self.data_context
+    }
+
     pub fn get_root(&self) -> Option<&AbstractSyntaxGraphNode> {
         self.get_node(AbstractSyntaxGraphNodeId::root())
     }
@@ -78,7 +84,8 @@ impl Default for AbstractSyntaxGraph {
     fn default() -> Self {
         Self {
             nodes: vec!(),
-            id_cursor: AbstractSyntaxGraphNodeId::default()
+            id_cursor: AbstractSyntaxGraphNodeId::default(),
+            data_context: DataContext::default()
         }
     }
 }

@@ -51,13 +51,13 @@ pub fn collect_array_usizes(from: &Vec<ArrayTokenResult>, amount: usize) -> Resu
     Ok(collected)
 }
 
-pub fn collect_properties_unsigned_int(from: &Vec<SourceTokenPropertyValue>, position: usize) -> Result<u16, SpecificCollectionError> {
+pub fn collect_properties_usize(from: &Vec<SourceTokenPropertyValue>, position: usize) -> Result<usize, SpecificCollectionError> {
     if from.len() < position + 1 {
         return Err(SpecificCollectionError::NotEnoughItems(from.len()));
     }
 
     if let SourceTokenPropertyValue::UnsignedInt(value) = from[position] {
-        return Ok(value as u16);
+        return Ok(value as usize);
     }
     
     Err(SpecificCollectionError::WrongType)

@@ -30,14 +30,14 @@
                 <label text="label11" />
             </scroll-area>
             <separator />
-            <scroll-area id="scroll-area2" max-height=100.0 >
+            <scroll-area id="scroll-area2" max-height=100.0>
                 <for $item_id=[0, 10]>
-                    <selectable-label text="selectable-label4" selected on-select={ruxy::examples::first::select_item(1)} />
+                    <selectable-label text="selectable-label4" selected on-select={ruxy::examples::first::select_item($item_id)} />
                 </for>
             </scroll-area>
             <separator />
             <separator />
-            <scroll-area id="scroll-area3" max-height=100.0 >
+            <scroll-area id="scroll-area3" max-height=100.0>
                 <coloured-label text="coloured label" colour=[255, 0, 0, 255] />
                 <coloured-label text="coloured label" colour=[255, 0, 0, 255] />
                 <coloured-label text="coloured label" colour=[255, 0, 0, 255] />

@@ -3,6 +3,7 @@ use crate::prelude::*;
 
 #[derive(Default)]
 pub struct ForBuildAbstractSyntaxGraphStreamStrategy {
+    variable: Option<String>,
     range: Option<USizeRange>,
     current_position: usize
 }
@@ -18,7 +19,8 @@ impl BuildAbstractSyntaxGraphStreamStrategy for ForBuildAbstractSyntaxGraphStrea
 
     fn property(&mut self, _node: AbstractSyntaxGraphNodeId, property: AbstractSyntaxTokenProperty, _ast: &mut AbstractSyntaxGraph) {
         match property {
-            AbstractSyntaxTokenProperty::USizeRangeVariable(_variable, range) => {
+            AbstractSyntaxTokenProperty::USizeRangeVariable(variable, range) => {
+                self.variable = Some(variable);
                 self.current_position = range.lower_bound();
                 self.range = Some(range);
             },
@@ -26,10 +28,16 @@ impl BuildAbstractSyntaxGraphStreamStrategy for ForBuildAbstractSyntaxGraphStrea
         }
     }
 
+    fn start_child_node(&mut self, ast: &mut AbstractSyntaxGraph) {
+        if let Some(variable) = &self.variable {
+            ast.data_context().set_variable(variable.clone(), VariablePropertyType::Usize(self.current_position))
+        }
+    }
+
     fn end_child_node(&mut self) -> EndNodeAction {
         if let Some(range) = &self.range {
             self.current_position += 1;
-            if self.current_position < range.upper_bound() {
+            if self.current_position <= range.upper_bound() {
                 return EndNodeAction::Repeat
             }
         }
