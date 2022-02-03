@@ -64,15 +64,15 @@ impl Default for TopBottomPanelProperties {
     }
 }
 
-impl From<&Vec<AbstractSyntaxTokenProperty>> for TopBottomPanelProperties {
-    fn from(from: &Vec<AbstractSyntaxTokenProperty>) -> Self {
+impl From<&Vec<AbstractSyntaxProperty>> for TopBottomPanelProperties {
+    fn from(from: &Vec<AbstractSyntaxProperty>) -> Self {
         let mut to = Self::default();
         for property in from {
-            match property {
-                AbstractSyntaxTokenProperty::Id(value) => to.id = value.clone(),
-                AbstractSyntaxTokenProperty::Resizable(value) => to.resizable = *value,
-                AbstractSyntaxTokenProperty::DefaultHeight(value) => to.default_height = Some(*value),
-                AbstractSyntaxTokenProperty::HeightRange(value) => to.height_range = RangeInclusive::<f32>::from(value),
+            match property.property_type() {
+                AbstractSyntaxPropertyType::Id => to.id = property.value().get_string_value().unwrap(),
+                AbstractSyntaxPropertyType::Resizable => to.resizable = property.value().get_bool_value().unwrap(),
+                AbstractSyntaxPropertyType::DefaultHeight => to.default_height = Some(property.value().get_float_value().unwrap()),
+                AbstractSyntaxPropertyType::HeightRange => to.height_range = property.value().get_float_range_value().unwrap(),
                 _ => {}
             }
         }
@@ -98,15 +98,15 @@ impl Default for SidePanelProperties {
     }
 }
 
-impl From<&Vec<AbstractSyntaxTokenProperty>> for SidePanelProperties {
-    fn from(from: &Vec<AbstractSyntaxTokenProperty>) -> Self {
+impl From<&Vec<AbstractSyntaxProperty>> for SidePanelProperties {
+    fn from(from: &Vec<AbstractSyntaxProperty>) -> Self {
         let mut to = Self::default();
         for property in from {
-            match property {
-                AbstractSyntaxTokenProperty::Id(value) => to.id = value.clone(),
-                AbstractSyntaxTokenProperty::Resizable(value) => to.resizable = *value,
-                AbstractSyntaxTokenProperty::DefaultWidth(value) => to.default_width = *value,
-                AbstractSyntaxTokenProperty::WidthRange(value) => to.width_range = RangeInclusive::<f32>::from(value),
+            match property.property_type() {
+                AbstractSyntaxPropertyType::Id => to.id = property.value().get_string_value().unwrap(),
+                AbstractSyntaxPropertyType::Resizable => to.resizable = property.value().get_bool_value().unwrap(),
+                AbstractSyntaxPropertyType::DefaultWidth => to.default_width = property.value().get_float_value().unwrap(),
+                AbstractSyntaxPropertyType::WidthRange => to.width_range = property.value().get_float_range_value().unwrap(),
                 _ => {}
             }
         }

@@ -63,24 +63,24 @@ impl SourceTokenVisitor for BuildAbstractSyntaxSourceTokenVisitor {
 
 fn match_control_name(control_name: &str) -> Box<dyn BuildAbstractSyntaxTokenStreamStrategy> {
     match control_name {
-        "root" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::Root)),
+        "root" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxControlType::Root)),
         "for" => Box::new(ForBuildAbstractSyntaxTokenStreamStrategy),
         "let" => Box::new(LetBuildAbstractSyntaxTokenStreamStrategy),
-        "central-panel" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::CentralPanel)),
-        "top-panel" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::TopPanel)),
-        "bottom-panel" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::BottomPanel)),
-        "left-side-bar" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::LeftSidebar)),
-        "right-side-bar" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::RightSidebar)),
-        "scroll-area" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::ScrollArea)),
-        "separator" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::Separator)),
-        "horizontal" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::Horizontal)),
-        "vertical" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::Vertical)),
-        "label" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::Label)),
-        "coloured-label" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::ColouredLabel)),
-        "selectable-label" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::SelectableLabel)),
-        "heading" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::Heading)),
-        "monospace" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::Monospace)),
-        "code" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::Code)),
-        _ => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxTokenType::Unknown))
+        "central-panel" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxControlType::CentralPanel)),
+        "top-panel" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxControlType::TopPanel)),
+        "bottom-panel" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxControlType::BottomPanel)),
+        "left-side-bar" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxControlType::LeftSidebar)),
+        "right-side-bar" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxControlType::RightSidebar)),
+        "scroll-area" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxControlType::ScrollArea)),
+        "separator" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxControlType::Separator)),
+        "horizontal" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxControlType::Horizontal)),
+        "vertical" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxControlType::Vertical)),
+        "label" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxControlType::Label)),
+        "coloured-label" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxControlType::ColouredLabel)),
+        "selectable-label" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxControlType::SelectableLabel)),
+        "heading" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxControlType::Heading)),
+        "monospace" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxControlType::Monospace)),
+        "code" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxControlType::Code)),
+        _ => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxControlType::Unknown))
     }
 }

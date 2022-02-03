@@ -11,7 +11,7 @@ pub fn property_with_array_value_produces_property_and_value_result_inside_contr
             SourceTokenPropertyValue::Array(
                 vec!(
                     Ok(SourceTokenPropertyValue::Float(1.0)),
-                    Ok(SourceTokenPropertyValue::UnsignedInt(2)),
+                    Ok(SourceTokenPropertyValue::USize(2)),
                     Ok(SourceTokenPropertyValue::Int(-5)),
                     Ok(SourceTokenPropertyValue::String(String::from("xxx")))
                 )

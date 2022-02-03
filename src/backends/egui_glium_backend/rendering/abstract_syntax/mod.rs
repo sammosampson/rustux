@@ -51,15 +51,15 @@ impl AbstractSyntaxTreeRenderer {
 
     fn render_top_level(&self, context: &mut StateContext, ast: &AbstractSyntaxGraph, node: &AbstractSyntaxGraphNode) {
         match node.node_type() {
-            AbstractSyntaxTokenType::CentralPanel =>
+            AbstractSyntaxControlType::CentralPanel =>
                 self.render_central_panel(| ui | self.render_children(ui, context, ast, node)),
-            AbstractSyntaxTokenType::TopPanel =>
+            AbstractSyntaxControlType::TopPanel =>
                 self.render_top_panel(node.properties().into(), | ui | self.render_children(ui, context, ast, node)),
-            AbstractSyntaxTokenType::BottomPanel =>
+            AbstractSyntaxControlType::BottomPanel =>
                 self.render_bottom_panel(node.properties().into(), | ui | self.render_children(ui, context, ast, node)),
-            AbstractSyntaxTokenType::LeftSidebar =>
+            AbstractSyntaxControlType::LeftSidebar =>
                 self.render_left_side_panel(node.properties().into(), | ui | self.render_children(ui, context, ast, node)),
-            AbstractSyntaxTokenType::RightSidebar =>
+            AbstractSyntaxControlType::RightSidebar =>
                 self.render_right_side_panel(node.properties().into(), | ui | self.render_children(ui, context, ast, node)),
             _ => {}
         }
@@ -73,27 +73,27 @@ impl AbstractSyntaxTreeRenderer {
 
     fn render_child(&self, ui: &mut egui::Ui, context: &mut StateContext, ast: &AbstractSyntaxGraph, child: &AbstractSyntaxGraphNode) {
         match child.node_type() {
-            AbstractSyntaxTokenType::Container => 
+            AbstractSyntaxControlType::Container => 
                 self.render_children(ui, context, ast, child),
-            AbstractSyntaxTokenType::ScrollArea => 
+            AbstractSyntaxControlType::ScrollArea => 
                 self.render_scroll_area(ui, child.properties().into(), | ui | self.render_children(ui, context, ast, child)),
-            AbstractSyntaxTokenType::Separator => 
+            AbstractSyntaxControlType::Separator => 
                 self.render_separator(ui),
-            AbstractSyntaxTokenType::Horizontal => 
+            AbstractSyntaxControlType::Horizontal => 
                 self.render_horizontal(ui, | ui | self.render_children(ui, context, ast, child)),
-            AbstractSyntaxTokenType::Vertical => 
+            AbstractSyntaxControlType::Vertical => 
                 self.render_vertical(ui, | ui | self.render_children(ui, context, ast, child)),
-            AbstractSyntaxTokenType::Label => 
+            AbstractSyntaxControlType::Label => 
                 self.render_label(ui, child.properties().into()),
-            AbstractSyntaxTokenType::ColouredLabel => 
+            AbstractSyntaxControlType::ColouredLabel => 
                 self.render_coloured_label(ui, child.properties().into()),
-            AbstractSyntaxTokenType::SelectableLabel => 
+            AbstractSyntaxControlType::SelectableLabel => 
                 self.render_selectable_label(ui, context, child.properties().into()),
-            AbstractSyntaxTokenType::Heading => 
+            AbstractSyntaxControlType::Heading => 
                 self.render_heading(ui, child.properties().into()),
-            AbstractSyntaxTokenType::Monospace => 
+            AbstractSyntaxControlType::Monospace => 
                 self.render_monospace(ui, child.properties().into()),
-            AbstractSyntaxTokenType::Code => 
+            AbstractSyntaxControlType::Code => 
                 self.render_code(ui, child.properties().into()),
             _ => {}
         }

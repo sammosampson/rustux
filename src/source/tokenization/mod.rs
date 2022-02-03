@@ -31,7 +31,7 @@ pub enum SourceTokenError {
 pub enum SourceTokenPropertyValue {
     String(String),
     Int(i128),
-    UnsignedInt(u128),
+    USize(usize),
     Float(f64), 
     Array(Vec<ArrayTokenResult>), 
     Code(Vec<CodeTokenResult>),

@@ -11,7 +11,7 @@ enum SourceState {
     InProperty(usize),
     InStringPropertyValue(usize),
     InVariablePropertyValue(usize),
-    InUnsignedNumberPropertyValue(usize),
+    InUSizeNumberPropertyValue(usize),
     InSignedNumberPropertyValue(usize),
     InArrayPropertyValue(usize),
     InCodePropertyValue(usize),
@@ -82,8 +82,8 @@ impl<'a> SourceTokenizer<'a> {
             SourceState::InVariablePropertyValue(start) => {
                 self.handle_inside_variable_property_value(start, index, character)
             },
-            SourceState::InUnsignedNumberPropertyValue(start) => {
-                self.handle_inside_unsigned_number_property_value(start, index, character)
+            SourceState::InUSizeNumberPropertyValue(start) => {
+                self.handle_inside_usize_number_property_value(start, index, character)
             },
             SourceState::InSignedNumberPropertyValue(start) => {
                 self.handle_inside_signed_number_property_value(start, index, character)
@@ -192,7 +192,7 @@ impl<'a> SourceTokenizer<'a> {
             return None;
         }
         if character.is_numeric() {
-            self.state = SourceState::InUnsignedNumberPropertyValue(index);
+            self.state = SourceState::InUSizeNumberPropertyValue(index);
             return None;
         }
         if character == '-' {
@@ -218,10 +218,10 @@ impl<'a> SourceTokenizer<'a> {
         Some(Ok(SourceToken::PropertyValue(SourceTokenPropertyValue::Variable(String::from(self.splice_input(start, index))))))
     }
 
-    fn produce_unsigned_number_property_value_result(&mut self, start: usize, index: usize) -> SourceTokenOption {
+    fn produce_usize_number_property_value_result(&mut self, start: usize, index: usize) -> SourceTokenOption {
         let raw_value = self.splice_input(start, index);
-        match raw_value.parse::<u128>() {
-            Ok(value) => return Some(Ok(SourceToken::PropertyValue(SourceTokenPropertyValue::UnsignedInt(value)))),
+        match raw_value.parse::<usize>() {
+            Ok(value) => return Some(Ok(SourceToken::PropertyValue(SourceTokenPropertyValue::USize(value)))),
             Err(_) => return self.produce_float_property_value_result(raw_value, index)
         }
     }
@@ -271,14 +271,14 @@ impl<'a> SourceTokenizer<'a> {
         None
     }
 
-    fn handle_inside_unsigned_number_property_value(&mut self, start: usize, index: usize, character: char)  -> SourceTokenOption {
+    fn handle_inside_usize_number_property_value(&mut self, start: usize, index: usize, character: char)  -> SourceTokenOption {
         if character == ' ' || character.is_whitespace() {
             self.state = SourceState::InWhitespace;
-            return self.produce_unsigned_number_property_value_result(start, index);
+            return self.produce_usize_number_property_value_result(start, index);
         }
         if character == '>' {
             self.state = SourceState::Start;
-            return self.produce_unsigned_number_property_value_result(start, index);
+            return self.produce_usize_number_property_value_result(start, index);
         }
         None
     }

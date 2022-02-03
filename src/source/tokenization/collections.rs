@@ -9,7 +9,7 @@ enum ArrayState {
     StartValue,
     EndArray,
     InSignedNumberValue(usize),
-    InUnsignedNumberValue(usize),
+    InUSizeNumberValue(usize),
     InStringValue(usize),
     EndValue,
     InWhitespace
@@ -62,7 +62,7 @@ impl<'a> ArrayTokenizer<'a> {
             return None;
         }
         if character.is_numeric() {
-            self.state = ArrayState::InUnsignedNumberValue(index);
+            self.state = ArrayState::InUSizeNumberValue(index);
             return None;
         }
         if character == '-' {
@@ -88,10 +88,10 @@ impl<'a> ArrayTokenizer<'a> {
         }
     }
 
-    fn produce_unsigned_number_value_result(&mut self, start: usize, index: usize) -> ArrayTokenOption {
+    fn produce_usize_value_result(&mut self, start: usize, index: usize) -> ArrayTokenOption {
         let raw_value = self.splice_input(start, index);
-        match raw_value.parse::<u128>() {
-            Ok(value) => return Some(Ok(SourceTokenPropertyValue::UnsignedInt(value))),
+        match raw_value.parse::<usize>() {
+            Ok(value) => return Some(Ok(SourceTokenPropertyValue::USize(value))),
             Err(_) => return self.produce_float_value_result(raw_value, index)
         }
     }
@@ -108,14 +108,14 @@ impl<'a> ArrayTokenizer<'a> {
         return Some(Ok(SourceTokenPropertyValue::String(value.to_string())));
     }
 
-    fn handle_inside_unsigned_number_value(&mut self, start: usize, index: usize, character: char) -> ArrayTokenOption {
+    fn handle_inside_usize_value(&mut self, start: usize, index: usize, character: char) -> ArrayTokenOption {
         if character == ARRAY_CLOSING_CHAR {
             self.state = ArrayState::EndArray;
-            return self.produce_unsigned_number_value_result(start, index);
+            return self.produce_usize_value_result(start, index);
         }
         if character == ',' {
             self.state = ArrayState::EndValue;
-            return self.produce_unsigned_number_value_result(start, index);
+            return self.produce_usize_value_result(start, index);
         }
         None
     }
@@ -151,8 +151,8 @@ impl<'a> ArrayTokenizer<'a> {
             ArrayState::InSignedNumberValue(start) => {
                 self.handle_inside_signed_number_value(start, index, character)
             },
-            ArrayState::InUnsignedNumberValue(start) => {
-                self.handle_inside_unsigned_number_value(start, index, character)
+            ArrayState::InUSizeNumberValue(start) => {
+                self.handle_inside_usize_value(start, index, character)
             },
             ArrayState::InStringValue(start) => {
                 self.handle_inside_string_value(start, index, character)

@@ -12,7 +12,7 @@ pub enum AbstractSyntaxTokenError {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AbstractSyntaxTokenType {
+pub enum AbstractSyntaxControlType {
     Unknown,
     Root,
     Container,
@@ -35,47 +35,71 @@ pub enum AbstractSyntaxTokenType {
     Code
 }
 
-impl Default for AbstractSyntaxTokenType {
+impl Default for AbstractSyntaxControlType {
     fn default() -> Self {
         Self::Unknown
     }
 }
 
+pub fn create_ast_property(
+    property_type: AbstractSyntaxPropertyType,
+    value: AbstractSyntaxPropertyValue
+) -> AbstractSyntaxProperty {
+    AbstractSyntaxProperty(property_type, value)
+}
+
 #[derive(Debug, Clone)]
-pub enum AbstractSyntaxTokenProperty {
-    Id(String),
-    Text(String),
-    Selected(bool),
-    Resizable(bool),
-    Wrap(bool),
-    Code(bool),
-    Strong(bool),
-    Weak(bool),
-    Strikethrough(bool),
-    Underline(bool),
-    Italics(bool),
-    Raised(bool),
-    TextStyle(TextStyle),
-    DefaultWidth(f32),
-    DefaultHeight(f32),
-    WidthRange(FloatRange),
-    HeightRange(FloatRange),
-    VerticallySized(VerticalSize), 
-    AlwaysShowScroll(bool),
-    ScrollOffset(f32),
-    EnableScrolling(bool),
-    Colour(Colour), 
-    BackgroundColour(Colour),
-    OnSelect(Function),
-    USizeRangeVariable(String, USizeRange),
-    FunctionVariable(String, Function)
+pub struct AbstractSyntaxProperty(AbstractSyntaxPropertyType, AbstractSyntaxPropertyValue);
+
+impl AbstractSyntaxProperty {
+    pub fn property_type(&self) -> &AbstractSyntaxPropertyType {
+        &self.0
+    }
+
+    pub fn value(&self) -> &AbstractSyntaxPropertyValue {
+        &self.1
+    }
+
+    pub fn set_value(&self, value: AbstractSyntaxPropertyValue) -> AbstractSyntaxProperty {
+        AbstractSyntaxProperty(self.0.clone(), value)
+    }
+}
+
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub enum AbstractSyntaxPropertyType {
+    Id,
+    Text,
+    Selected,
+    Resizable,
+    Wrap,
+    Code,
+    Strong,
+    Weak,
+    Strikethrough,
+    Underline,
+    Italics,
+    Raised,
+    TextStyle,
+    DefaultWidth,
+    DefaultHeight,
+    WidthRange,
+    HeightRange,
+    VerticallySized, 
+    AlwaysShowScroll,
+    ScrollOffset,
+    EnableScrolling,
+    Colour, 
+    BackgroundColour,
+    OnSelect,
+    USizeRangeVariable,
+    FunctionVariable
 }
 
 #[derive(Debug, Clone)]
 pub enum AbstractSyntaxToken {
-    StartNode(AbstractSyntaxTokenType),
-    Property(AbstractSyntaxTokenProperty),
-    EndNode(AbstractSyntaxTokenType),
+    StartControl(AbstractSyntaxControlType),
+    Property(AbstractSyntaxProperty),
+    EndControl(AbstractSyntaxControlType),
 }
 
 pub type AbstractSyntaxTokenResult = Result<AbstractSyntaxToken, AbstractSyntaxTokenError>;

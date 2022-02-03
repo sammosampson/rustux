@@ -61,16 +61,16 @@ impl Default for ScrollAreaProperties {
     }
 }
 
-impl From<&Vec<AbstractSyntaxTokenProperty>> for ScrollAreaProperties {
-    fn from(from: &Vec<AbstractSyntaxTokenProperty>) -> Self {
+impl From<&Vec<AbstractSyntaxProperty>> for ScrollAreaProperties {
+    fn from(from: &Vec<AbstractSyntaxProperty>) -> Self {
         let mut to = Self::default();
         for property in from {
-            match property {
-                AbstractSyntaxTokenProperty::Id(value) => to.id = value.clone(),
-                AbstractSyntaxTokenProperty::VerticallySized(value) => to.size = *value,
-                AbstractSyntaxTokenProperty::AlwaysShowScroll(value) => to.always_show_scroll = *value,
-                AbstractSyntaxTokenProperty::ScrollOffset(value) => to.scroll_offset = Some(*value),
-                AbstractSyntaxTokenProperty::EnableScrolling(value) => to.enable_scrolling = *value,
+            match property.property_type() {
+                AbstractSyntaxPropertyType::Id => to.id = property.value().get_string_value().unwrap(),
+                AbstractSyntaxPropertyType::VerticallySized => to.size = property.value().get_vertical_size_value().unwrap(),
+                AbstractSyntaxPropertyType::AlwaysShowScroll => to.always_show_scroll = property.value().get_bool_value().unwrap(),
+                AbstractSyntaxPropertyType::ScrollOffset => to.scroll_offset = Some(property.value().get_float_value().unwrap()),
+                AbstractSyntaxPropertyType::EnableScrolling => to.enable_scrolling = property.value().get_bool_value().unwrap(),
                 _ => {}
             }
         }

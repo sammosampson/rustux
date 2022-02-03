@@ -4,7 +4,7 @@ pub struct ForBuildAbstractSyntaxTokenStreamStrategy;
 
 impl BuildAbstractSyntaxTokenStreamStrategy for ForBuildAbstractSyntaxTokenStreamStrategy {
     fn control(&self, ast: &mut AbstractSyntaxTokenStream) {
-        ast.start_node(AbstractSyntaxTokenType::For);
+        ast.start_node(AbstractSyntaxControlType::For);
     }
     
     fn property(&self, _property: &CurrentProperty, _ast: &mut AbstractSyntaxTokenStream) {
@@ -22,14 +22,17 @@ impl BuildAbstractSyntaxTokenStreamStrategy for ForBuildAbstractSyntaxTokenStrea
     }
 
     fn end_control(&self, ast: &mut AbstractSyntaxTokenStream) {
-        ast.end_node(AbstractSyntaxTokenType::For);
+        ast.end_node(AbstractSyntaxControlType::For);
     }
 }
 
-fn match_property_value(variable_name: &str, property_value: &SourceTokenPropertyValue) -> Result<AbstractSyntaxTokenProperty, AbstractSyntaxTokenError> {
+fn match_property_value(variable_name: &str, property_value: &SourceTokenPropertyValue) -> Result<AbstractSyntaxProperty, AbstractSyntaxTokenError> {
     match property_value {
         SourceTokenPropertyValue::Array(token_result) => 
-        Ok(AbstractSyntaxTokenProperty::USizeRangeVariable(variable_name.to_string(), USizeRange::parse(token_result)?)),
+        Ok(create_ast_property(
+            AbstractSyntaxPropertyType::USizeRangeVariable, 
+            AbstractSyntaxPropertyValue::USizeRangeVariable(variable_name.to_string(), USizeRange::parse(token_result)?)
+        )),
         _ => Err(AbstractSyntaxTokenError::UnknownProperty(variable_name.to_string())) 
     }
 }

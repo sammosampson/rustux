@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-pub struct StandardBuildAbstractSyntaxTokenStreamStrategy(pub AbstractSyntaxTokenType);
+pub struct StandardBuildAbstractSyntaxTokenStreamStrategy(pub AbstractSyntaxControlType);
 
 impl BuildAbstractSyntaxTokenStreamStrategy for StandardBuildAbstractSyntaxTokenStreamStrategy {
     fn control(&self, ast: &mut AbstractSyntaxTokenStream) {
@@ -38,82 +38,119 @@ impl BuildAbstractSyntaxTokenStreamStrategy for StandardBuildAbstractSyntaxToken
     }
 }
 
-fn match_property_value(property_name: &str, property_value: &SourceTokenPropertyValue) -> Result<AbstractSyntaxTokenProperty, AbstractSyntaxTokenError> {
+fn match_property_value(property_name: &str, property_value: &SourceTokenPropertyValue) -> Result<AbstractSyntaxProperty, AbstractSyntaxTokenError> {
     match property_name {
         "id" => {
             match property_value {
-                SourceTokenPropertyValue::String(value) => Ok(AbstractSyntaxTokenProperty::Id(value.clone())),
+                SourceTokenPropertyValue::String(value) => Ok(create_ast_property(
+                    AbstractSyntaxPropertyType::Id, 
+                    AbstractSyntaxPropertyValue::String(value.clone())
+                )),
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
         },
         "text" => {
             match property_value {
-                SourceTokenPropertyValue::String(value) => Ok(AbstractSyntaxTokenProperty::Text(value.clone())),
+                SourceTokenPropertyValue::String(value) => Ok(create_ast_property(
+                    AbstractSyntaxPropertyType::Text, 
+                    AbstractSyntaxPropertyValue::String(value.clone())
+                )),
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
         },
         "default-width" => {
             match property_value {
-                SourceTokenPropertyValue::Float(value) => Ok(AbstractSyntaxTokenProperty::DefaultWidth(*value as f32)),
+                SourceTokenPropertyValue::Float(value) => Ok(create_ast_property(
+                    AbstractSyntaxPropertyType::DefaultWidth, 
+                    AbstractSyntaxPropertyValue::Float(*value as f32)
+                )),
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
         },
         "default-height" => {
             match property_value {
-                SourceTokenPropertyValue::Float(value) => Ok(AbstractSyntaxTokenProperty::DefaultHeight(*value as f32)),
+                SourceTokenPropertyValue::Float(value) => Ok(create_ast_property(
+                    AbstractSyntaxPropertyType::DefaultHeight, 
+                    AbstractSyntaxPropertyValue::Float(*value as f32)
+                )),
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
         },
         "height-range" => {
             match property_value {
                 SourceTokenPropertyValue::Array(value) => 
-                    Ok(AbstractSyntaxTokenProperty::HeightRange(FloatRange::parse(value)?)),
+                Ok(create_ast_property(
+                    AbstractSyntaxPropertyType::HeightRange, 
+                    AbstractSyntaxPropertyValue::FloatRange(FloatRange::parse(value)?)
+                )),
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
         },
         "width-range" => {
             match property_value {
                 SourceTokenPropertyValue::Array(value) => 
-                    Ok(AbstractSyntaxTokenProperty::WidthRange(FloatRange::parse(value)?)),
+                Ok(create_ast_property(
+                    AbstractSyntaxPropertyType::WidthRange, 
+                    AbstractSyntaxPropertyValue::FloatRange(FloatRange::parse(value)?)
+                )),
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
         },
         "colour" => {
             match property_value {
                 SourceTokenPropertyValue::Array(value) => 
-                    Ok(AbstractSyntaxTokenProperty::Colour(Colour::parse(value)?)),
+                    Ok(create_ast_property(
+                        AbstractSyntaxPropertyType::Colour, 
+                        AbstractSyntaxPropertyValue::Colour(Colour::parse(value)?)
+                    )),
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
         },
         "background-colour" => {
             match property_value {
                 SourceTokenPropertyValue::Array(value) => 
-                    Ok(AbstractSyntaxTokenProperty::BackgroundColour(Colour::parse(value)?)),
+                Ok(create_ast_property(
+                    AbstractSyntaxPropertyType::BackgroundColour, 
+                    AbstractSyntaxPropertyValue::Colour(Colour::parse(value)?)
+                )),
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
         },
         "text-style" => {
             match property_value {
-                SourceTokenPropertyValue::String(value)
-                    => Ok(AbstractSyntaxTokenProperty::TextStyle(TextStyle::parse(value)?)),
+                SourceTokenPropertyValue::String(value) =>
+                    Ok(create_ast_property(
+                        AbstractSyntaxPropertyType::TextStyle, 
+                        AbstractSyntaxPropertyValue::TextStyle(TextStyle::parse(value)?)
+                    )),
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string()))
             }
         },
         "max-height" => {
             match property_value {
-                SourceTokenPropertyValue::Float(value) => Ok(AbstractSyntaxTokenProperty::VerticallySized(VerticalSize::MaxHeight(*value as f32))),
+                SourceTokenPropertyValue::Float(value) => 
+                Ok(create_ast_property(
+                    AbstractSyntaxPropertyType::VerticallySized, 
+                    AbstractSyntaxPropertyValue::VerticalSize(VerticalSize::MaxHeight(*value as f32))
+                )),
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
         },
         "scroll_offset" => {
             match property_value {
-                SourceTokenPropertyValue::Float(value) => Ok(AbstractSyntaxTokenProperty::ScrollOffset(*value as f32)),
+                SourceTokenPropertyValue::Float(value) => Ok(create_ast_property(
+                    AbstractSyntaxPropertyType::ScrollOffset, 
+                    AbstractSyntaxPropertyValue::Float(*value as f32)
+                )),
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
         },
         "on-select" => {
             match property_value {
-                SourceTokenPropertyValue::Code(value) => Ok(AbstractSyntaxTokenProperty::OnSelect(Function::parse(value)?)),
+                SourceTokenPropertyValue::Code(value) => Ok(create_ast_property(
+                    AbstractSyntaxPropertyType::OnSelect, 
+                    AbstractSyntaxPropertyValue::Function(Function::parse(value)?)
+                )),
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
         },
@@ -121,21 +158,21 @@ fn match_property_value(property_name: &str, property_value: &SourceTokenPropert
     }
 }
 
-fn match_property_only(property_name: &str) -> Option<AbstractSyntaxTokenProperty> {
+fn match_property_only(property_name: &str) -> Option<AbstractSyntaxProperty> {
     match property_name {
-        "selected" => Some(AbstractSyntaxTokenProperty::Selected(true)),
-        "resizable" => Some(AbstractSyntaxTokenProperty::Resizable(true)),
-        "wrap" => Some(AbstractSyntaxTokenProperty::Wrap(true)),
-        "code" => Some(AbstractSyntaxTokenProperty::Code(true)),
-        "strong" => Some(AbstractSyntaxTokenProperty::Strong(true)),
-        "weak" => Some(AbstractSyntaxTokenProperty::Weak(true)),
-        "strike-through" => Some(AbstractSyntaxTokenProperty::Strikethrough(true)),
-        "underline" => Some(AbstractSyntaxTokenProperty::Underline(true)),
-        "italics" => Some(AbstractSyntaxTokenProperty::Italics(true)),
-        "raised" => Some(AbstractSyntaxTokenProperty::Raised(true)),
-        "auto-sized" => Some(AbstractSyntaxTokenProperty::VerticallySized(VerticalSize::Auto)),
-        "always_show_scroll" => Some(AbstractSyntaxTokenProperty::AlwaysShowScroll(true)),
-        "enable_scrolling" => Some(AbstractSyntaxTokenProperty::EnableScrolling(true)),
+        "selected" => Some(create_ast_property(AbstractSyntaxPropertyType::Selected, AbstractSyntaxPropertyValue::Bool(true))),
+        "resizable" => Some(create_ast_property(AbstractSyntaxPropertyType::Resizable, AbstractSyntaxPropertyValue::Bool(true))),
+        "wrap" => Some(create_ast_property(AbstractSyntaxPropertyType::Wrap, AbstractSyntaxPropertyValue::Bool(true))),
+        "code" => Some(create_ast_property(AbstractSyntaxPropertyType::Code, AbstractSyntaxPropertyValue::Bool(true))),
+        "strong" => Some(create_ast_property(AbstractSyntaxPropertyType::Strong, AbstractSyntaxPropertyValue::Bool(true))),
+        "weak" => Some(create_ast_property(AbstractSyntaxPropertyType::Weak, AbstractSyntaxPropertyValue::Bool(true))),
+        "strike-through" => Some(create_ast_property(AbstractSyntaxPropertyType::Strikethrough, AbstractSyntaxPropertyValue::Bool(true))),
+        "underline" => Some(create_ast_property(AbstractSyntaxPropertyType::Underline, AbstractSyntaxPropertyValue::Bool(true))),
+        "italics" => Some(create_ast_property(AbstractSyntaxPropertyType::Italics, AbstractSyntaxPropertyValue::Bool(true))),
+        "raised" => Some(create_ast_property(AbstractSyntaxPropertyType::Raised, AbstractSyntaxPropertyValue::Bool(true))),
+        "auto-sized" => Some(create_ast_property(AbstractSyntaxPropertyType::VerticallySized, AbstractSyntaxPropertyValue::VerticalSize(VerticalSize::Auto))),
+        "always_show_scroll" => Some(create_ast_property(AbstractSyntaxPropertyType::AlwaysShowScroll, AbstractSyntaxPropertyValue::Bool(true))),
+        "enable_scrolling" => Some(create_ast_property(AbstractSyntaxPropertyType::EnableScrolling, AbstractSyntaxPropertyValue::Bool(true))),
         _ => None 
     }
 }

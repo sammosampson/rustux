@@ -32,8 +32,8 @@ fn property_with_function_value_produces_property_and_value_result_inside_contro
             SourceTokenPropertyValue::Code(
                 vec!(
                     Ok(CodeTokenPropertyValue::StartFunction(String::from("click_it"))),
-                    Ok(CodeTokenPropertyValue::PropertyValue(SourceTokenPropertyValue::UnsignedInt(1))),
-                    Ok(CodeTokenPropertyValue::PropertyValue(SourceTokenPropertyValue::UnsignedInt(2))),
+                    Ok(CodeTokenPropertyValue::PropertyValue(SourceTokenPropertyValue::USize(1))),
+                    Ok(CodeTokenPropertyValue::PropertyValue(SourceTokenPropertyValue::USize(2))),
                     Ok(CodeTokenPropertyValue::EndFunction),
 
                 )
@@ -82,7 +82,7 @@ fn property_with_multi_argument_function_value_containing_variable_argument_prod
                 vec!(
                     Ok(CodeTokenPropertyValue::StartFunction(String::from("click_it"))),
                     Ok(CodeTokenPropertyValue::PropertyValue(SourceTokenPropertyValue::Variable(String::from("item")))),
-                    Ok(CodeTokenPropertyValue::PropertyValue(SourceTokenPropertyValue::UnsignedInt(2))),
+                    Ok(CodeTokenPropertyValue::PropertyValue(SourceTokenPropertyValue::USize(2))),
                     Ok(CodeTokenPropertyValue::EndFunction),
 
                 )
@@ -105,8 +105,8 @@ fn variable_property_with_property_and_value_result_inside_control() {
         SourceToken::PropertyValue(
             SourceTokenPropertyValue::Array(
                 vec!(
-                    Ok(SourceTokenPropertyValue::UnsignedInt(1)),
-                    Ok(SourceTokenPropertyValue::UnsignedInt(2))
+                    Ok(SourceTokenPropertyValue::USize(1)),
+                    Ok(SourceTokenPropertyValue::USize(2))
                 )
             )
         ),

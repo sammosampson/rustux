@@ -12,7 +12,7 @@ pub fn collect_array_unsigned_shorts(from: &Vec<ArrayTokenResult>, amount: usize
         return Err(SpecificCollectionError::NotEnoughItems(from.len()));
     }
     for token in from {
-        if let Ok(SourceTokenPropertyValue::UnsignedInt(value)) = token {
+        if let Ok(SourceTokenPropertyValue::USize(value)) = token {
             collected.push(*value as u16)
         } else {
             return Err(SpecificCollectionError::WrongType)
@@ -42,7 +42,7 @@ pub fn collect_array_usizes(from: &Vec<ArrayTokenResult>, amount: usize) -> Resu
         return Err(SpecificCollectionError::NotEnoughItems(from.len()));
     }
     for token in from {
-        if let Ok(SourceTokenPropertyValue::UnsignedInt(value)) = token {
+        if let Ok(SourceTokenPropertyValue::USize(value)) = token {
             collected.push(*value as usize)
         } else {
             return Err(SpecificCollectionError::WrongType)
@@ -56,7 +56,7 @@ pub fn collect_properties_usize(from: &Vec<SourceTokenPropertyValue>, position: 
         return Err(SpecificCollectionError::NotEnoughItems(from.len()));
     }
 
-    if let SourceTokenPropertyValue::UnsignedInt(value) = from[position] {
+    if let SourceTokenPropertyValue::USize(value) = from[position] {
         return Ok(value as usize);
     }
     

@@ -10,7 +10,7 @@ enum CodeState {
     InFunction(usize),
     StartValue,
     InSignedNumberValue(usize),
-    InUnsignedNumberValue(usize),
+    InUSizeNumberValue(usize),
     InStringValue(usize),
     InVariableValue(usize),
     EndValue,
@@ -93,7 +93,7 @@ impl<'a> CodeTokenizer<'a> {
             return None;
         }
         if character.is_numeric() {
-            self.state = CodeState::InUnsignedNumberValue(index);
+            self.state = CodeState::InUSizeNumberValue(index);
             return None;
         }
         if character == '-' {
@@ -128,10 +128,10 @@ impl<'a> CodeTokenizer<'a> {
         }
     }
 
-    fn produce_unsigned_number_value_result(&mut self, start: usize, index: usize) -> CodeTokenOption {
+    fn produce_usize_number_value_result(&mut self, start: usize, index: usize) -> CodeTokenOption {
         let raw_value = self.splice_input(start, index);
-        match raw_value.parse::<u128>() {
-            Ok(value) => return Some(Ok(CodeTokenPropertyValue::PropertyValue(SourceTokenPropertyValue::UnsignedInt(value)))),
+        match raw_value.parse::<usize>() {
+            Ok(value) => return Some(Ok(CodeTokenPropertyValue::PropertyValue(SourceTokenPropertyValue::USize(value)))),
             Err(_) => return self.produce_float_value_result(raw_value, index)
         }
     }
@@ -163,14 +163,14 @@ impl<'a> CodeTokenizer<'a> {
     }
 
 
-    fn handle_inside_unsigned_number_value(&mut self, start: usize, index: usize, character: char) -> CodeTokenOption {
+    fn handle_inside_usize_number_value(&mut self, start: usize, index: usize, character: char) -> CodeTokenOption {
         if character == FUNCTION_CLOSING_BRACE {
             self.state = CodeState::EndFunction;
-            return self.produce_unsigned_number_value_result(start, index);
+            return self.produce_usize_number_value_result(start, index);
         }
         if character == ',' {
             self.state = CodeState::EndValue;
-            return self.produce_unsigned_number_value_result(start, index);
+            return self.produce_usize_number_value_result(start, index);
         }
         None
     }
@@ -224,8 +224,8 @@ impl<'a> CodeTokenizer<'a> {
             CodeState::InSignedNumberValue(start) => {
                 self.handle_inside_signed_number_value(start, index, character)
             },
-            CodeState::InUnsignedNumberValue(start) => {
-                self.handle_inside_unsigned_number_value(start, index, character)
+            CodeState::InUSizeNumberValue(start) => {
+                self.handle_inside_usize_number_value(start, index, character)
             },
             CodeState::InStringValue(start) => {
                 self.handle_inside_string_value(start, index, character)

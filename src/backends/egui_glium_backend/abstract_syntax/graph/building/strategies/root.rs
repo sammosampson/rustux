@@ -12,7 +12,7 @@ impl BuildAbstractSyntaxGraphStreamStrategy for RootBuildAbstractSyntaxGraphStre
         AbstractSyntaxGraphNodeId::default()
     }
 
-    fn property(&mut self, _node: AbstractSyntaxGraphNodeId, _property: AbstractSyntaxTokenProperty, _ast: &mut AbstractSyntaxGraph) {
+    fn property(&mut self, _node: AbstractSyntaxGraphNodeId, _property: AbstractSyntaxProperty, _ast: &mut AbstractSyntaxGraph) {
         panic!()
     }
 

@@ -2,7 +2,7 @@
 
 use crate::prelude::*;
 
-pub struct StandardBuildAbstractSyntaxGraphStreamStrategy(pub AbstractSyntaxTokenType);
+pub struct StandardBuildAbstractSyntaxGraphStreamStrategy(pub AbstractSyntaxControlType);
 
 impl BuildAbstractSyntaxGraphStreamStrategy for StandardBuildAbstractSyntaxGraphStreamStrategy {
     fn start_node(&mut self, parent: AbstractSyntaxGraphNodeId, ast: &mut AbstractSyntaxGraph) -> AbstractSyntaxGraphNodeId {
@@ -13,8 +13,9 @@ impl BuildAbstractSyntaxGraphStreamStrategy for StandardBuildAbstractSyntaxGraph
         ast.get_parent(node)
     }
 
-    fn property(&mut self, node: AbstractSyntaxGraphNodeId, property: AbstractSyntaxTokenProperty, ast: &mut AbstractSyntaxGraph) {
-        ast.add_node_property(node, property);
+    fn property(&mut self, node: AbstractSyntaxGraphNodeId, property: AbstractSyntaxProperty, ast: &mut AbstractSyntaxGraph) {
+        let resolved_property = ast.data_context().replace_variable_data_in_property(property).unwrap();
+        ast.add_node_property(node, resolved_property);
     }
 
     fn end_child_node(&mut self) -> EndNodeAction {

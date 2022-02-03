@@ -10,27 +10,26 @@ pub struct ForBuildAbstractSyntaxGraphStreamStrategy {
 
 impl BuildAbstractSyntaxGraphStreamStrategy for ForBuildAbstractSyntaxGraphStreamStrategy {
     fn start_node(&mut self, parent: AbstractSyntaxGraphNodeId, ast: &mut AbstractSyntaxGraph) -> AbstractSyntaxGraphNodeId {
-        ast.add_child_node(parent, AbstractSyntaxTokenType::Container)
+        ast.add_child_node(parent, AbstractSyntaxControlType::Container)
     }
 
     fn end_node(&mut self, node: AbstractSyntaxGraphNodeId, ast: &mut AbstractSyntaxGraph) -> AbstractSyntaxGraphNodeId {
         ast.get_parent(node)
     }
 
-    fn property(&mut self, _node: AbstractSyntaxGraphNodeId, property: AbstractSyntaxTokenProperty, _ast: &mut AbstractSyntaxGraph) {
-        match property {
-            AbstractSyntaxTokenProperty::USizeRangeVariable(variable, range) => {
-                self.variable = Some(variable);
-                self.current_position = range.lower_bound();
-                self.range = Some(range);
-            },
-            _ => panic!(),
-        }
+    fn property(&mut self, _node: AbstractSyntaxGraphNodeId, property: AbstractSyntaxProperty, _ast: &mut AbstractSyntaxGraph) {
+        let (variable, range) = property.value().get_usize_range_variable_value().unwrap();
+        self.variable = Some(variable);
+        self.current_position = range.lower_bound();
+        self.range = Some(range);
     }
 
     fn start_child_node(&mut self, ast: &mut AbstractSyntaxGraph) {
         if let Some(variable) = &self.variable {
-            ast.data_context().set_variable(variable.clone(), VariablePropertyType::Usize(self.current_position))
+            ast.data_context().set_variable(
+                variable.clone(), 
+                AbstractSyntaxPropertyValue::USize(self.current_position)
+            )
         }
     }
 

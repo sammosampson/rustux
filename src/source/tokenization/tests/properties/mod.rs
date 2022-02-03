@@ -1,6 +1,7 @@
 mod strings;
 mod floats;
 mod ints;
+mod usizes;
 mod booleans;
 mod collections;
 mod code;
@@ -18,8 +19,8 @@ fn multiple_nested_controls_with_properties_with_values_produces_correct_tokens(
         SourceToken::PropertyValue(
             SourceTokenPropertyValue::Array(
                 vec!(
-                    Ok(SourceTokenPropertyValue::UnsignedInt(200)),
-                    Ok(SourceTokenPropertyValue::UnsignedInt(100)),
+                    Ok(SourceTokenPropertyValue::USize(200)),
+                    Ok(SourceTokenPropertyValue::USize(100)),
                 )
             )
         ),

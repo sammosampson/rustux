@@ -51,7 +51,7 @@ impl AbstractSyntaxTreeRenderer {
     pub fn render_selectable_label(&self, ui: &mut egui::Ui, context: &mut StateContext, props: SelectableLabelProperties) {
         let response = ui.selectable_label(props.selected, props.text);
         if response.clicked() {
-            context.run_action_function(&props.on_selected);
+            context.run_action_function(&props.on_selected).unwrap();
         }
     }
 
@@ -102,23 +102,23 @@ impl Default for LabelProperties {
     }
 }
 
-impl From<&Vec<AbstractSyntaxTokenProperty>> for LabelProperties {
-    fn from(from: &Vec<AbstractSyntaxTokenProperty>) -> Self {
+impl From<&Vec<AbstractSyntaxProperty>> for LabelProperties {
+    fn from(from: &Vec<AbstractSyntaxProperty>) -> Self {
         let mut to = Self::default();
         for property in from {
-            match property {
-                AbstractSyntaxTokenProperty::Text(value) => to.text = value.into(),
-                AbstractSyntaxTokenProperty::Wrap(value) => to.wrap = Some(*value),
-                AbstractSyntaxTokenProperty::TextStyle(value) => to.text_style = Some(value.into()),
-                AbstractSyntaxTokenProperty::BackgroundColour(value) => to.background_color = value.into(),
-                AbstractSyntaxTokenProperty::Colour(value) => to.text_color = Some(value.into()),
-                AbstractSyntaxTokenProperty::Code(value) => to.code = *value,
-                AbstractSyntaxTokenProperty::Strong(value) => to.strong = *value,
-                AbstractSyntaxTokenProperty::Weak(value) => to.weak = *value,
-                AbstractSyntaxTokenProperty::Strikethrough(value) => to.strikethrough = *value,
-                AbstractSyntaxTokenProperty::Underline(value) => to.underline = *value,
-                AbstractSyntaxTokenProperty::Italics(value) => to.italics = *value,
-                AbstractSyntaxTokenProperty::Raised(value) => to.raised = *value,
+            match property.property_type() {
+                AbstractSyntaxPropertyType::Text => to.text = property.value().get_string_value().unwrap(),
+                AbstractSyntaxPropertyType::Wrap => to.wrap = Some(property.value().get_bool_value().unwrap()),
+                AbstractSyntaxPropertyType::TextStyle => to.text_style = Some(property.value().get_text_style_value().unwrap()),
+                AbstractSyntaxPropertyType::BackgroundColour => to.background_color = property.value().get_colour_value().unwrap(),
+                AbstractSyntaxPropertyType::Colour => to.text_color = Some(property.value().get_colour_value().unwrap()),
+                AbstractSyntaxPropertyType::Code => to.code = property.value().get_bool_value().unwrap(),
+                AbstractSyntaxPropertyType::Strong => to.strong = property.value().get_bool_value().unwrap(),
+                AbstractSyntaxPropertyType::Weak => to.weak = property.value().get_bool_value().unwrap(),
+                AbstractSyntaxPropertyType::Strikethrough => to.strikethrough = property.value().get_bool_value().unwrap(),
+                AbstractSyntaxPropertyType::Underline => to.underline = property.value().get_bool_value().unwrap(),
+                AbstractSyntaxPropertyType::Italics => to.italics = property.value().get_bool_value().unwrap(),
+                AbstractSyntaxPropertyType::Raised => to.raised = property.value().get_bool_value().unwrap(),
                 _ => {}
             }
         }
@@ -139,13 +139,13 @@ impl Default for ColouredLabelProperties {
     }
 }
 
-impl From<&Vec<AbstractSyntaxTokenProperty>> for ColouredLabelProperties {
-    fn from(from: &Vec<AbstractSyntaxTokenProperty>) -> Self {
+impl From<&Vec<AbstractSyntaxProperty>> for ColouredLabelProperties {
+    fn from(from: &Vec<AbstractSyntaxProperty>) -> Self {
         let mut to = Self::default();
         for property in from {
-            match property {
-                AbstractSyntaxTokenProperty::Text(value) => to.text = value.into(),
-                AbstractSyntaxTokenProperty::Colour(value) => to.colour = value.into(),
+            match property.property_type() {
+                AbstractSyntaxPropertyType::Text => to.text = property.value().get_string_value().unwrap(),
+                AbstractSyntaxPropertyType::Colour => to.colour = property.value().get_colour_value().unwrap(),
                 _ => {}
             }
         }
@@ -160,14 +160,14 @@ pub struct SelectableLabelProperties {
     pub on_selected: Function
 }
 
-impl From<&Vec<AbstractSyntaxTokenProperty>> for SelectableLabelProperties {
-    fn from(from: &Vec<AbstractSyntaxTokenProperty>) -> Self {
+impl From<&Vec<AbstractSyntaxProperty>> for SelectableLabelProperties {
+    fn from(from: &Vec<AbstractSyntaxProperty>) -> Self {
         let mut to = Self::default();
         for property in from {
-            match property {
-                AbstractSyntaxTokenProperty::Text(value) => to.text = value.clone(),
-                AbstractSyntaxTokenProperty::Selected(value) => to.selected = *value,
-                AbstractSyntaxTokenProperty::OnSelect(value) => to.on_selected = value.clone(),
+            match property.property_type() {
+                AbstractSyntaxPropertyType::Text => to.text = property.value().get_string_value().unwrap(),
+                AbstractSyntaxPropertyType::Selected => to.selected = property.value().get_bool_value().unwrap(),
+                AbstractSyntaxPropertyType::OnSelect => to.on_selected = property.value().get_function_value().unwrap(),
                 _ => {}
             }
         }
@@ -187,12 +187,12 @@ impl Default for MonospaceProperties {
     }
 }
 
-impl From<&Vec<AbstractSyntaxTokenProperty>> for MonospaceProperties {
-    fn from(from: &Vec<AbstractSyntaxTokenProperty>) -> Self {
+impl From<&Vec<AbstractSyntaxProperty>> for MonospaceProperties {
+    fn from(from: &Vec<AbstractSyntaxProperty>) -> Self {
         let mut to = Self::default();
         for property in from {
-            match property {
-                AbstractSyntaxTokenProperty::Text(value) => to.text = value.clone(),
+            match property.property_type() {
+                AbstractSyntaxPropertyType::Text => to.text = property.value().get_string_value().unwrap(),
                 _ => {}
             }
         }
@@ -212,12 +212,12 @@ impl Default for CodeProperties {
     }
 }
 
-impl From<&Vec<AbstractSyntaxTokenProperty>> for CodeProperties {
-    fn from(from: &Vec<AbstractSyntaxTokenProperty>) -> Self {
+impl From<&Vec<AbstractSyntaxProperty>> for CodeProperties {
+    fn from(from: &Vec<AbstractSyntaxProperty>) -> Self {
         let mut to = Self::default();
         for property in from {
-            match property {
-                AbstractSyntaxTokenProperty::Text(value) => to.text = value.clone(),
+            match property.property_type() {
+                AbstractSyntaxPropertyType::Text => to.text = property.value().get_string_value().unwrap(),
                 _ => {}
             }
         }
@@ -237,12 +237,12 @@ impl Default for HeadingProperties {
     }
 }
 
-impl From<&Vec<AbstractSyntaxTokenProperty>> for HeadingProperties {
-    fn from(from: &Vec<AbstractSyntaxTokenProperty>) -> Self {
+impl From<&Vec<AbstractSyntaxProperty>> for HeadingProperties {
+    fn from(from: &Vec<AbstractSyntaxProperty>) -> Self {
         let mut to = Self::default();
         for property in from {
-            match property {
-                AbstractSyntaxTokenProperty::Text(value) => to.text = value.clone(),
+            match property.property_type() {
+                AbstractSyntaxPropertyType::Text => to.text = property.value().get_string_value().unwrap(),
                 _ => {}
             }
         }

@@ -49,9 +49,14 @@ impl ActionContainer for SelectItemActionContainer {
         &self.path
     }
 
-    fn run(&self, state: &mut State, arguments: &Vec<SourceTokenPropertyValue>) {
-        let action = Actions::SelectItem(collect_properties_usize(arguments, 0).unwrap());
+    fn run(&self, state: &mut State, arguments: &Vec<AbstractSyntaxPropertyValue>) -> Result<(), ActionRunError> {
+        if arguments.len() != 1 {
+            return Err(ActionRunError::IncorrectAmountOfArgumentsPassed);
+        }
+
+        let action = Actions::SelectItem(arguments[0].get_usize_value()?);
         println!("Running action {:?}", action);
         state.process(1, Box::new(| local_state: &SelectedClickState | local_state.process(action)));
+        Ok(())
     }
 }
