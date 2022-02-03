@@ -17,19 +17,16 @@ impl BuildAbstractSyntaxGraphStreamStrategy for ForBuildAbstractSyntaxGraphStrea
         ast.get_parent(node)
     }
 
-    fn property(&mut self, _node: AbstractSyntaxGraphNodeId, property: AbstractSyntaxProperty, _ast: &mut AbstractSyntaxGraph) {
+    fn property(&mut self, _node: AbstractSyntaxGraphNodeId, property: AbstractSyntaxProperty, _ast: &mut AbstractSyntaxGraph, context: &mut DataContext) {
         let (variable, range) = property.value().get_usize_range_variable_value().unwrap();
         self.variable = Some(variable);
         self.current_position = range.lower_bound();
         self.range = Some(range);
     }
 
-    fn start_child_node(&mut self, ast: &mut AbstractSyntaxGraph) {
+    fn start_child_node(&mut self, ast: &mut AbstractSyntaxGraph, context: &mut DataContext) {
         if let Some(variable) = &self.variable {
-            ast.data_context().set_variable(
-                variable.clone(), 
-                AbstractSyntaxPropertyValue::USize(self.current_position)
-            )
+            context.set_variable(variable.clone(), AbstractSyntaxPropertyValue::USize(self.current_position));
         }
     }
 

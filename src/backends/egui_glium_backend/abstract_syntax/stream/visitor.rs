@@ -7,9 +7,9 @@ pub enum EndNodeAction {
 }
 
 pub trait AbstractSyntaxTokenStreamVisitor {
-    fn start_node_with_repeat_possibility(&mut self, position: usize, node_type: &AbstractSyntaxControlType) {
+    fn start_node_with_repeat_possibility(&mut self, position: usize, node_type: &AbstractSyntaxControlType, context: &mut DataContext) {
         self.push_last_node_position(position);
-        self.start_node(node_type)
+        self.start_node(node_type, context)
     }
 
     fn end_node_with_repeat_check(&mut self, position: usize, node_type: &AbstractSyntaxControlType) -> Option<USizeRange> {
@@ -23,8 +23,8 @@ pub trait AbstractSyntaxTokenStreamVisitor {
 
     fn push_last_node_position(&mut self, position: usize);
     fn pop_last_node_position(&mut self) -> Option<usize>;
-    fn start_node(&mut self, node_type: &AbstractSyntaxControlType);
-    fn property(&mut self, property: &AbstractSyntaxProperty);
+    fn start_node(&mut self, node_type: &AbstractSyntaxControlType, context: &mut DataContext);
+    fn property(&mut self, property: &AbstractSyntaxProperty, context: &mut DataContext);
     fn end_node(&mut self, node_type: &AbstractSyntaxControlType) -> EndNodeAction;
     fn token_error(&mut self, error: &AbstractSyntaxTokenError);
 }

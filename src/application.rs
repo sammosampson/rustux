@@ -21,7 +21,7 @@ impl From<RendererError> for RustuxError {
 pub struct Application {
     relative_rux_folder_path: &'static str,
     file_monitor_poll: Duration,
-    on_context: Box<dyn FnOnce(&mut StateContext) -> ()>
+    on_context: Box<dyn FnOnce(&mut DataContext) -> ()>
 }
 
 impl Default for Application {
@@ -50,7 +50,7 @@ impl Application {
         self
     }
 
-    pub fn with_context(mut self, on_context: impl FnOnce(&mut StateContext) -> () + 'static) -> Self {
+    pub fn with_context(mut self, on_context: impl FnOnce(&mut DataContext) -> () + 'static) -> Self {
         self.on_context = Box::new(on_context);
         self
     }
@@ -62,7 +62,7 @@ impl Application {
         let event_loop = create_system_event_loop();
         let screen_renderer = create_screen_renderer(&event_loop)?;
         let egui_renderer = create_ast_renderer(&screen_renderer.display);
-        let mut state_context= create_state_context();
+        let mut state_context= create_data_context();
         (self.on_context)(&mut state_context);
     
         resources.insert(file_paths);

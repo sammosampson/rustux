@@ -154,6 +154,15 @@ fn match_property_value(property_name: &str, property_value: &SourceTokenPropert
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
         },
+        "selected" => {
+            match property_value {
+                SourceTokenPropertyValue::Variable(value) => Ok(create_ast_property(
+                    AbstractSyntaxPropertyType::Selected, 
+                    AbstractSyntaxPropertyValue::Variable(value.clone())
+                )),
+                _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
+            }
+        },
         _ => Err(AbstractSyntaxTokenError::UnknownProperty(property_name.to_string())) 
     }
 }

@@ -29,27 +29,27 @@ impl AbstractSyntaxTreeRenderer {
         self.egui.on_event(event);
     }
    
-    pub fn render(&mut self, context: &mut StateContext, ast: &AbstractSyntaxGraph, display: &Display, frame: &mut Frame) -> bool {
+    pub fn render(&mut self, context: &mut DataContext, ast: &AbstractSyntaxGraph, display: &Display, frame: &mut Frame) -> bool {
         if let Some(root) = ast.get_root() {
             return self.render_root(context, ast, root, display, frame);
         }
         false     
     }
 
-    pub fn render_root(&mut self, context: &mut StateContext, ast: &AbstractSyntaxGraph, root: &AbstractSyntaxGraphNode, display: &Display, frame: &mut Frame) -> bool {
+    pub fn render_root(&mut self, context: &mut DataContext, ast: &AbstractSyntaxGraph, root: &AbstractSyntaxGraphNode, display: &Display, frame: &mut Frame) -> bool {
         self.begin_frame(display);
         self.set_visuals();
         self.render_top_levels(context, ast, ast.get_children(root));
         self.end_frame_and_paint(display, frame)
     }
 
-    fn render_top_levels(&self, context: &mut StateContext, ast: &AbstractSyntaxGraph, children: Vec<&AbstractSyntaxGraphNode>) {
+    fn render_top_levels(&self, context: &mut DataContext, ast: &AbstractSyntaxGraph, children: Vec<&AbstractSyntaxGraphNode>) {
         for child in children {
             self.render_top_level(context, ast, child)
         }
     }
 
-    fn render_top_level(&self, context: &mut StateContext, ast: &AbstractSyntaxGraph, node: &AbstractSyntaxGraphNode) {
+    fn render_top_level(&self, context: &mut DataContext, ast: &AbstractSyntaxGraph, node: &AbstractSyntaxGraphNode) {
         match node.node_type() {
             AbstractSyntaxControlType::CentralPanel =>
                 self.render_central_panel(| ui | self.render_children(ui, context, ast, node)),
@@ -65,13 +65,13 @@ impl AbstractSyntaxTreeRenderer {
         }
     }
 
-    fn render_children(&self, ui: &mut egui::Ui, context: &mut StateContext, ast: &AbstractSyntaxGraph, parent: &AbstractSyntaxGraphNode) {
+    fn render_children(&self, ui: &mut egui::Ui, context: &mut DataContext, ast: &AbstractSyntaxGraph, parent: &AbstractSyntaxGraphNode) {
         for child in ast.get_children(parent) {
             self.render_child(ui, context, ast, child)
         }
     }
 
-    fn render_child(&self, ui: &mut egui::Ui, context: &mut StateContext, ast: &AbstractSyntaxGraph, child: &AbstractSyntaxGraphNode) {
+    fn render_child(&self, ui: &mut egui::Ui, context: &mut DataContext, ast: &AbstractSyntaxGraph, child: &AbstractSyntaxGraphNode) {
         match child.node_type() {
             AbstractSyntaxControlType::Container => 
                 self.render_children(ui, context, ast, child),

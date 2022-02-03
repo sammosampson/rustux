@@ -9,6 +9,21 @@ fn property_without_value_produces_boolean_property_result_inside_control() {
     assert_eq!(None, tokenizer.next());
 }
 
+fn boolean_property_with_value_produces_boolean_property_result_inside_control() {
+    let mut tokenizer = SourceTokenizer::from_string("<rect large-size=true />");
+    assert_eq!(SourceToken::Control(String::from("rect")), tokenizer.next().unwrap().unwrap());
+    assert_eq!(SourceToken::Property(SourceTokenPropertyType::Standard, String::from("large-size")), tokenizer.next().unwrap().unwrap());
+    assert_eq!(SourceToken::EndControl(String::from("rect")), tokenizer.next().unwrap().unwrap());
+    assert_eq!(None, tokenizer.next());
+}
+
+fn boolean_property_with_false_value_produces_boolean_property_result_inside_control() {
+    let mut tokenizer = SourceTokenizer::from_string("<rect large-size=false />");
+    assert_eq!(SourceToken::Control(String::from("rect")), tokenizer.next().unwrap().unwrap());
+    assert_eq!(SourceToken::EndControl(String::from("rect")), tokenizer.next().unwrap().unwrap());
+    assert_eq!(None, tokenizer.next());
+}
+
 #[test]
 fn multiple_properties_without_value_produces_boolean_properties_result_inside_control() {
     let mut tokenizer = SourceTokenizer::from_string("<rect large-size rounded-edges other />");

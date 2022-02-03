@@ -48,7 +48,7 @@ impl AbstractSyntaxTreeRenderer {
         ui.colored_label(props.colour, props.text);
     }
 
-    pub fn render_selectable_label(&self, ui: &mut egui::Ui, context: &mut StateContext, props: SelectableLabelProperties) {
+    pub fn render_selectable_label(&self, ui: &mut egui::Ui, context: &mut DataContext, props: SelectableLabelProperties) {
         let response = ui.selectable_label(props.selected, props.text);
         if response.clicked() {
             context.run_action_function(&props.on_selected).unwrap();

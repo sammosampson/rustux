@@ -29,7 +29,7 @@ pub fn is_selected(state: &SelectedClickState, item_id: usize) -> bool {
 //---------------------------------------------
 // derived code from here down
 impl Actions {
-    pub fn register(ctx: &mut StateContext) {
+    pub fn register(ctx: &mut DataContext) {
         ctx.actions_mut().register_action(SelectItemActionContainer::default());
     }
 }

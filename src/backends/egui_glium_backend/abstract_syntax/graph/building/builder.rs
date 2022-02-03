@@ -29,9 +29,9 @@ impl AbstractSyntaxTokenStreamVisitor for AbstractSyntaxGraphBuilder {
         panic!("{:?}", error)
     }
 
-    fn start_node(&mut self, node_type: &AbstractSyntaxControlType) {
+    fn start_node(&mut self, node_type: &AbstractSyntaxControlType, context: &mut DataContext) {
         if let Some(parent_strategy) = self.strategies.last_mut() {
-            parent_strategy.start_child_node(&mut self.ast);
+            parent_strategy.start_child_node(&mut self.ast, context);
         }
         
         let mut strategy = get_strategy(node_type);
@@ -39,8 +39,8 @@ impl AbstractSyntaxTokenStreamVisitor for AbstractSyntaxGraphBuilder {
         self.strategies.push(strategy);
     }
 
-    fn property(&mut self, property: &AbstractSyntaxProperty) {
-        self.strategies.last_mut().unwrap().property(self.current_node, property.clone(), &mut self.ast);
+    fn property(&mut self, property: &AbstractSyntaxProperty, context: &mut DataContext) {
+        self.strategies.last_mut().unwrap().property(self.current_node, property.clone(), &mut self.ast, context);
     }
 
     fn end_node(&mut self, _node_type: &AbstractSyntaxControlType) -> EndNodeAction {
@@ -72,6 +72,8 @@ fn get_strategy(node_type: &AbstractSyntaxControlType) -> Box<dyn BuildAbstractS
             Box::new(RootBuildAbstractSyntaxGraphStreamStrategy),
         AbstractSyntaxControlType::For => 
             Box::new(ForBuildAbstractSyntaxGraphStreamStrategy::default()),
+        AbstractSyntaxControlType::Let => 
+            Box::new(LetBuildAbstractSyntaxGraphStreamStrategy::default()),
         node_type => 
             Box::new(StandardBuildAbstractSyntaxGraphStreamStrategy(*node_type)),
     }

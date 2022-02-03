@@ -1,9 +1,5 @@
 use crate::prelude::*;
 
-pub fn create_state_context() -> StateContext {
-    StateContext::default()
-}
-
 #[derive(Default)]
 pub struct RegisteredActions {
     actions: HashMap<String, Box<dyn ActionContainer>>
@@ -135,6 +131,13 @@ impl AbstractSyntaxPropertyValue {
         }
         Err(AbstractSyntaxPropertyValueError::ValueNotExpected(self.clone()))
     }
+
+    pub fn get_function_variable_value(&self) -> Result<(String, Function), AbstractSyntaxPropertyValueError> {
+        if let AbstractSyntaxPropertyValue::FunctionVariable(variable, function) = self.clone() {
+            return Ok((variable, function));
+        }
+        Err(AbstractSyntaxPropertyValueError::ValueNotExpected(self.clone()))
+    }
 }
 
 impl From<&SourceTokenPropertyValue> for AbstractSyntaxPropertyValue {
@@ -148,31 +151,11 @@ impl From<&SourceTokenPropertyValue> for AbstractSyntaxPropertyValue {
     }
 }
 
-#[derive(Default)]
-pub struct StateContext {
-    actions: RegisteredActions,
-    state: State
-}
-
 #[derive(Debug)]
 pub enum ActionRunError {
     ContainerNotFound,
     IncorrectAmountOfArgumentsPassed,
     PropertyValueError(AbstractSyntaxPropertyValueError)
-}
-
-
-impl StateContext {
-    pub fn run_action_function(&mut self, function: &Function) -> Result<(), ActionRunError> {
-        if let Some(container) = self.actions.get_action_container(&function.name) {
-            return container.run(&mut self.state, &function.arguments);
-        }
-        Err(ActionRunError::ContainerNotFound)
-    }
-
-    pub fn actions_mut(&mut self) -> &mut RegisteredActions {
-        &mut self.actions
-    }
 }
 
 impl From<AbstractSyntaxPropertyValueError> for ActionRunError {
@@ -218,22 +201,56 @@ impl Function {
     }
 }
 
-
+pub fn create_data_context() -> DataContext {
+    DataContext::default()
+}
 
 #[derive(Debug)]
 pub enum DataContextError {
-    VariableDoesNotExist
+    ActionRunError(ActionRunError),
+    VariableDoesNotExist,
+    ContainerNotFound
+}
+
+
+impl From<ActionRunError> for DataContextError {
+    fn from(from: ActionRunError) -> Self {
+        Self::ActionRunError(from)
+    }
 }
 
 #[derive(Default)]
-pub struct DataContext(HashMap<String, AbstractSyntaxPropertyValue>);
+pub struct DataContext { 
+    actions: RegisteredActions,
+    state: State,
+    variables: HashMap<String, AbstractSyntaxPropertyValue> 
+}
 
 impl DataContext {
-    pub fn set_variable(&mut self, variable: String, variable_value: AbstractSyntaxPropertyValue) {
-        self.0.insert(variable, variable_value);
+    pub fn run_action_function(&mut self, function: &Function) -> Result<(), DataContextError> {
+        if let Some(container) = self.actions.get_action_container(&function.name) {
+            container.run(&mut self.state, &function.arguments)?;
+            return Ok(());
+        }
+        Err(DataContextError::ContainerNotFound)
     }
 
-    pub fn replace_variable_data_in_property(&mut self, property: AbstractSyntaxProperty) -> Result<AbstractSyntaxProperty, DataContextError> {
+    pub fn run_select_function(&mut self, function: &Function) -> Result<AbstractSyntaxPropertyValue, DataContextError> {
+        todo!()
+    }
+
+    pub fn actions_mut(&mut self) -> &mut RegisteredActions {
+        &mut self.actions
+    }
+
+    pub fn set_variable(&mut self, variable: String, variable_value: AbstractSyntaxPropertyValue) {
+        self.variables.insert(variable, variable_value);
+    }
+
+    pub fn replace_variable_data_in_property(
+        &mut self,
+        property: AbstractSyntaxProperty
+    ) -> Result<AbstractSyntaxProperty, DataContextError> {
         match property.value() {
             AbstractSyntaxPropertyValue::Variable(_) |
             AbstractSyntaxPropertyValue::Function(_) => {
@@ -243,7 +260,10 @@ impl DataContext {
         }
     }
 
-    fn replace_variable_data_in_property_value(&mut self, property_value: &AbstractSyntaxPropertyValue) -> Result<AbstractSyntaxPropertyValue, DataContextError> {
+    fn replace_variable_data_in_property_value(
+        &mut self,
+        property_value: &AbstractSyntaxPropertyValue
+    ) -> Result<AbstractSyntaxPropertyValue, DataContextError> {
         match property_value {
             AbstractSyntaxPropertyValue::Function(function) =>
                 Ok(AbstractSyntaxPropertyValue::Function(self.replace_variable_data_in_function(function)?)),
@@ -254,7 +274,7 @@ impl DataContext {
         }
     }
 
-    fn replace_variable_data_in_function(&mut self, function: &Function) -> Result<Function, DataContextError> {
+    pub fn replace_variable_data_in_function(&mut self, function: &Function) -> Result<Function, DataContextError> {
         let mut resolved_arguments = vec!();
         for argument in &function.arguments {
             resolved_arguments.push(self.replace_variable_data_in_property_value(argument)?)
@@ -263,7 +283,7 @@ impl DataContext {
     }
 
     fn get_variable(&self, variable: &str) -> Result<AbstractSyntaxPropertyValue, DataContextError> {
-        if let Some(variable_value) = self.0.get(variable) {
+        if let Some(variable_value) = self.variables.get(variable) {
             return Ok(variable_value.clone());
         } 
         return Err(DataContextError::VariableDoesNotExist);

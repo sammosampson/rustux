@@ -34,23 +34,23 @@ impl AbstractSyntaxTokenStream {
         self.1
     }
 
-    pub fn accept(&self, visitor: &mut impl AbstractSyntaxTokenStreamVisitor) {
+    pub fn accept(&self, visitor: &mut impl AbstractSyntaxTokenStreamVisitor, context: &mut DataContext) {
         for position in 0..self.0.len() {
-            self.accept_node(position, visitor);
+            self.accept_node(position, visitor, context);
         }
     }
 
-    fn accept_node(&self, position: usize, visitor: &mut impl AbstractSyntaxTokenStreamVisitor) {
+    fn accept_node(&self, position: usize, visitor: &mut impl AbstractSyntaxTokenStreamVisitor, context: &mut DataContext) {
         let node_result = &self.0[position];
 
         match node_result {
             Ok(node) => match node {
-                AbstractSyntaxToken::StartControl(node_type) => visitor.start_node_with_repeat_possibility(position, node_type),
-                AbstractSyntaxToken::Property(property) => visitor.property(property),
+                AbstractSyntaxToken::StartControl(node_type) => visitor.start_node_with_repeat_possibility(position, node_type, context),
+                AbstractSyntaxToken::Property(property) => visitor.property(property, context),
                 AbstractSyntaxToken::EndControl(node_type) =>
                     if let Some(range) = visitor.end_node_with_repeat_check(position, node_type) {
                         for child_position in RangeInclusive::<usize>::from(&range) {
-                            self.accept_node(child_position, visitor);
+                            self.accept_node(child_position, visitor, context);
                         }
                     },
             },

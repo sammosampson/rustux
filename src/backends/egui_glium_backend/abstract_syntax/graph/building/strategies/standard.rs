@@ -13,8 +13,8 @@ impl BuildAbstractSyntaxGraphStreamStrategy for StandardBuildAbstractSyntaxGraph
         ast.get_parent(node)
     }
 
-    fn property(&mut self, node: AbstractSyntaxGraphNodeId, property: AbstractSyntaxProperty, ast: &mut AbstractSyntaxGraph) {
-        let resolved_property = ast.data_context().replace_variable_data_in_property(property).unwrap();
+    fn property(&mut self, node: AbstractSyntaxGraphNodeId, property: AbstractSyntaxProperty, ast: &mut AbstractSyntaxGraph, context: &mut DataContext) {
+        let resolved_property = context.replace_variable_data_in_property(property).unwrap();
         ast.add_node_property(node, resolved_property);
     }
 
@@ -22,6 +22,6 @@ impl BuildAbstractSyntaxGraphStreamStrategy for StandardBuildAbstractSyntaxGraph
         EndNodeAction::Continue
     }
     
-    fn start_child_node(&mut self, _ast: &mut AbstractSyntaxGraph) {
+    fn start_child_node(&mut self, _ast: &mut AbstractSyntaxGraph, context: &mut DataContext) {
     }
 }
