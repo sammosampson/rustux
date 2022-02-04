@@ -15,11 +15,11 @@ impl BuildAbstractSyntaxGraphStreamStrategy for LetBuildAbstractSyntaxGraphStrea
         ast.get_parent(node)
     }
 
-    fn property(&mut self, _node: AbstractSyntaxGraphNodeId, property: AbstractSyntaxProperty, _ast: &mut AbstractSyntaxGraph, context: &mut DataContext) {
+    fn property(&mut self, _node: AbstractSyntaxGraphNodeId, property: AbstractSyntaxProperty, _ast: &mut AbstractSyntaxGraph, _context: &mut DataContext) {
         self.function_variable = Some(property.value().get_function_variable_value().unwrap());
     }
 
-    fn start_child_node(&mut self, ast: &mut AbstractSyntaxGraph, context: &mut DataContext) {
+    fn start_child_node(&mut self, _ast: &mut AbstractSyntaxGraph, context: &mut DataContext) {
         if let Some((variable, function)) = &self.function_variable {
             let function = context.replace_variable_data_in_function(function).unwrap();
             let function_value = context.run_selector_function(&function).unwrap();

@@ -4,6 +4,7 @@ mod events;
 mod source;
 mod backends;
 mod state;
+mod abstract_syntax;
 mod examples;
 
 mod prelude {
@@ -22,7 +23,8 @@ mod prelude {
     pub use crate::events::*;
     pub use crate::source::*;
     pub use crate::backends::*;
-    pub use crate::state::*;
+    pub use crate::state::*;    
+    pub use crate::abstract_syntax::*;    
 }
 
 use crate::prelude::*;

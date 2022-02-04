@@ -1,9 +1,6 @@
-
+#[cfg(test)]
 mod control;
+#[cfg(test)]
 mod properties;
-
-pub use control::*;
-pub use properties::*;
-
 
 

@@ -22,6 +22,6 @@ impl BuildAbstractSyntaxGraphStreamStrategy for StandardBuildAbstractSyntaxGraph
         EndNodeAction::Continue
     }
     
-    fn start_child_node(&mut self, _ast: &mut AbstractSyntaxGraph, context: &mut DataContext) {
+    fn start_child_node(&mut self, _ast: &mut AbstractSyntaxGraph, _context: &mut DataContext) {
     }
 }

@@ -50,15 +50,3 @@ pub fn collect_array_usizes(from: &Vec<ArrayTokenResult>, amount: usize) -> Resu
     }
     Ok(collected)
 }
-
-pub fn collect_properties_usize(from: &Vec<SourceTokenPropertyValue>, position: usize) -> Result<usize, SpecificCollectionError> {
-    if from.len() < position + 1 {
-        return Err(SpecificCollectionError::NotEnoughItems(from.len()));
-    }
-
-    if let SourceTokenPropertyValue::USize(value) = from[position] {
-        return Ok(value as usize);
-    }
-    
-    Err(SpecificCollectionError::WrongType)
-}

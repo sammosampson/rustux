@@ -109,9 +109,9 @@ impl From<&Vec<AbstractSyntaxProperty>> for LabelProperties {
             match property.property_type() {
                 AbstractSyntaxPropertyType::Text => to.text = property.value().get_string_value().unwrap(),
                 AbstractSyntaxPropertyType::Wrap => to.wrap = Some(property.value().get_bool_value().unwrap()),
-                AbstractSyntaxPropertyType::TextStyle => to.text_style = Some(property.value().get_text_style_value().unwrap()),
-                AbstractSyntaxPropertyType::BackgroundColour => to.background_color = property.value().get_colour_value().unwrap(),
-                AbstractSyntaxPropertyType::Colour => to.text_color = Some(property.value().get_colour_value().unwrap()),
+                AbstractSyntaxPropertyType::TextStyle => to.text_style = Some(property.value().get_text_style_value().unwrap().into()),
+                AbstractSyntaxPropertyType::BackgroundColour => to.background_color = property.value().get_colour_value().unwrap().into(),
+                AbstractSyntaxPropertyType::Colour => to.text_color = Some(property.value().get_colour_value().unwrap().into()),
                 AbstractSyntaxPropertyType::Code => to.code = property.value().get_bool_value().unwrap(),
                 AbstractSyntaxPropertyType::Strong => to.strong = property.value().get_bool_value().unwrap(),
                 AbstractSyntaxPropertyType::Weak => to.weak = property.value().get_bool_value().unwrap(),
@@ -145,7 +145,7 @@ impl From<&Vec<AbstractSyntaxProperty>> for ColouredLabelProperties {
         for property in from {
             match property.property_type() {
                 AbstractSyntaxPropertyType::Text => to.text = property.value().get_string_value().unwrap(),
-                AbstractSyntaxPropertyType::Colour => to.colour = property.value().get_colour_value().unwrap(),
+                AbstractSyntaxPropertyType::Colour => to.colour = property.value().get_colour_value().unwrap().into(),
                 _ => {}
             }
         }

@@ -12,7 +12,7 @@ impl BuildAbstractSyntaxGraphStreamStrategy for RootBuildAbstractSyntaxGraphStre
         AbstractSyntaxGraphNodeId::default()
     }
 
-    fn property(&mut self, _node: AbstractSyntaxGraphNodeId, _property: AbstractSyntaxProperty, _ast: &mut AbstractSyntaxGraph, context: &mut DataContext) {
+    fn property(&mut self, _node: AbstractSyntaxGraphNodeId, _property: AbstractSyntaxProperty, _ast: &mut AbstractSyntaxGraph, _context: &mut DataContext) {
         panic!()
     }
 
@@ -20,6 +20,6 @@ impl BuildAbstractSyntaxGraphStreamStrategy for RootBuildAbstractSyntaxGraphStre
         EndNodeAction::Continue
     }
     
-    fn start_child_node(&mut self, _ast: &mut AbstractSyntaxGraph, context: &mut DataContext) {
+    fn start_child_node(&mut self, _ast: &mut AbstractSyntaxGraph, _context: &mut DataContext) {
     }
 }
