@@ -22,16 +22,15 @@ impl SelectedClickState {
 }
 
 // #[selector]
-pub fn is_selected(state: &SelectedClickState, item_id: usize) -> bool {
-    state.selected == Some(item_id)
+pub fn is_selected(state: &mut State, item_id: usize) -> bool {
+    state.get_local::<SelectedClickState>(1).selected == Some(item_id)
 }
 
 //---------------------------------------------
 // derived code from here down
-impl Actions {
-    pub fn register(ctx: &mut DataContext) {
-        ctx.actions_mut().register_action(SelectItemActionContainer::default());
-    }
+pub fn register(ctx: &mut DataContext) {
+    ctx.actions_mut().register_action(SelectItemActionContainer::default());
+    ctx.selectors_mut().register_selector(IsSelectedSelectorContainer::default());
 }
 
 pub struct SelectItemActionContainer {
@@ -49,14 +48,42 @@ impl ActionContainer for SelectItemActionContainer {
         &self.path
     }
 
-    fn run(&self, state: &mut State, arguments: &Vec<AbstractSyntaxPropertyValue>) -> Result<(), ActionRunError> {
+    fn run(&self, state: &mut State, arguments: &Vec<AbstractSyntaxPropertyValue>) -> Result<(), ContainerRunError> {
         if arguments.len() != 1 {
-            return Err(ActionRunError::IncorrectAmountOfArgumentsPassed);
+            return Err(ContainerRunError::IncorrectAmountOfArgumentsPassed);
         }
 
         let action = Actions::SelectItem(arguments[0].get_usize_value()?);
         println!("Running action {:?}", action);
         state.process(1, Box::new(| local_state: &SelectedClickState | local_state.process(action)));
         Ok(())
+    }
+}
+
+pub struct IsSelectedSelectorContainer {
+    path: String
+}
+
+impl Default for IsSelectedSelectorContainer {
+    fn default() -> Self {
+        Self { path: format!("{}::is_selected", module_path!()) }
+    }
+}
+
+impl SelectorContainer for IsSelectedSelectorContainer {
+    fn function_name(&self) -> &str {
+        &self.path
+    }
+
+    fn run(&self, state: &mut State, arguments: &Vec<AbstractSyntaxPropertyValue>) -> Result<AbstractSyntaxPropertyValue, ContainerRunError> {
+        if arguments.len() != 2 {
+            return Err(ContainerRunError::IncorrectAmountOfArgumentsPassed);
+        }
+
+        if !arguments[0].is_state_variable() {
+            return Err(ContainerRunError::FirstArgumentNotStateVariable);
+        }
+
+        Ok(AbstractSyntaxPropertyValue::Bool(is_selected(state, arguments[1].get_usize_value()?)))
     }
 }

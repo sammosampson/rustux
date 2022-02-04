@@ -32,7 +32,7 @@
             <separator />
             <scroll-area id="scroll-area2" max-height=100.0>
                 <for $item_id=[0, 10]>
-                    <let $selected={ruxy::examples::first::is_selected($item_id)}>
+                    <let $selected={ruxy::examples::first::is_selected($state, $item_id)}>
                         <selectable-label text="selectable-label4" selected=$selected on-select={ruxy::examples::first::select_item($item_id)} />
                     </let>
                 </for>

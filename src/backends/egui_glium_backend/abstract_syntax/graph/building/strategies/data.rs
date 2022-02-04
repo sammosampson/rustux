@@ -22,7 +22,7 @@ impl BuildAbstractSyntaxGraphStreamStrategy for LetBuildAbstractSyntaxGraphStrea
     fn start_child_node(&mut self, ast: &mut AbstractSyntaxGraph, context: &mut DataContext) {
         if let Some((variable, function)) = &self.function_variable {
             let function = context.replace_variable_data_in_function(function).unwrap();
-            let function_value = context.run_select_function(&function).unwrap();
+            let function_value = context.run_selector_function(&function).unwrap();
             context.set_variable(variable.clone(), function_value);
         }
     }

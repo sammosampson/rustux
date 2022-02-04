@@ -32,7 +32,7 @@ fn main() {
         .use_logging()
         .with_file_path("examples/assets/first")
         .with_file_monitor_poll(Duration::from_secs(1))
-        .with_context(|ctx| examples::first::Actions::register(ctx))
+        .with_context(|ctx| examples::first::register(ctx))
         .build()
         .expect("Build error")
         .run();
