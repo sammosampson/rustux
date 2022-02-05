@@ -65,6 +65,7 @@ fn match_control_name(control_name: &str) -> Box<dyn BuildAbstractSyntaxTokenStr
     match control_name {
         "root" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxControlType::Root)),
         "for" => Box::new(ForBuildAbstractSyntaxTokenStreamStrategy),
+        "for-each" => Box::new(ForEachBuildAbstractSyntaxTokenStreamStrategy),
         "let" => Box::new(LetBuildAbstractSyntaxTokenStreamStrategy),
         "central-panel" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxControlType::CentralPanel)),
         "top-panel" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxControlType::TopPanel)),

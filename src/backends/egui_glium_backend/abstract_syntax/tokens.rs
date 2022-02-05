@@ -17,6 +17,7 @@ pub enum AbstractSyntaxControlType {
     Root,
     Container,
     For,
+    ForEach,
     Let,
     CentralPanel,
     TopPanel,

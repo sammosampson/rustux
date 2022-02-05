@@ -14,7 +14,18 @@ pub enum AbstractSyntaxPropertyValue {
     USize(usize),
     USizeRangeVariable(String, USizeRange),
     FunctionVariable(String, Function),
-    Variable(String)
+    Variable(String),
+    Array(Vec<AbstractSyntaxPropertyValue>)
+}
+
+impl From<&Vec<usize>> for AbstractSyntaxPropertyValue {
+    fn from(from: &Vec<usize>) -> Self {
+        Self::Array(from
+            .iter()
+            .map(|item| Self::USize(*item))
+            .collect()
+        )
+    }
 }
 
 #[derive(Debug, Clone)]

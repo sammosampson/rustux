@@ -72,6 +72,8 @@ fn get_strategy(node_type: &AbstractSyntaxControlType) -> Box<dyn BuildAbstractS
             Box::new(RootBuildAbstractSyntaxGraphStreamStrategy),
         AbstractSyntaxControlType::For => 
             Box::new(ForBuildAbstractSyntaxGraphStreamStrategy::default()),
+        AbstractSyntaxControlType::ForEach => 
+            Box::new(ForEachBuildAbstractSyntaxGraphStreamStrategy::default()),
         AbstractSyntaxControlType::Let => 
             Box::new(LetBuildAbstractSyntaxGraphStreamStrategy::default()),
         node_type => 

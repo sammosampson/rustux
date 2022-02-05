@@ -9,14 +9,18 @@ pub enum Actions {
 // #[state]
 #[derive(Debug, Default)]
 pub struct SelectedClickState {
-    selected: Option<usize>
+    selected: Option<usize>,
+    items: Vec<usize>
 }
 
 // #[reducer]
 impl SelectedClickState {
     fn process(&self, action: Actions) -> Self {
         match action {
-            Actions::SelectItem(id) => Self{ selected: Some(id) },
+            Actions::SelectItem(id) => Self{ 
+                selected: Some(id), 
+                items: [&vec!(id)[..], &self.items[..]].concat()
+            },
         }
     }
 }
@@ -26,11 +30,17 @@ pub fn is_selected(state: &mut State, item_id: usize) -> bool {
     state.get_local::<SelectedClickState>(1).selected == Some(item_id)
 }
 
+// #[selector]
+pub fn get_items(state: &mut State) -> &Vec<usize> {
+    &state.get_local::<SelectedClickState>(1).items
+}
+
 //---------------------------------------------
 // derived code from here down
 pub fn register(ctx: &mut DataContext) {
     ctx.actions_mut().register_action(SelectItemActionContainer::default());
     ctx.selectors_mut().register_selector(IsSelectedSelectorContainer::default());
+    ctx.selectors_mut().register_selector(GetItemsSelectorContainer::default());
 }
 
 pub struct SelectItemActionContainer {
@@ -85,5 +95,33 @@ impl SelectorContainer for IsSelectedSelectorContainer {
         }
 
         Ok(AbstractSyntaxPropertyValue::Bool(is_selected(state, arguments[1].get_usize_value()?)))
+    }
+}
+
+pub struct GetItemsSelectorContainer {
+    path: String
+}
+
+impl Default for GetItemsSelectorContainer {
+    fn default() -> Self {
+        Self { path: format!("{}::get_items", module_path!()) }
+    }
+}
+
+impl SelectorContainer for GetItemsSelectorContainer {
+    fn function_name(&self) -> &str {
+        &self.path
+    }
+
+    fn run(&self, state: &mut State, arguments: &Vec<AbstractSyntaxPropertyValue>) -> Result<AbstractSyntaxPropertyValue, ContainerRunError> {
+        if arguments.len() != 1 {
+            return Err(ContainerRunError::IncorrectAmountOfArgumentsPassed);
+        }
+
+        if !arguments[0].is_state_variable() {
+            return Err(ContainerRunError::FirstArgumentNotStateVariable);
+        }
+
+        Ok(get_items(state).into())
     }
 }
