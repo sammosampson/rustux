@@ -120,31 +120,3 @@ impl Colour {
         }
     }
 }
-
-#[derive(Debug, Clone, Copy)]
-pub enum VerticalSize {
-    Auto,
-    MaxHeight(f32)
-}
-
-#[derive(Debug, Clone)]
-pub enum TextStyle {
-    Small,
-    Body,
-    Button,
-    Heading,
-    Monospace,
-}
-
-impl TextStyle {
-    pub fn parse(value: &str) -> Result<TextStyle, AbstractSyntaxTokenError> {
-        match value {
-            "small" => Ok(TextStyle::Small),
-            "body" => Ok(TextStyle::Body),
-            "button" => Ok(TextStyle::Button),
-            "heading" => Ok(TextStyle::Heading),
-            "monospace" => Ok(TextStyle::Monospace),
-            _ => Err(AbstractSyntaxTokenError::TextStyleValueParseError(value.to_string()))
-        }
-    }
-}

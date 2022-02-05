@@ -86,6 +86,7 @@ pub enum AbstractSyntaxPropertyType {
     WidthRange,
     HeightRange,
     VerticallySized, 
+    AutoSized, 
     AlwaysShowScroll,
     ScrollOffset,
     EnableScrolling,

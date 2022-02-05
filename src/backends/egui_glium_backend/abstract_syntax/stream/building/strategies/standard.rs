@@ -125,7 +125,7 @@ fn match_property_value(property_name: &str, property_value: &SourceTokenPropert
                 SourceTokenPropertyValue::String(value) =>
                     Ok(create_ast_property(
                         AbstractSyntaxPropertyType::TextStyle, 
-                        AbstractSyntaxPropertyValue::TextStyle(TextStyle::parse(value)?)
+                        AbstractSyntaxPropertyValue::String(value.clone())
                     )),
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string()))
             }
@@ -135,7 +135,7 @@ fn match_property_value(property_name: &str, property_value: &SourceTokenPropert
                 SourceTokenPropertyValue::Float(value) => 
                 Ok(create_ast_property(
                     AbstractSyntaxPropertyType::VerticallySized, 
-                    AbstractSyntaxPropertyValue::VerticalSize(VerticalSize::MaxHeight(*value as f32))
+                    AbstractSyntaxPropertyValue::Float(*value as f32)
                 )),
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
@@ -183,7 +183,7 @@ fn match_property_only(property_name: &str) -> Option<AbstractSyntaxProperty> {
         "underline" => Some(create_ast_property(AbstractSyntaxPropertyType::Underline, AbstractSyntaxPropertyValue::Bool(true))),
         "italics" => Some(create_ast_property(AbstractSyntaxPropertyType::Italics, AbstractSyntaxPropertyValue::Bool(true))),
         "raised" => Some(create_ast_property(AbstractSyntaxPropertyType::Raised, AbstractSyntaxPropertyValue::Bool(true))),
-        "auto-sized" => Some(create_ast_property(AbstractSyntaxPropertyType::VerticallySized, AbstractSyntaxPropertyValue::VerticalSize(VerticalSize::Auto))),
+        "auto-sized" => Some(create_ast_property(AbstractSyntaxPropertyType::AutoSized, AbstractSyntaxPropertyValue::Bool(true))),
         "always_show_scroll" => Some(create_ast_property(AbstractSyntaxPropertyType::AlwaysShowScroll, AbstractSyntaxPropertyValue::Bool(true))),
         "enable_scrolling" => Some(create_ast_property(AbstractSyntaxPropertyType::EnableScrolling, AbstractSyntaxPropertyValue::Bool(true))),
         _ => None 

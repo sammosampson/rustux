@@ -8,14 +8,19 @@ impl From<Colour> for Color32 {
     }
 }
 
-impl From<TextStyle> for egui::TextStyle {
-    fn from(from: TextStyle) -> Self {
+impl From<&AbstractSyntaxPropertyValue> for egui::TextStyle {
+    fn from(from: &AbstractSyntaxPropertyValue) -> Self {
         match from {
-            TextStyle::Small => egui::TextStyle::Small,
-            TextStyle::Body => egui::TextStyle::Body,
-            TextStyle::Button => egui::TextStyle::Button,
-            TextStyle::Heading => egui::TextStyle::Heading,
-            TextStyle::Monospace => egui::TextStyle::Monospace,
+            AbstractSyntaxPropertyValue::String(value) => 
+                match value.as_str() { 
+                    "small" => egui::TextStyle::Small,
+                    "body" => egui::TextStyle::Body,
+                    "button" => egui::TextStyle::Button,
+                    "heading" => egui::TextStyle::Heading,
+                    "monospace" => egui::TextStyle::Monospace,
+                    _=> panic!()
+            },
+            _ => panic!()
         }
     }
 }

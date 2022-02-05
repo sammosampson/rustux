@@ -7,8 +7,8 @@ impl AbstractSyntaxTreeRenderer {
 
     pub fn render_scroll_area(&self, ui: &mut egui::Ui, props: ScrollAreaProperties, add_contents: impl FnOnce(&mut egui::Ui) -> ()) {
         let mut scroll_area = match props.size {
-            VerticalSize::Auto => render_auto_sized_scroll_area(),
-            VerticalSize::MaxHeight(height) => render_max_height_scroll_area(height),
+            None => render_auto_sized_scroll_area(),
+            Some(height) => render_max_height_scroll_area(height),
         };
 
         scroll_area = scroll_area
@@ -43,7 +43,7 @@ fn render_max_height_scroll_area(height: f32) -> egui::ScrollArea {
 
 pub struct ScrollAreaProperties {
     pub id: String,
-    pub size: VerticalSize,
+    pub size: Option<f32>,
     pub scroll_offset: Option<f32>,
     pub always_show_scroll: bool,
     pub enable_scrolling: bool,
@@ -53,7 +53,7 @@ impl Default for ScrollAreaProperties {
     fn default() -> Self {
         Self { 
             id: "".to_string(),
-            size: VerticalSize::Auto,
+            size: None,
             scroll_offset: None,
             always_show_scroll: false,
             enable_scrolling: true,
@@ -67,7 +67,8 @@ impl From<&Vec<AbstractSyntaxProperty>> for ScrollAreaProperties {
         for property in from {
             match property.property_type() {
                 AbstractSyntaxPropertyType::Id => to.id = property.value().get_string_value().unwrap(),
-                AbstractSyntaxPropertyType::VerticallySized => to.size = property.value().get_vertical_size_value().unwrap(),
+                AbstractSyntaxPropertyType::VerticallySized => to.size = Some(property.value().get_float_value().unwrap()),
+                AbstractSyntaxPropertyType::AutoSized => to.size = None,
                 AbstractSyntaxPropertyType::AlwaysShowScroll => to.always_show_scroll = property.value().get_bool_value().unwrap(),
                 AbstractSyntaxPropertyType::ScrollOffset => to.scroll_offset = Some(property.value().get_float_value().unwrap()),
                 AbstractSyntaxPropertyType::EnableScrolling => to.enable_scrolling = property.value().get_bool_value().unwrap(),

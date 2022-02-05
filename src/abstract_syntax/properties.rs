@@ -5,10 +5,8 @@ use crate::prelude::*;
 pub enum AbstractSyntaxPropertyValue {
     String(String),
     Bool(bool),
-    TextStyle(TextStyle),
     Float(f32),
     FloatRange(FloatRange),
-    VerticalSize(VerticalSize), 
     Colour(Colour), 
     Function(Function),
     USize(usize),
@@ -88,20 +86,6 @@ impl AbstractSyntaxPropertyValue {
             return Ok(value.clone());
         }
         Err(AbstractSyntaxPropertyValueError::ValueNotExpected(self.clone()))
-    }
-    
-    pub fn get_text_style_value(&self) -> Result<TextStyle, AbstractSyntaxPropertyValueError> {
-        if let AbstractSyntaxPropertyValue::TextStyle(value) = &self {
-            return Ok(value.clone());
-        }
-        Err(AbstractSyntaxPropertyValueError::ValueNotExpected(self.clone()))
-    }
-    
-    pub fn get_vertical_size_value(&self) -> Result<VerticalSize, AbstractSyntaxPropertyValueError> {
-        if let AbstractSyntaxPropertyValue::VerticalSize(value) = self.clone() {
-            return Ok(value);
-        }
-        panic!()
     }
     
     pub fn get_function_value(&self) -> Result<Function, AbstractSyntaxPropertyValueError> {

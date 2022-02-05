@@ -109,7 +109,7 @@ impl From<&Vec<AbstractSyntaxProperty>> for LabelProperties {
             match property.property_type() {
                 AbstractSyntaxPropertyType::Text => to.text = property.value().get_string_value().unwrap(),
                 AbstractSyntaxPropertyType::Wrap => to.wrap = Some(property.value().get_bool_value().unwrap()),
-                AbstractSyntaxPropertyType::TextStyle => to.text_style = Some(property.value().get_text_style_value().unwrap().into()),
+                AbstractSyntaxPropertyType::TextStyle => to.text_style = Some(property.value().into()),
                 AbstractSyntaxPropertyType::BackgroundColour => to.background_color = property.value().get_colour_value().unwrap().into(),
                 AbstractSyntaxPropertyType::Colour => to.text_color = Some(property.value().get_colour_value().unwrap().into()),
                 AbstractSyntaxPropertyType::Code => to.code = property.value().get_bool_value().unwrap(),
