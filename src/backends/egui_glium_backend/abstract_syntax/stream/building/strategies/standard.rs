@@ -55,6 +55,10 @@ fn match_property_value(property_name: &str, property_value: &SourceTokenPropert
                     AbstractSyntaxPropertyType::Text, 
                     AbstractSyntaxPropertyValue::String(value.clone())
                 )),
+                SourceTokenPropertyValue::Variable(value) => Ok(create_ast_property(
+                    AbstractSyntaxPropertyType::Text, 
+                    AbstractSyntaxPropertyValue::Variable(value.clone())
+                )),
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
         },

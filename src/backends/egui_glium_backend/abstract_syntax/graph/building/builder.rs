@@ -30,11 +30,19 @@ impl AbstractSyntaxTokenStreamVisitor for AbstractSyntaxGraphBuilder {
     }
 
     fn start_node(&mut self, node_type: &AbstractSyntaxControlType, context: &mut DataContext) {
+        let mut action = StartNodeAction::Continue;
+
         if let Some(parent_strategy) = self.strategies.last_mut() {
-            parent_strategy.start_child_node(&mut self.ast, context);
+            action = parent_strategy.start_child_node(&mut self.ast, context);
         }
         
+        
         let mut strategy = get_strategy(node_type);
+        
+        if action == StartNodeAction::Prevent {
+            strategy = Box::new(PreventBuildAbstractSyntaxGraphStreamStrategy);
+        }
+
         self.current_node = strategy.start_node(self.current_node, &mut self.ast);
         self.strategies.push(strategy);
     }

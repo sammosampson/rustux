@@ -18,11 +18,11 @@ pub enum AbstractSyntaxPropertyValue {
     Array(Vec<AbstractSyntaxPropertyValue>)
 }
 
-impl From<&Vec<usize>> for AbstractSyntaxPropertyValue {
-    fn from(from: &Vec<usize>) -> Self {
+impl From<&Vec<String>> for AbstractSyntaxPropertyValue {
+    fn from(from: &Vec<String>) -> Self {
         Self::Array(from
             .iter()
-            .map(|item| Self::USize(*item))
+            .map(|item| Self::String(item.clone()))
             .collect()
         )
     }

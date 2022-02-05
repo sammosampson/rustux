@@ -10,7 +10,7 @@ pub enum Actions {
 #[derive(Debug, Default)]
 pub struct SelectedClickState {
     selected: Option<usize>,
-    items: Vec<usize>
+    items: Vec<String>
 }
 
 // #[reducer]
@@ -19,7 +19,7 @@ impl SelectedClickState {
         match action {
             Actions::SelectItem(id) => Self{ 
                 selected: Some(id), 
-                items: [&vec!(id)[..], &self.items[..]].concat()
+                items: [&vec!(format!("selected_{}", id))[..], &self.items[..]].concat()
             },
         }
     }
@@ -31,7 +31,7 @@ pub fn is_selected(state: &mut State, item_id: usize) -> bool {
 }
 
 // #[selector]
-pub fn get_items(state: &mut State) -> &Vec<usize> {
+pub fn get_items(state: &mut State) -> &Vec<String> {
     &state.get_local::<SelectedClickState>(1).items
 }
 

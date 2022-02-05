@@ -25,19 +25,24 @@ impl BuildAbstractSyntaxGraphStreamStrategy for ForEachBuildAbstractSyntaxGraphS
         }
     }
 
-    fn start_child_node(&mut self, _ast: &mut AbstractSyntaxGraph, context: &mut DataContext) {
+    fn start_child_node(&mut self, _ast: &mut AbstractSyntaxGraph, context: &mut DataContext) -> StartNodeAction {
         if let Some((variable, items)) = &self.variable_items {
             if items.len() == 0 {
-                return;
+                return StartNodeAction::Prevent;
             }
             context.set_variable(variable.clone(), items[self.current_position].clone());
         }
+        StartNodeAction::Continue
+
     }
 
     fn end_child_node(&mut self) -> EndNodeAction {
         if let Some((_variable, items)) = &self.variable_items {
+            if items.len() == 0 {
+                return EndNodeAction::Continue;
+            }
             self.current_position += 1;
-            if self.current_position <= items.len() {
+            if self.current_position < items.len() {
                 return EndNodeAction::Repeat
             }
         }
@@ -68,10 +73,11 @@ impl BuildAbstractSyntaxGraphStreamStrategy for ForBuildAbstractSyntaxGraphStrea
         self.range = Some(range);
     }
 
-    fn start_child_node(&mut self, _ast: &mut AbstractSyntaxGraph, context: &mut DataContext) {
+    fn start_child_node(&mut self, _ast: &mut AbstractSyntaxGraph, context: &mut DataContext) -> StartNodeAction {
         if let Some(variable) = &self.variable {
             context.set_variable(variable.clone(), AbstractSyntaxPropertyValue::USize(self.current_position));
         }
+        StartNodeAction::Continue
     }
 
     fn end_child_node(&mut self) -> EndNodeAction {

@@ -19,12 +19,13 @@ impl BuildAbstractSyntaxGraphStreamStrategy for LetBuildAbstractSyntaxGraphStrea
         self.function_variable = Some(property.value().get_function_variable_value().unwrap());
     }
 
-    fn start_child_node(&mut self, _ast: &mut AbstractSyntaxGraph, context: &mut DataContext) {
+    fn start_child_node(&mut self, _ast: &mut AbstractSyntaxGraph, context: &mut DataContext) -> StartNodeAction {
         if let Some((variable, function)) = &self.function_variable {
             let function = context.replace_variable_data_in_function(function).unwrap();
             let function_value = context.run_selector_function(&function).unwrap();
             context.set_variable(variable.clone(), function_value);
         }
+        StartNodeAction::Continue
     }
 
     fn end_child_node(&mut self) -> EndNodeAction {

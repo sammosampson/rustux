@@ -1,6 +1,12 @@
 use crate::prelude::*;
 
 #[derive(PartialEq, Eq)]
+pub enum StartNodeAction {
+    Continue,
+    Prevent
+}
+
+#[derive(PartialEq, Eq)]
 pub enum EndNodeAction {
     Continue,
     Repeat
@@ -9,7 +15,7 @@ pub enum EndNodeAction {
 pub trait AbstractSyntaxTokenStreamVisitor {
     fn start_node_with_repeat_possibility(&mut self, position: usize, node_type: &AbstractSyntaxControlType, context: &mut DataContext) {
         self.push_last_node_position(position);
-        self.start_node(node_type, context)
+        self.start_node(node_type, context);
     }
 
     fn end_node_with_repeat_check(&mut self, position: usize, node_type: &AbstractSyntaxControlType) -> Option<USizeRange> {
