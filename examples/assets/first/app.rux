@@ -46,7 +46,7 @@
             <separator />
             <scroll-area id="scroll-area4" max-height=100.0>
                 <for-each $item={ruxy::examples::first::get_items($state)}>
-                    <coloured-label text=$item colour=[255, 0, 0, 255] />
+                    <coloured-label text=$item.text colour=$item.colour />
                 </for-each>            
             </scroll-area>
             <separator />

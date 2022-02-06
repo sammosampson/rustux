@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use crate::prelude::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -10,7 +8,7 @@ pub struct DataArrayId(usize);
 pub struct DataArrays(Vec<Box<dyn DataArray>>);
 
 impl DataArrays {
-    pub fn add_string_array(&mut self, items: Rc<Vec<String>>) -> DataArrayId {
+    pub fn add_string_array(&mut self, items: Vec<String>) -> DataArrayId {
         self.add(StringDataArray::from(items))
     }
 
@@ -34,7 +32,7 @@ pub trait DataArray {
     fn get_array_item_value(&self, position: usize, variable: &VariablePath) -> Option<AbstractSyntaxPropertyValue>;
 }
 
-pub struct StringDataArray(Rc<Vec<String>>);
+pub struct StringDataArray(Vec<String>);
 
 impl DataArray for StringDataArray {
     fn len(&self) -> usize {
@@ -49,8 +47,8 @@ impl DataArray for StringDataArray {
     }
 }
 
-impl From<Rc<Vec<String>>> for StringDataArray {
-    fn from(from: Rc<Vec<String>>) -> Self {
+impl From<Vec<String>> for StringDataArray {
+    fn from(from: Vec<String>) -> Self {
         Self(from)
     }
 }

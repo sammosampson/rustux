@@ -106,7 +106,12 @@ fn match_property_value(property_name: &str, property_value: &SourceTokenPropert
                     Ok(create_ast_property(
                         AbstractSyntaxPropertyType::Colour, 
                         AbstractSyntaxPropertyValue::Colour(Colour::parse(value)?)
-                    )),
+                    )
+                ),
+                SourceTokenPropertyValue::Variable(value) => Ok(create_ast_property(
+                    AbstractSyntaxPropertyType::Colour, 
+                    AbstractSyntaxPropertyValue::VariablePath(VariablePath::parse(value.clone())?)
+                )),
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
         },
