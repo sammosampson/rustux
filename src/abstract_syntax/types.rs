@@ -120,3 +120,31 @@ impl Colour {
         }
     }
 }
+
+#[derive(Debug, Clone)]
+pub struct VariablePath(String, Option<String>);
+
+impl VariablePath {
+    pub fn parse(value: String) -> Result<VariablePath, AbstractSyntaxTokenError> {
+        let mut values = value.split('.');
+        if let Some(variable_part) = values.next() {
+            if let Some(property_part) = values.next() {
+                return Ok(Self(variable_part.to_string(), Some(property_part.to_string())))
+            }
+            return Ok(Self(variable_part.to_string(), None))
+        }
+        Err(AbstractSyntaxTokenError::VariablePathParseError(value))
+    }
+
+    pub fn variable_part(&self) -> &str {
+        &self.0
+    }
+    
+    pub fn is_state_variable(&self) -> bool {
+        self.variable_part() == "state"
+    }
+
+    pub fn property_part(&self) -> &Option<String> {
+        &self.1
+    }
+}

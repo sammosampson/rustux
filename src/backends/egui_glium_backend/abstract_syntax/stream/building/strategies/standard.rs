@@ -57,7 +57,7 @@ fn match_property_value(property_name: &str, property_value: &SourceTokenPropert
                 )),
                 SourceTokenPropertyValue::Variable(value) => Ok(create_ast_property(
                     AbstractSyntaxPropertyType::Text, 
-                    AbstractSyntaxPropertyValue::Variable(value.clone())
+                    AbstractSyntaxPropertyValue::VariablePath(VariablePath::parse(value.clone())?)
                 )),
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
@@ -162,7 +162,7 @@ fn match_property_value(property_name: &str, property_value: &SourceTokenPropert
             match property_value {
                 SourceTokenPropertyValue::Variable(value) => Ok(create_ast_property(
                     AbstractSyntaxPropertyType::Selected, 
-                    AbstractSyntaxPropertyValue::Variable(value.clone())
+                    AbstractSyntaxPropertyValue::VariablePath(VariablePath::parse(value.clone())?)
                 )),
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }

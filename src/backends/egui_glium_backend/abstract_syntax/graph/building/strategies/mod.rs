@@ -16,7 +16,7 @@ pub trait BuildAbstractSyntaxGraphStreamStrategy {
     fn end_node(&mut self, node: AbstractSyntaxGraphNodeId, ast: &mut AbstractSyntaxGraph) -> AbstractSyntaxGraphNodeId;
     fn property(&mut self, node: AbstractSyntaxGraphNodeId, property: AbstractSyntaxProperty, ast: &mut AbstractSyntaxGraph, context: &mut DataContext);
     fn start_child_node(&mut self, ast: &mut AbstractSyntaxGraph, context: &mut DataContext) -> StartNodeAction;
-    fn end_child_node(&mut self) -> EndNodeAction;
+    fn end_child_node(&mut self, context: &mut DataContext) -> EndNodeAction;
 }
 
 pub struct EmptyBuildAbstractSyntaxGraphStreamStrategy;
@@ -34,7 +34,7 @@ impl BuildAbstractSyntaxGraphStreamStrategy for EmptyBuildAbstractSyntaxGraphStr
         panic!()
     }
 
-    fn end_child_node(&mut self) -> EndNodeAction {
+    fn end_child_node(&mut self, _context: &mut DataContext) -> EndNodeAction {
         panic!()
     }
 
@@ -57,7 +57,7 @@ impl BuildAbstractSyntaxGraphStreamStrategy for PreventBuildAbstractSyntaxGraphS
     fn property(&mut self, _node: AbstractSyntaxGraphNodeId, _property: AbstractSyntaxProperty, _ast: &mut AbstractSyntaxGraph, _context: &mut DataContext) {
     }
 
-    fn end_child_node(&mut self) -> EndNodeAction {
+    fn end_child_node(&mut self, _context: &mut DataContext) -> EndNodeAction {
         EndNodeAction::Continue
     }
 

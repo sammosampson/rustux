@@ -2,7 +2,12 @@ use crate::prelude::*;
 
 pub trait SelectorContainer {
     fn function_name(&self) -> &str;
-    fn run(&self, state: &mut State, arguments: &Vec<AbstractSyntaxPropertyValue>) -> Result<AbstractSyntaxPropertyValue, ContainerRunError>;
+    fn run(
+        &self,
+        data_arrays: &mut DataArrays,
+        state: &mut State,
+        arguments: &Vec<AbstractSyntaxPropertyValue>
+    ) -> Result<AbstractSyntaxPropertyValue, ContainerRunError>;
 }
 
 #[derive(Default)]

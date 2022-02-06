@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use crate::prelude::*;
 
 // #[actions]
@@ -10,7 +12,7 @@ pub enum Actions {
 #[derive(Debug, Default)]
 pub struct SelectedClickState {
     selected: Option<usize>,
-    items: Vec<String>
+    items: Rc<Vec<String>>
 }
 
 // #[reducer]
@@ -19,7 +21,7 @@ impl SelectedClickState {
         match action {
             Actions::SelectItem(id) => Self{ 
                 selected: Some(id), 
-                items: [&vec!(format!("selected_{}", id))[..], &self.items[..]].concat()
+                items: Rc::new([&vec!(format!("selected_{}", id))[..], &self.items[..]].concat())
             },
         }
     }
@@ -31,8 +33,8 @@ pub fn is_selected(state: &mut State, item_id: usize) -> bool {
 }
 
 // #[selector]
-pub fn get_items(state: &mut State) -> &Vec<String> {
-    &state.get_local::<SelectedClickState>(1).items
+pub fn get_items(state: &mut State) -> Rc<Vec<String>> {
+    state.get_local::<SelectedClickState>(1).items.clone()
 }
 
 //---------------------------------------------
@@ -85,7 +87,7 @@ impl SelectorContainer for IsSelectedSelectorContainer {
         &self.path
     }
 
-    fn run(&self, state: &mut State, arguments: &Vec<AbstractSyntaxPropertyValue>) -> Result<AbstractSyntaxPropertyValue, ContainerRunError> {
+    fn run(&self, _data_arrays: &mut DataArrays, state: &mut State, arguments: &Vec<AbstractSyntaxPropertyValue>) -> Result<AbstractSyntaxPropertyValue, ContainerRunError> {
         if arguments.len() != 2 {
             return Err(ContainerRunError::IncorrectAmountOfArgumentsPassed);
         }
@@ -113,7 +115,7 @@ impl SelectorContainer for GetItemsSelectorContainer {
         &self.path
     }
 
-    fn run(&self, state: &mut State, arguments: &Vec<AbstractSyntaxPropertyValue>) -> Result<AbstractSyntaxPropertyValue, ContainerRunError> {
+    fn run(&self, data_arrays: &mut DataArrays, state: &mut State, arguments: &Vec<AbstractSyntaxPropertyValue>) -> Result<AbstractSyntaxPropertyValue, ContainerRunError> {
         if arguments.len() != 1 {
             return Err(ContainerRunError::IncorrectAmountOfArgumentsPassed);
         }
@@ -122,6 +124,9 @@ impl SelectorContainer for GetItemsSelectorContainer {
             return Err(ContainerRunError::FirstArgumentNotStateVariable);
         }
 
-        Ok(get_items(state).into())
+        let items = get_items(state);
+        let data_id = data_arrays.add_string_array(items);
+
+        Ok(AbstractSyntaxPropertyValue::DataArray(data_id, 0))
     }
 }

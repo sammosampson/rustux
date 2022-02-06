@@ -48,7 +48,7 @@ impl AbstractSyntaxTokenStream {
                 AbstractSyntaxToken::StartControl(node_type) => visitor.start_node_with_repeat_possibility(position, node_type, context),
                 AbstractSyntaxToken::Property(property) => visitor.property(property, context),
                 AbstractSyntaxToken::EndControl(node_type) =>
-                    if let Some(range) = visitor.end_node_with_repeat_check(position, node_type) {
+                    if let Some(range) = visitor.end_node_with_repeat_check(position, node_type, context) {
                         for child_position in RangeInclusive::<usize>::from(&range) {
                             self.accept_node(child_position, visitor, context);
                         }

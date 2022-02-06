@@ -8,6 +8,7 @@ pub enum AbstractSyntaxTokenError {
     UnknownPropertyValue(String),
     RangeValueParseError,
     ColourValueParseError,
+    VariablePathParseError(String),
     TextStyleValueParseError(String)
 }
 

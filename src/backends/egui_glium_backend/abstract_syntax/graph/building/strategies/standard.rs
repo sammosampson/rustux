@@ -18,7 +18,7 @@ impl BuildAbstractSyntaxGraphStreamStrategy for StandardBuildAbstractSyntaxGraph
         ast.add_node_property(node, resolved_property);
     }
 
-    fn end_child_node(&mut self) -> EndNodeAction {
+    fn end_child_node(&mut self, _context: &mut DataContext) -> EndNodeAction {
         EndNodeAction::Continue
     }
     

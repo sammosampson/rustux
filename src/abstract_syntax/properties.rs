@@ -12,18 +12,8 @@ pub enum AbstractSyntaxPropertyValue {
     USize(usize),
     USizeRangeVariable(String, USizeRange),
     FunctionVariable(String, Function),
-    Variable(String),
-    Array(Vec<AbstractSyntaxPropertyValue>)
-}
-
-impl From<&Vec<String>> for AbstractSyntaxPropertyValue {
-    fn from(from: &Vec<String>) -> Self {
-        Self::Array(from
-            .iter()
-            .map(|item| Self::String(item.clone()))
-            .collect()
-        )
-    }
+    VariablePath(VariablePath),
+    DataArray(DataArrayId, usize)
 }
 
 #[derive(Debug, Clone)]
@@ -33,8 +23,8 @@ pub enum AbstractSyntaxPropertyValueError {
 
 impl AbstractSyntaxPropertyValue {
     pub fn is_state_variable(&self) -> bool {
-        if let Self::Variable(value) = self {
-            return value == "state";
+        if let Self::VariablePath(value) = self {
+            return value.is_state_variable()
         }
         false
     }
@@ -108,7 +98,7 @@ impl From<&SourceTokenPropertyValue> for AbstractSyntaxPropertyValue {
         match from {
             SourceTokenPropertyValue::String(value) => Self::String(value.clone()),
             SourceTokenPropertyValue::Float(value) => Self::Float(*value as f32),
-            SourceTokenPropertyValue::Variable(value) => Self::Variable(value.clone()),
+            SourceTokenPropertyValue::Variable(value) => Self::VariablePath(VariablePath::parse(value.clone()).unwrap()),
             _  => panic!(),
         }
     }

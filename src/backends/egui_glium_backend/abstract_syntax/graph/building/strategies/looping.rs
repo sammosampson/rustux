@@ -3,8 +3,8 @@ use crate::prelude::*;
 
 #[derive(Default)]
 pub struct ForEachBuildAbstractSyntaxGraphStreamStrategy {
-    variable_items: Option<(String, Vec<AbstractSyntaxPropertyValue>)>,
-    current_position: usize
+    variable_items: Option<(String, DataArrayId)>,
+    position: usize
 }
 
 impl BuildAbstractSyntaxGraphStreamStrategy for ForEachBuildAbstractSyntaxGraphStreamStrategy {
@@ -18,32 +18,37 @@ impl BuildAbstractSyntaxGraphStreamStrategy for ForEachBuildAbstractSyntaxGraphS
 
     fn property(&mut self, _node: AbstractSyntaxGraphNodeId, property: AbstractSyntaxProperty, _ast: &mut AbstractSyntaxGraph, context: &mut DataContext) {
         let (variable, function) = property.value().get_function_variable_value().unwrap();
-        self.current_position = 0;
         let function = context.replace_variable_data_in_function(&function).unwrap();
-        if let AbstractSyntaxPropertyValue::Array(items) = context.run_selector_function(&function).unwrap() {
-            self.variable_items = Some((variable, items));
+        if let AbstractSyntaxPropertyValue::DataArray(array_id, position) = context.run_selector_function(&function).unwrap() {
+            self.variable_items = Some((variable, array_id));
+            self.position = position
         }
     }
 
     fn start_child_node(&mut self, _ast: &mut AbstractSyntaxGraph, context: &mut DataContext) -> StartNodeAction {
-        if let Some((variable, items)) = &self.variable_items {
-            if items.len() == 0 {
-                return StartNodeAction::Prevent;
+        if let Some((variable, array_id)) = &self.variable_items {
+            if let Some(array) = context.data_arrays().get(*array_id) {
+                if array.len() == 0 {
+                    return StartNodeAction::Prevent;
+                }
+                
+                context.set_variable(variable.clone(), AbstractSyntaxPropertyValue::DataArray(*array_id, self.position));
             }
-            context.set_variable(variable.clone(), items[self.current_position].clone());
         }
         StartNodeAction::Continue
 
     }
 
-    fn end_child_node(&mut self) -> EndNodeAction {
-        if let Some((_variable, items)) = &self.variable_items {
-            if items.len() == 0 {
-                return EndNodeAction::Continue;
-            }
-            self.current_position += 1;
-            if self.current_position < items.len() {
-                return EndNodeAction::Repeat
+    fn end_child_node(&mut self, context: &mut DataContext) -> EndNodeAction {
+        if let Some((_variable, array_id)) = &self.variable_items {
+            if let Some(array) = context.data_arrays_mut().get_mut(*array_id) {
+                if array.len() == 0 {
+                    return EndNodeAction::Continue;
+                }
+                self.position += 1;
+                if self.position < array.len() {
+                    return EndNodeAction::Repeat
+                }
             }
         }
         EndNodeAction::Continue
@@ -80,7 +85,7 @@ impl BuildAbstractSyntaxGraphStreamStrategy for ForBuildAbstractSyntaxGraphStrea
         StartNodeAction::Continue
     }
 
-    fn end_child_node(&mut self) -> EndNodeAction {
+    fn end_child_node(&mut self, _context: &mut DataContext) -> EndNodeAction {
         if let Some(range) = &self.range {
             self.current_position += 1;
             if self.current_position <= range.upper_bound() {

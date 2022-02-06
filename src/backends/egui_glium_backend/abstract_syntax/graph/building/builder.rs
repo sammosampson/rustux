@@ -51,7 +51,7 @@ impl AbstractSyntaxTokenStreamVisitor for AbstractSyntaxGraphBuilder {
         self.strategies.last_mut().unwrap().property(self.current_node, property.clone(), &mut self.ast, context);
     }
 
-    fn end_node(&mut self, _node_type: &AbstractSyntaxControlType) -> EndNodeAction {
+    fn end_node(&mut self, _node_type: &AbstractSyntaxControlType, context: &mut DataContext) -> EndNodeAction {
         let mut strategy = self.strategies.pop().unwrap();
         let ending_node = self.current_node;
         self.current_node = strategy.end_node(ending_node, &mut self.ast);
@@ -59,7 +59,7 @@ impl AbstractSyntaxTokenStreamVisitor for AbstractSyntaxGraphBuilder {
         let mut end_node_action = EndNodeAction::Continue;
 
         if let Some(parent_strategy) = self.strategies.last_mut() {
-            end_node_action = parent_strategy.end_child_node();
+            end_node_action = parent_strategy.end_child_node(context);
         }
 
         end_node_action

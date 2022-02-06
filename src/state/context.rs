@@ -7,6 +7,8 @@ pub fn create_data_context() -> DataContext {
 #[derive(Debug)]
 pub enum DataContextError {
     ActionRunError(ContainerRunError),
+    DataArrayItemDoesNotExist(VariablePath),
+    DataArrayDoesNotExist,
     VariableDoesNotExist,
     ContainerNotFound
 }
@@ -22,6 +24,7 @@ impl From<ContainerRunError> for DataContextError {
 pub struct DataContext { 
     actions: RegisteredActions,
     selectors: RegisteredSelectors,
+    data_arrays: DataArrays,
     state: State,
     variables: HashMap<String, AbstractSyntaxPropertyValue> 
 }
@@ -37,9 +40,17 @@ impl DataContext {
 
     pub fn run_selector_function(&mut self, function: &Function) -> Result<AbstractSyntaxPropertyValue, DataContextError> {
         if let Some(container) = self.selectors.get_selector_container(function.name()) {
-            return Ok(container.run(&mut self.state, &function.arguments())?);
+            return Ok(container.run(&mut self.data_arrays, &mut self.state, &function.arguments())?);
         }
         Err(DataContextError::ContainerNotFound)
+    }
+
+    pub fn data_arrays(&self) -> &DataArrays {
+        &self.data_arrays
+    }
+
+    pub fn data_arrays_mut(&mut self) -> &mut DataArrays {
+        &mut self.data_arrays
     }
 
     pub fn actions_mut(&mut self) -> &mut RegisteredActions {
@@ -59,7 +70,7 @@ impl DataContext {
         property: AbstractSyntaxProperty
     ) -> Result<AbstractSyntaxProperty, DataContextError> {
         match property.value() {
-            AbstractSyntaxPropertyValue::Variable(_) |
+            AbstractSyntaxPropertyValue::VariablePath(_) |
             AbstractSyntaxPropertyValue::Function(_) => {
                 Ok(property.set_value(self.replace_variable_data_in_value(property.value())?))
             },
@@ -74,8 +85,8 @@ impl DataContext {
         match property_value {
             AbstractSyntaxPropertyValue::Function(function) =>
                 Ok(AbstractSyntaxPropertyValue::Function(self.replace_variable_data_in_function(function)?)),
-            AbstractSyntaxPropertyValue::Variable(variable) => 
-                Ok(self.get_variable(&variable)?),
+            AbstractSyntaxPropertyValue::VariablePath(variable) => 
+                Ok(self.get_variable_value(variable)?),
             _ =>
                 Ok(property_value.clone())
         }
@@ -93,10 +104,25 @@ impl DataContext {
         return Ok(function.set_arguments(resolved_arguments));
     }
 
-    fn get_variable(&self, variable: &str) -> Result<AbstractSyntaxPropertyValue, DataContextError> {
-        if let Some(variable_value) = self.variables.get(variable) {
-            return Ok(variable_value.clone());
+    fn get_variable_value(&self, variable: &VariablePath) -> Result<AbstractSyntaxPropertyValue, DataContextError> {
+        if let Some(variable_value) = self.variables.get(variable.variable_part()) {
+            match variable_value {
+                AbstractSyntaxPropertyValue::DataArray(array_id, position) => return self.get_array_item_value(*array_id, *position, variable),
+                _ => return Ok(variable_value.clone())
+            }
         } 
         return Err(DataContextError::VariableDoesNotExist);
+    }
+
+    fn get_array_item_value(&self, array_id: DataArrayId, position: usize, variable: &VariablePath) -> Result<AbstractSyntaxPropertyValue, DataContextError> {
+        if let Some(array) = self.data_arrays().get(array_id) {
+            if let Some(value) = array.get_array_item_value(position, variable) {
+                return Ok(value);
+            } else {
+                return Err(DataContextError::DataArrayItemDoesNotExist(variable.clone()))        
+            }
+        }
+        
+        Err(DataContextError::DataArrayDoesNotExist)
     }
 }

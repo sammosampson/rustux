@@ -16,7 +16,7 @@ impl BuildAbstractSyntaxGraphStreamStrategy for RootBuildAbstractSyntaxGraphStre
         panic!()
     }
 
-    fn end_child_node(&mut self) -> EndNodeAction {
+    fn end_child_node(&mut self, _context: &mut DataContext) -> EndNodeAction {
         EndNodeAction::Continue
     }
     

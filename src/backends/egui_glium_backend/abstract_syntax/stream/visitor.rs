@@ -18,9 +18,9 @@ pub trait AbstractSyntaxTokenStreamVisitor {
         self.start_node(node_type, context);
     }
 
-    fn end_node_with_repeat_check(&mut self, position: usize, node_type: &AbstractSyntaxControlType) -> Option<USizeRange> {
+    fn end_node_with_repeat_check(&mut self, position: usize, node_type: &AbstractSyntaxControlType, context: &mut DataContext) -> Option<USizeRange> {
         if let Some(last_node_position) = self.pop_last_node_position() {
-            if self.end_node(node_type) == EndNodeAction::Repeat {
+            if self.end_node(node_type, context) == EndNodeAction::Repeat {
                 return Some(USizeRange::new(last_node_position, position));
             }
         }
@@ -31,6 +31,6 @@ pub trait AbstractSyntaxTokenStreamVisitor {
     fn pop_last_node_position(&mut self) -> Option<usize>;
     fn start_node(&mut self, node_type: &AbstractSyntaxControlType, context: &mut DataContext);
     fn property(&mut self, property: &AbstractSyntaxProperty, context: &mut DataContext);
-    fn end_node(&mut self, node_type: &AbstractSyntaxControlType) -> EndNodeAction;
+    fn end_node(&mut self, node_type: &AbstractSyntaxControlType, context: &mut DataContext) -> EndNodeAction;
     fn token_error(&mut self, error: &AbstractSyntaxTokenError);
 }
