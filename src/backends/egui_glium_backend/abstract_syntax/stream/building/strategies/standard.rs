@@ -49,10 +49,36 @@ fn match_property_value(property_name: &str, property_value: &SourceTokenPropert
                 _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
             }
         },
+        "name" => {
+            match property_value {
+                SourceTokenPropertyValue::String(value) => Ok(create_ast_property(
+                    AbstractSyntaxPropertyType::Name, 
+                    AbstractSyntaxPropertyValue::String(value.clone())
+                )),
+                SourceTokenPropertyValue::Variable(value) => Ok(create_ast_property(
+                    AbstractSyntaxPropertyType::Name, 
+                    AbstractSyntaxPropertyValue::VariablePath(VariablePath::parse(value.clone())?)
+                )),
+                _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
+            }
+        },
         "text" => {
             match property_value {
                 SourceTokenPropertyValue::String(value) => Ok(create_ast_property(
                     AbstractSyntaxPropertyType::Text, 
+                    AbstractSyntaxPropertyValue::String(value.clone())
+                )),
+                SourceTokenPropertyValue::Variable(value) => Ok(create_ast_property(
+                    AbstractSyntaxPropertyType::Text, 
+                    AbstractSyntaxPropertyValue::VariablePath(VariablePath::parse(value.clone())?)
+                )),
+                _ => Err(AbstractSyntaxTokenError::UnknownPropertyValue(property_name.to_string())) 
+            }
+        },
+        "path" => {
+            match property_value {
+                SourceTokenPropertyValue::String(value) => Ok(create_ast_property(
+                    AbstractSyntaxPropertyType::Path, 
                     AbstractSyntaxPropertyValue::String(value.clone())
                 )),
                 SourceTokenPropertyValue::Variable(value) => Ok(create_ast_property(

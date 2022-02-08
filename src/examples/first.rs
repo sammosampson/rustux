@@ -27,12 +27,12 @@ impl SelectedClickState {
 
 // #[selector]
 pub fn is_selected(state: &mut State, item_id: usize) -> bool {
-    state.get_local::<SelectedClickState>(1).selected == Some(item_id)
+    state.get_local::<SelectedClickState>().selected == Some(item_id)
 }
 
 // #[selector]
 pub fn get_names(state: &mut State) -> Vec<String> {
-    state.get_local::<SelectedClickState>(1)
+    state.get_local::<SelectedClickState>()
         .items
         .iter()
         .map(|id|format!("selected_{}", id))
@@ -41,7 +41,7 @@ pub fn get_names(state: &mut State) -> Vec<String> {
 
 // #[selector]
 pub fn get_items(state: &mut State) -> Vec<SelectedItem> {
-    state.get_local::<SelectedClickState>(1)
+    state.get_local::<SelectedClickState>()
         .items
         .iter()
         .map(|id| 

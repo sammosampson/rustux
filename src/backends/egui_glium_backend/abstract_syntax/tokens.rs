@@ -16,6 +16,8 @@ pub enum AbstractSyntaxTokenError {
 pub enum AbstractSyntaxControlType {
     Unknown,
     Root,
+    Control,
+    Import,
     Container,
     For,
     ForEach,
@@ -70,6 +72,8 @@ impl AbstractSyntaxProperty {
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub enum AbstractSyntaxPropertyType {
     Id,
+    Name,
+    Path,
     Text,
     Selected,
     Resizable,

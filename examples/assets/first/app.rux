@@ -1,4 +1,5 @@
 <root>
+    <import name="selections" path=".\selections.rux" /> 
     <top-panel id="top-panel" />
     <bottom-panel id="bottom-panel" />
     <central-panel />
@@ -16,7 +17,7 @@
             <code text="code" />
         </vertical>
     </left-side-bar>
-    <right-side-bar id="right-sdie-bar">
+    <right-side-bar id="right-side-bar">
         <vertical>
             <separator />
             <scroll-area id="scroll-area1" auto-sized>
@@ -30,26 +31,7 @@
                 <label text="label11" />
             </scroll-area>
             <separator />
-            <scroll-area id="scroll-area2" max-height=100.0>
-                <for $item_id=[0, 10]>
-                    <let $selected={ruxy::examples::first::is_selected($state, $item_id)}>
-                        <selectable-label text="selectable-label4" selected=$selected on-select={ruxy::examples::first::select_item($item_id)} />
-                    </let>
-                </for>
-            </scroll-area>
-            <separator />
-            <scroll-area id="scroll-area3" max-height=100.0>
-                <for $item_id=[0, 10]>
-                    <coloured-label text="coloured label" colour=[255, 0, 0, 255] />
-                </for>            
-            </scroll-area>
-            <separator />
-            <scroll-area id="scroll-area4" max-height=100.0>
-                <for-each $item={ruxy::examples::first::get_items($state)}>
-                    <coloured-label text=$item.text colour=$item.colour />
-                </for-each>            
-            </scroll-area>
-            <separator />
+            <selections />
         </vertical>
     </right-side-bar>
 </root>

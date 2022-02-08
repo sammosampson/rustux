@@ -64,6 +64,8 @@ impl SourceTokenVisitor for BuildAbstractSyntaxSourceTokenVisitor {
 fn match_control_name(control_name: &str) -> Box<dyn BuildAbstractSyntaxTokenStreamStrategy> {
     match control_name {
         "root" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxControlType::Root)),
+        "control" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxControlType::Control)),
+        "import" => Box::new(StandardBuildAbstractSyntaxTokenStreamStrategy(AbstractSyntaxControlType::Import)),
         "for" => Box::new(ForBuildAbstractSyntaxTokenStreamStrategy),
         "for-each" => Box::new(ForEachBuildAbstractSyntaxTokenStreamStrategy),
         "let" => Box::new(LetBuildAbstractSyntaxTokenStreamStrategy),
