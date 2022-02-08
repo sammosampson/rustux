@@ -1,6 +1,5 @@
-use std::fs;
-
 use crate::prelude::*;
+use std::fs;
 
 pub fn create_file_paths(relative_folder_path: &'static str) -> FilePaths {
     FilePaths::new(relative_folder_path)

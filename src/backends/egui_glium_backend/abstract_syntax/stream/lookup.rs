@@ -4,4 +4,4 @@ pub fn create_abstract_syntax_token_stream_lookup() -> AbstractSyntaxTokenStream
     AbstractSyntaxTokenStreamLookup::new()
 }
 
-pub type AbstractSyntaxTokenStreamLookup = HashMap<Entity, AbstractSyntaxTokenStream>;
+pub type AbstractSyntaxTokenStreamLookup = HashMap<SourceLocation, AbstractSyntaxTokenStream>;

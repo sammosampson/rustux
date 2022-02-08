@@ -1,5 +1,5 @@
 mod application;
-mod systems;
+mod rendering;
 mod events;
 mod source;
 mod backends;
@@ -19,7 +19,7 @@ mod prelude {
     pub use core::fmt::Debug;
     pub use core::time::Duration;
     pub use crate::application::*;
-    pub use crate::systems::*;
+    pub use crate::rendering::*;
     pub use crate::events::*;
     pub use crate::source::*;
     pub use crate::backends::*;

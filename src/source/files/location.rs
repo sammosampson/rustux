@@ -1,4 +1,5 @@
 use std::{ path::*};
+
 use crate::prelude::*;
 
 pub trait ToSourceLocationConversion {
@@ -76,53 +77,4 @@ impl ToPathBufConversion for &SourceLocation {
         }
         std::path::PathBuf::new()
     }
-}
-
-pub fn delete_source(
-    location: SourceLocation,
-    command_buffer: &mut CommandBuffer,
-    source_entity_lookup: &mut SourceEntityLookup) {
-
-    if let Some(entity) = source_entity_lookup.get(&location) {
-        command_buffer.add_component(*entity, SourceFileRemoval::default());
-        command_buffer.remove_component::<SourceFileParsed>(*entity);
-    }
-}
-
-pub fn modify_source(
-    location: SourceLocation,
-    command_buffer: &mut CommandBuffer,
-    source_entity_lookup: &mut SourceEntityLookup) {
-    
-    if let Some(entity) = source_entity_lookup.get(&location) {
-        command_buffer.add_component(*entity, SourceFileChange::default());
-        command_buffer.remove_component::<SourceFileParsed>(*entity);
-    }
-}
-
-pub fn create_source(
-    location: SourceLocation,
-    command_buffer: &mut CommandBuffer,
-    source_entity_lookup: &mut SourceEntityLookup,
-    source_location_lookup: &mut SourceLocationLookup) {
-
-    if let Some(entity) = source_entity_lookup.get(&location) {
-        command_buffer.add_component(*entity, SourceFileCreation::default());
-        command_buffer.remove_component::<SourceFileParsed>(*entity);
-    } else {
-        let entity = command_buffer.push((SourceFile::default(), SourceFileCreation::default()));
-        source_location_lookup.insert(entity, location.to_owned());
-        source_entity_lookup.insert(location, entity);
-    }
-}
-
-pub fn read_source(
-    location: SourceLocation,
-    command_buffer: &mut CommandBuffer,
-    source_entity_lookup: &mut SourceEntityLookup,
-    source_location_lookup: &mut SourceLocationLookup) {
-
-    let entity = command_buffer.push((SourceFile::default(), SourceFileInitialRead::default()));
-    source_location_lookup.insert(entity, location.to_owned());
-    source_entity_lookup.insert(location, entity);
 }

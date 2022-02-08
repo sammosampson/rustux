@@ -56,42 +56,27 @@ impl Application {
     }
 
     pub fn build(self) -> Result<ApplicationRunner, RustuxError> {
-        let mut resources = Resources::default();
-
-        let file_paths = create_file_paths(self.relative_rux_folder_path);
         let event_loop = create_system_event_loop();
-        let screen_renderer = create_screen_renderer(&event_loop)?;
-        let egui_renderer = create_ast_renderer(&screen_renderer.display);
-        let mut state_context= create_data_context();
-        (self.on_context)(&mut state_context);
-    
-        resources.insert(file_paths);
-        resources.insert(screen_renderer);
-        resources.insert(egui_renderer);
-        resources.insert(create_file_system_source_location_walker());
-        resources.insert(monitor_files(file_paths, self.file_monitor_poll)?);
-        resources.insert(create_source_file_reader());
-        resources.insert(create_source_entity_lookup());
-        resources.insert(create_abstract_syntax_token_stream_lookup());
-        resources.insert(create_source_location_lookup());
-        resources.insert(state_context);
-        Ok(ApplicationRunner::new(event_loop, build_schedule(), resources))
+        
+        Ok(ApplicationRunner::new(
+            SourceFiles::new(self.relative_rux_folder_path, self.file_monitor_poll)?,
+            Renderer::new(&event_loop, self.on_context)?,
+            event_loop
+        ))
     }
 }
 
 pub struct ApplicationRunner {
-    world: World,
-    resources: Resources,
-    schedule: Schedule,
+    source_files: SourceFiles,
+    renderer: Renderer,
     event_loop: SystemEventLoop
 }
 
 impl ApplicationRunner {
-    fn new(event_loop: SystemEventLoop, schedule: Schedule, resources: Resources) -> Self {
+    fn new(source_files: SourceFiles, renderer: Renderer, event_loop: SystemEventLoop) -> Self {
         Self {
-            world: World::default(),
-            schedule,
-            resources,
+            source_files, 
+            renderer,
             event_loop
         }
     }
@@ -108,20 +93,17 @@ impl ApplicationRunner {
         if !self.process_events() {
             return false;
         }
-        self.execute_schedule();
+        self.execute();
         return true;
     }
 
     fn process_events(&mut self) -> bool {
-        let mut editor_renderer = &mut self.resources.get_mut::<AbstractSyntaxTreeRenderer>().unwrap();
-        self.event_loop.run(&mut editor_renderer)
+        self.event_loop.run(&mut self.renderer)
     }
 
-    fn execute_schedule(&mut self) {
-        self.schedule.execute(&mut self.world, &mut self.resources);
+    fn execute(&mut self) {
+        self.source_files.process();
+        let graph = self.renderer.build_graph(&mut self.source_files);
+        self.renderer.render(graph);
     }
-}
-
-fn create_screen_renderer(event_loop: &SystemEventLoop) -> Result<ScreenRenderer, RustuxError> {
-    Ok(ScreenRenderer::new(&event_loop.get_loop())?)
 }
