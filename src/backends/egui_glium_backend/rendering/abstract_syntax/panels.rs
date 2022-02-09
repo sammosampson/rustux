@@ -1,7 +1,7 @@
 
 use crate::prelude::*;
 
-impl AbstractSyntaxTreeRenderer {
+impl AbstractSyntaxGraphRenderer {
     pub fn render_central_panel(&self, contents: impl FnOnce(&mut egui::Ui) -> ()) {
         egui::CentralPanel::default()
             .show(self.egui.ctx(), contents);

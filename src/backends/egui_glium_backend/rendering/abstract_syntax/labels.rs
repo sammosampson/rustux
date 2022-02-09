@@ -1,7 +1,7 @@
 use crate::prelude::*;
 use egui::{Color32, TextStyle};
 
-impl AbstractSyntaxTreeRenderer {
+impl AbstractSyntaxGraphRenderer {
     pub fn render_label(&self, ui: &mut egui::Ui, props: LabelProperties) {
         let mut label = egui::Label::new(props.text);
 

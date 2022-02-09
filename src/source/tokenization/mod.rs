@@ -2,12 +2,14 @@ mod source;
 mod collections;
 mod collection;
 mod code;
+mod lookup;
 mod tests;
 
 pub use source::*;
 pub use collections::*;
 pub use collection::*;
 pub use code::*;
+pub use lookup::*;
 
 pub const FUNCTION_OPENING_BRACE: char = '(';
 pub const FUNCTION_CLOSING_BRACE: char = ')';

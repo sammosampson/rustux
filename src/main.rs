@@ -37,5 +37,6 @@ fn main() {
         .with_context(|ctx| examples::first::register(ctx))
         .build()
         .expect("Build error")
-        .run();
+        .run()
+        .unwrap();
 }

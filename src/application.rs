@@ -1,20 +1,35 @@
 use crate::prelude::*;
 
 #[derive(Debug)]
-pub enum RustuxError {
+pub enum RuxError {
     FileMonitoringError(FileMonitorError),
+    FileMonitoringWatchError(FileMonitorWatchError),
+    SourceReadingError(SourceReaderError),
     RendererError(RendererError)
 }
 
-impl From<FileMonitorError> for RustuxError {
-    fn from(from: FileMonitorError) -> Self {
-        RustuxError::FileMonitoringError(from)
+impl From<SourceReaderError> for RuxError {
+    fn from(from: SourceReaderError) -> Self {
+        RuxError::SourceReadingError(from)
     }
 }
 
-impl From<RendererError> for RustuxError {
+
+impl From<FileMonitorError> for RuxError {
+    fn from(from: FileMonitorError) -> Self {
+        RuxError::FileMonitoringError(from)
+    }
+}
+
+impl From<FileMonitorWatchError> for RuxError {
+    fn from(from: FileMonitorWatchError) -> Self {
+        RuxError::FileMonitoringWatchError(from)
+    }
+}
+
+impl From<RendererError> for RuxError {
     fn from(from: RendererError) -> Self {
-        RustuxError::RendererError(from)
+        RuxError::RendererError(from)
     }
 }
 
@@ -55,55 +70,64 @@ impl Application {
         self
     }
 
-    pub fn build(self) -> Result<ApplicationRunner, RustuxError> {
+    pub fn build(self) -> Result<ApplicationRunner, RuxError> {
         let event_loop = create_system_event_loop();
+        let mut data_context = create_data_context();
+        (self.on_context)(&mut data_context);
         
         Ok(ApplicationRunner::new(
+            data_context,
             SourceFiles::new(self.relative_rux_folder_path, self.file_monitor_poll)?,
-            Renderer::new(&event_loop, self.on_context)?,
+            AbstractSyntax::default(),
+            Renderer::new(&event_loop)?,
             event_loop
         ))
     }
 }
 
 pub struct ApplicationRunner {
+    data_context: DataContext,
     source_files: SourceFiles,
+    ast: AbstractSyntax,
     renderer: Renderer,
     event_loop: SystemEventLoop
 }
 
 impl ApplicationRunner {
-    fn new(source_files: SourceFiles, renderer: Renderer, event_loop: SystemEventLoop) -> Self {
+    fn new(data_context: DataContext, source_files: SourceFiles, ast: AbstractSyntax, renderer: Renderer, event_loop: SystemEventLoop) -> Self {
         Self {
+            data_context,
             source_files, 
+            ast,
             renderer,
             event_loop
         }
     }
 
-    pub fn run(&mut self) {
+    pub fn run(&mut self) -> Result<(), RuxError> {
         loop {
-            if !self.run_loop() {
-                return
+            if !self.run_loop()? {
+                return Ok(());
             }
         }
     }
 
-    fn run_loop(&mut self) -> bool {
+    fn run_loop(&mut self) -> Result<bool, RuxError> {
         if !self.process_events() {
-            return false;
+            return Ok(false);
         }
-        self.execute();
-        return true;
+        self.execute()?;
+        return Ok(true);
     }
 
     fn process_events(&mut self) -> bool {
         self.event_loop.run(&mut self.renderer)
     }
 
-    fn execute(&mut self) {
-        self.source_files.process();
-        let graph = self.renderer.build_graph(&mut self.source_files);
-        self.renderer.render(graph);
+    fn execute(&mut self) -> Result<(), RuxError> {
+        let changes = self.source_files.process()?;
+        self.ast.build(&changes, &mut self.source_files, &mut self.data_context);
+        self.renderer.render(&mut self.data_context, &mut self.ast);
+        Ok(())
     }
 }

@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-impl AbstractSyntaxTreeRenderer {
+impl AbstractSyntaxGraphRenderer {
     pub fn render_separator(&self, ui: &mut egui::Ui) {
         ui.separator();
     }
