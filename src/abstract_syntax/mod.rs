@@ -1,31 +1,31 @@
 mod properties;
 mod types;
+mod linking;
 
 pub use properties::*;
 pub use types::*;
+pub use linking::*;
 
 use crate::prelude::*;
 
 #[derive(Default)]
 pub struct AbstractSyntax {
     graph: AbstractSyntaxGraph,
+    linked_stream: AbstractSyntaxTokenStream,
     stream_lookup: AbstractSyntaxTokenStreamLookup,
     root_location: Option<SourceLocation>,
 }
 
 impl AbstractSyntax {
     pub fn build(&mut self, changes: &SourceChanges, source_files: &mut SourceFiles, context: &mut DataContext) {
-        self.build_streams(changes, source_files);
-        if let Some(root_location) = &self.root_location {
-            self.graph = self.build_graph(context, root_location);
+        if !changes.is_empty() {
+            self.build_streams(changes, source_files);
+            if let Some(root_location) = &self.root_location {
+                self.linked_stream = link_streams(root_location.clone(), root_location.clone(), &self.stream_lookup);
+            }
         }
-    }
-    
-    fn build_graph(&self, context: &mut DataContext, root_location: &SourceLocation) ->  AbstractSyntaxGraph {
-        let ast_stream = self.stream_lookup.get(root_location).unwrap(); 
-        let mut graph_builder = AbstractSyntaxGraphBuilder::default();
-        ast_stream.accept(&mut graph_builder, context);
-        graph_builder.ast()
+        self.graph = self.build_graph(context);
+
     }
 
     fn build_streams(&mut self, changes: &SourceChanges, source_files: &mut SourceFiles) {
@@ -45,6 +45,12 @@ impl AbstractSyntax {
         
         navigator.accept(&mut ast_build_visitor);
         ast_build_visitor.ast()        
+    }
+
+    fn build_graph(&self, context: &mut DataContext) ->  AbstractSyntaxGraph {
+        let mut graph_builder = AbstractSyntaxGraphBuilder::default();
+        self.linked_stream.accept(&mut graph_builder, context);
+        graph_builder.ast()
     }
 
     pub fn graph(&self) ->  &AbstractSyntaxGraph {

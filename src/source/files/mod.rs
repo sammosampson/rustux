@@ -21,7 +21,8 @@ pub enum FileMonitorError {
 #[derive(Debug)]
 pub enum FileMonitorWatchError {
     NoLongerMonitoring,
-    NoFileChanges
+    NoFileChanges,
+    SourceLocationError(SourceLocationError)
 }
 
 #[derive(Debug)]
@@ -32,6 +33,12 @@ pub enum FilePathError {
 impl From<FilePathError> for FileMonitorError {
     fn from(error: FilePathError) -> FileMonitorError {
         FileMonitorError::FilePathError(error)
+    }
+}
+
+impl From<SourceLocationError> for FileMonitorWatchError {
+    fn from(error: SourceLocationError) -> FileMonitorWatchError {
+        FileMonitorWatchError::SourceLocationError(error)
     }
 }
 

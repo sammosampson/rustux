@@ -19,6 +19,10 @@
                     "kind": "bin"
                 }
             },
+            "env": {
+                "CARGO_MANIFEST_DIR": "C:\\work\\other\\ruxy",
+                "RUST_LOG": "debug"
+            },
             "args": [],
             "cwd": "${workspaceFolder}"
         },

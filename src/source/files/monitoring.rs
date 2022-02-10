@@ -44,9 +44,9 @@ impl FileMonitor for FileSystemFileMonitor {
         match self.rx.try_recv() {
             Ok(event) => {
                 match event {
-                    DebouncedEvent::Create(path) => Ok(FileMonitorFileChange::Create(path.to_source_location())),
-                    DebouncedEvent::Write(path) => Ok(FileMonitorFileChange::Modify(path.to_source_location())),
-                    DebouncedEvent::NoticeRemove(path) => Ok(FileMonitorFileChange::Delete(path.to_source_location())),
+                    DebouncedEvent::Create(path) => Ok(FileMonitorFileChange::Create(path.to_canonicalised_source_location()?)),
+                    DebouncedEvent::Write(path) => Ok(FileMonitorFileChange::Modify(path.to_canonicalised_source_location()?)),
+                    DebouncedEvent::NoticeRemove(path) => Ok(FileMonitorFileChange::Delete(path.to_canonicalised_source_location()?)),
                     _ => Err(FileMonitorWatchError::NoFileChanges)
                 }
             },

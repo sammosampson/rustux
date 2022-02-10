@@ -3,14 +3,20 @@ use crate::prelude::*;
 pub struct LetBuildAbstractSyntaxTokenStreamStrategy;
 
 impl BuildAbstractSyntaxTokenStreamStrategy for LetBuildAbstractSyntaxTokenStreamStrategy {
-    fn control(&self, ast: &mut AbstractSyntaxTokenStream) {
+    fn control(&self, ast: &mut AbstractSyntaxTokenStream, _imports: &SourceImports) {
         ast.start_node(AbstractSyntaxControlType::Let);
     }
     
     fn property(&self, _property: &CurrentProperty, _ast: &mut AbstractSyntaxTokenStream) {
     }
 
-    fn property_value(&self, property: &CurrentProperty, property_value: &SourceTokenPropertyValue, ast: &mut AbstractSyntaxTokenStream) {
+    fn property_value(
+        &self, 
+        property: &CurrentProperty, 
+        property_value: &SourceTokenPropertyValue, 
+        ast: &mut AbstractSyntaxTokenStream, 
+        _imports: &mut SourceImports
+    ) {
         match property {
             CurrentProperty::None => {},
             CurrentProperty::Standard(property_name) => ast.property_error(AbstractSyntaxTokenError::UnknownProperty(property_name.to_string())),
@@ -21,7 +27,7 @@ impl BuildAbstractSyntaxTokenStreamStrategy for LetBuildAbstractSyntaxTokenStrea
         }
     }
 
-    fn end_control(&self, ast: &mut AbstractSyntaxTokenStream) {
+    fn end_control(&self, ast: &mut AbstractSyntaxTokenStream, _imports: &SourceImports) {
         ast.end_node(AbstractSyntaxControlType::Let);
     }
 }

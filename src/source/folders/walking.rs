@@ -48,7 +48,7 @@ impl Iterator for FileSystemSourceLocationIterator {
                 let path = PathBuf::from(entry.path());
                 if let Some(extension) = path.extension() {
                     if extension == "rux" {
-                        let location = path.to_source_location();
+                        let location = path.to_canonicalised_source_location().unwrap();
                         return Some(location)
                     }
                 }

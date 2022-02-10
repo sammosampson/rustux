@@ -16,9 +16,9 @@ pub enum AbstractSyntaxTokenError {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AbstractSyntaxControlType {
     Unknown,
+    Empty,
     Root,
     Control,
-    Import,
     Container,
     For,
     ForEach,

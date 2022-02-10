@@ -21,4 +21,8 @@ impl SourceChanges {
     pub fn iter(&self) -> std::slice::Iter<'_, SourceLocation> {
         self.0.iter()
     }
+
+    pub(crate) fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
 }

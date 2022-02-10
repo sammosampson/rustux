@@ -3,7 +3,11 @@ use crate::prelude::*;
 #[derive(Debug, Clone, Default)]
 pub struct AbstractSyntaxTokenStream(Vec<AbstractSyntaxTokenResult>, bool);
 
-impl AbstractSyntaxTokenStream {
+impl AbstractSyntaxTokenStream { 
+    pub fn append_stream(&mut self, control_stream: &mut AbstractSyntaxTokenStream) {
+        self.0.append(&mut control_stream.0);
+    }
+
     pub fn add_error(&mut self, error: AbstractSyntaxTokenError) {
         self.0.push(Err(error));
     }

@@ -33,7 +33,7 @@ impl ToSourceLocationConversion for PathBuf {
         if let Ok(path) = self.canonicalize() {
             Ok(SourceLocation { 
                 location: match remove_canonicalization_prefix(path).to_str() {
-                    Some(path) => Some(path.to_owned()),
+                    Some(path) => Some(path.to_owned().replace("/", "\\")),
                     None => None
                 }
             })
