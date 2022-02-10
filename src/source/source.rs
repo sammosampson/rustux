@@ -6,6 +6,16 @@ pub struct SourceLocation {
     pub location: Option<String>
 }
 
+impl SourceLocation {
+    pub fn to_relative_location(&self, relative_location: &str) -> Result<SourceLocation, SourceLocationError> {
+        self.to_path_buf()
+            .parent().unwrap()
+            .join(relative_location)
+            .to_canonicalised_source_location()
+        
+    }
+}
+
 impl From<&str> for SourceLocation {
     fn from(from: &str) -> Self {
         Self { location: Some(from.to_owned()) }
@@ -26,7 +36,7 @@ pub enum SourceReaderError {
     ErrorReadingSource
 }
 
-#[derive(Debug)]
+#[derive(PartialEq, Eq, Debug, Clone)]
 pub enum SourceLocationError {
     DoesNotExist
 }
@@ -34,6 +44,5 @@ pub enum SourceLocationError {
 
 pub trait SourceReader {
     fn read_source_at_location(&self, location: &SourceLocation) -> Result<String, SourceReaderError>;
-    fn get_relative_source_location(&self, from: &SourceLocation, relative_location: &str) -> Result<SourceLocation, SourceLocationError>;
 }
 

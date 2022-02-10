@@ -2,6 +2,7 @@ use crate::prelude::*;
 
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub enum AbstractSyntaxTokenError {
+    SourceLocationError(SourceLocationError),
     SourceTokenError(SourceTokenError),
     CodeTokenError(CodeTokenError),
     UnknownProperty(String),

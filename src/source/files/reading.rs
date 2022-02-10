@@ -59,12 +59,4 @@ impl SourceReader for FileSourceReader {
     fn read_source_at_location(&self, location: &SourceLocation) -> Result<String, SourceReaderError> {
         Ok(fs::read_to_string(location.to_path_buf()).map_err(|_|SourceReaderError::ErrorReadingSource)?)
     }
-
-    fn get_relative_source_location(&self, from: &SourceLocation, relative_location: &str) -> Result<SourceLocation, SourceLocationError> {
-        from.to_path_buf()
-            .parent().unwrap()
-            .join(relative_location)
-            .to_canonicalised_source_location()
-        
-    }
 }

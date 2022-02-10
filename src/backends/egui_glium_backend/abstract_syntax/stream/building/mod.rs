@@ -10,23 +10,26 @@ pub enum CurrentProperty {
     Variable(String)
 }
 
+pub fn create_ast_token_visitor() -> BuildAbstractSyntaxSourceTokenVisitor {
+    BuildAbstractSyntaxSourceTokenVisitor::new()
+}
+
 pub struct BuildAbstractSyntaxSourceTokenVisitor {
     ast: AbstractSyntaxTokenStream,
     current_property: CurrentProperty,
     current_property_strategy: Box<dyn BuildAbstractSyntaxTokenStreamStrategy + 'static>
 }
 
-impl Default for BuildAbstractSyntaxSourceTokenVisitor {
-    fn default() -> Self {
+
+impl BuildAbstractSyntaxSourceTokenVisitor {
+    fn new() -> Self {
         Self {
             ast: AbstractSyntaxTokenStream::default(),
             current_property: CurrentProperty::None,
             current_property_strategy: Box::new(EmptyBuildAbstractSyntaxTokenStreamStrategy)
         }
     }
-}
 
-impl BuildAbstractSyntaxSourceTokenVisitor {
     pub fn ast(self) -> AbstractSyntaxTokenStream {
         self.ast
     }
