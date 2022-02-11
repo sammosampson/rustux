@@ -1,4 +1,5 @@
 <control>
+    <import name="item-label" path=".\item_label.rux" /> 
     <scroll-area id="scroll-area2" max-height=100.0>
         <for $item_id=[0, 10]>
             <let $selected={ruxy::examples::first::is_selected($state, $item_id)}>
@@ -15,7 +16,7 @@
     <separator />
     <scroll-area id="scroll-area4" max-height=100.0>
         <for-each $item={ruxy::examples::first::get_items($state)}>
-            <coloured-label text=$item.text colour=$item.colour />
+            <item-label item=$item />
         </for-each>            
     </scroll-area>
     <separator />
