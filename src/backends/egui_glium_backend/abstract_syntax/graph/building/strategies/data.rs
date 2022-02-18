@@ -15,7 +15,13 @@ impl BuildAbstractSyntaxGraphStreamStrategy for LetBuildAbstractSyntaxGraphStrea
         ast.get_parent(node)
     }
 
-    fn property(&mut self, _node: AbstractSyntaxGraphNodeId, property: AbstractSyntaxProperty, _ast: &mut AbstractSyntaxGraph, _context: &mut DataContext) {
+    fn property(
+        &mut self, 
+        _node: AbstractSyntaxGraphNodeId,
+        property: AbstractSyntaxProperty,
+        _ast: &mut AbstractSyntaxGraph,
+        _context: &mut DataContext
+    ) {
         self.function_variable = Some(property.value().get_function_variable_value().unwrap());
     }
 
@@ -28,7 +34,10 @@ impl BuildAbstractSyntaxGraphStreamStrategy for LetBuildAbstractSyntaxGraphStrea
         StartNodeAction::Continue
     }
 
-    fn end_child_node(&mut self, _context: &mut DataContext) -> EndNodeAction {
+    fn end_child_node(&mut self, context: &mut DataContext) -> EndNodeAction {
+        if let Some((variable, _function)) = &self.function_variable {
+            context.remove_variable(variable);
+        }
         EndNodeAction::Continue
     }
 }

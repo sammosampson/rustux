@@ -8,6 +8,9 @@ impl BuildAbstractSyntaxTokenStreamStrategy for ImportBuildAbstractSyntaxTokenSt
         ast.start_node(AbstractSyntaxControlType::Empty);
     }
 
+    fn child_control(&self, ast: &mut AbstractSyntaxTokenStream) {
+    }
+    
     fn end_control(&self, ast: &mut AbstractSyntaxTokenStream, _imports: &SourceImports) {
         ast.end_node(AbstractSyntaxControlType::Empty);
     }
@@ -16,7 +19,7 @@ impl BuildAbstractSyntaxTokenStreamStrategy for ImportBuildAbstractSyntaxTokenSt
     }
 
     fn property_value(
-        &self, 
+        &mut self, 
         property: &CurrentProperty, 
         property_value: &SourceTokenPropertyValue, 
         ast: &mut AbstractSyntaxTokenStream, 

@@ -19,6 +19,7 @@ pub enum AbstractSyntaxControlType {
     Empty,
     Root,
     Control,
+    ControlReference,
     Container,
     For,
     ForEach,
@@ -100,7 +101,8 @@ pub enum AbstractSyntaxPropertyType {
     BackgroundColour,
     OnSelect,
     USizeRangeVariable,
-    FunctionVariable
+    FunctionVariable,
+    ControlArguments
 }
 
 #[derive(Debug, Clone)]

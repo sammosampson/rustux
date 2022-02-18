@@ -14,10 +14,11 @@ use crate::prelude::*;
 
 pub trait BuildAbstractSyntaxTokenStreamStrategy {
     fn control(&self, ast: &mut AbstractSyntaxTokenStream, imports: &SourceImports);
+    fn child_control(&self, ast: &mut AbstractSyntaxTokenStream);
     fn end_control(&self, ast: &mut AbstractSyntaxTokenStream, imports: &SourceImports);
     fn property(&self, property: &CurrentProperty, ast: &mut AbstractSyntaxTokenStream);
     fn property_value(
-        &self,
+        &mut self,
         property: &CurrentProperty,
         property_value: &SourceTokenPropertyValue,
         ast: &mut AbstractSyntaxTokenStream,
@@ -32,12 +33,15 @@ impl BuildAbstractSyntaxTokenStreamStrategy for EmptyBuildAbstractSyntaxTokenStr
         panic!()
     }
 
+    fn child_control(&self, ast: &mut AbstractSyntaxTokenStream) {
+    }
+
     fn property(&self, _property: &CurrentProperty, _ast: &mut AbstractSyntaxTokenStream) {
         panic!()
     }
 
     fn property_value(
-        &self, 
+        &mut self, 
         _property: &CurrentProperty, 
         _property_value: &SourceTokenPropertyValue, 
         _ast: &mut AbstractSyntaxTokenStream, 

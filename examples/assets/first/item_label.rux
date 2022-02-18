@@ -1,4 +1,3 @@
-<control>
-    <arg $item>
-    <coloured-label text=$item.text colour=$item.colour />
+<control $thing>
+    <coloured-label text=$thing.text colour=$thing.colour />
 </control>

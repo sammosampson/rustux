@@ -5,6 +5,7 @@ use crate::prelude::*;
 pub enum AbstractSyntaxPropertyValue {
     String(String),
     Bool(bool),
+    Int(i32),
     Float(f32),
     FloatRange(FloatRange),
     Colour(Colour), 
@@ -13,7 +14,8 @@ pub enum AbstractSyntaxPropertyValue {
     USizeRangeVariable(String, USizeRange),
     FunctionVariable(String, Function),
     VariablePath(VariablePath),
-    DataArray(DataArrayId, usize)
+    DataArray(DataArrayId, usize),
+    ControlArguments(ControlArguments)
 }
 
 #[derive(Debug, Clone)]

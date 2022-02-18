@@ -16,7 +16,7 @@
     <separator />
     <scroll-area id="scroll-area4" max-height=100.0>
         <for-each $item={ruxy::examples::first::get_items($state)}>
-            <item-label item=$item />
+            <item-label thing=$item />
         </for-each>            
     </scroll-area>
     <separator />

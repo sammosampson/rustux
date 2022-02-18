@@ -65,6 +65,10 @@ impl DataContext {
         self.variables.insert(variable, variable_value);
     }
 
+    pub fn remove_variable(&mut self, variable: &str) {
+        self.variables.remove(variable);
+    }
+
     pub fn replace_variable_data_in_property(
         &mut self,
         property: AbstractSyntaxProperty

@@ -7,6 +7,9 @@ impl BuildAbstractSyntaxTokenStreamStrategy for StandardBuildAbstractSyntaxToken
         ast.start_node(self.0);
     }
 
+    fn child_control(&self, _ast: &mut AbstractSyntaxTokenStream) {
+    }
+    
     fn property(&self, property: &CurrentProperty, ast: &mut AbstractSyntaxTokenStream) {
         match property {
             CurrentProperty::None => {},
@@ -20,7 +23,7 @@ impl BuildAbstractSyntaxTokenStreamStrategy for StandardBuildAbstractSyntaxToken
     }
 
     fn property_value(
-        &self, 
+        &mut self, 
         property: &CurrentProperty, 
         property_value: &SourceTokenPropertyValue, 
         ast: &mut AbstractSyntaxTokenStream, 

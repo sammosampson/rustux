@@ -7,11 +7,14 @@ impl BuildAbstractSyntaxTokenStreamStrategy for ForEachBuildAbstractSyntaxTokenS
         ast.start_node(AbstractSyntaxControlType::ForEach);
     }
     
+    fn child_control(&self, _ast: &mut AbstractSyntaxTokenStream) {
+    }
+    
     fn property(&self, _property: &CurrentProperty, _ast: &mut AbstractSyntaxTokenStream) {
     }
 
     fn property_value(
-        &self, 
+        &mut self, 
         property: &CurrentProperty, 
         property_value: &SourceTokenPropertyValue, 
         ast: &mut AbstractSyntaxTokenStream, 
@@ -28,7 +31,7 @@ impl BuildAbstractSyntaxTokenStreamStrategy for ForEachBuildAbstractSyntaxTokenS
     }
 
     fn end_control(&self, ast: &mut AbstractSyntaxTokenStream, _imports: &SourceImports) {
-        ast.end_node(AbstractSyntaxControlType::For);
+        ast.end_node(AbstractSyntaxControlType::ForEach);
     }
 }
 
@@ -39,11 +42,14 @@ impl BuildAbstractSyntaxTokenStreamStrategy for ForBuildAbstractSyntaxTokenStrea
         ast.start_node(AbstractSyntaxControlType::For);
     }
     
+    fn child_control(&self, ast: &mut AbstractSyntaxTokenStream) {
+    }
+    
     fn property(&self, _property: &CurrentProperty, _ast: &mut AbstractSyntaxTokenStream) {
     }
 
     fn property_value(
-        &self, 
+        &mut self, 
         property: &CurrentProperty, 
         property_value: &SourceTokenPropertyValue, 
         ast: &mut AbstractSyntaxTokenStream, 

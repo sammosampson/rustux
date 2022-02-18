@@ -89,7 +89,7 @@ impl ActionContainer for SelectItemActionContainer {
         }
 
         let action = Actions::SelectItem(arguments[0].get_usize_value()?);
-        state.process(1, Box::new(| local_state: &SelectedClickState | local_state.process(action)));
+        state.process(Box::new(| local_state: &SelectedClickState | local_state.process(action)));
         Ok(())
     }
 }

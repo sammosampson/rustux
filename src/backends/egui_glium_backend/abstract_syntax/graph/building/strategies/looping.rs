@@ -40,7 +40,7 @@ impl BuildAbstractSyntaxGraphStreamStrategy for ForEachBuildAbstractSyntaxGraphS
     }
 
     fn end_child_node(&mut self, context: &mut DataContext) -> EndNodeAction {
-        if let Some((_variable, array_id)) = &self.variable_items {
+        if let Some((variable, array_id)) = &self.variable_items {
             if let Some(array) = context.data_arrays_mut().get_mut(*array_id) {
                 if array.len() == 0 {
                     return EndNodeAction::Continue;
@@ -50,6 +50,7 @@ impl BuildAbstractSyntaxGraphStreamStrategy for ForEachBuildAbstractSyntaxGraphS
                     return EndNodeAction::Repeat
                 }
             }
+            context.remove_variable(variable);
         }
         EndNodeAction::Continue
     }
@@ -85,12 +86,15 @@ impl BuildAbstractSyntaxGraphStreamStrategy for ForBuildAbstractSyntaxGraphStrea
         StartNodeAction::Continue
     }
 
-    fn end_child_node(&mut self, _context: &mut DataContext) -> EndNodeAction {
+    fn end_child_node(&mut self, context: &mut DataContext) -> EndNodeAction {
         if let Some(range) = &self.range {
             self.current_position += 1;
             if self.current_position <= range.upper_bound() {
                 return EndNodeAction::Repeat
             }
+        }
+        if let Some(variable) = &self.variable {
+            context.remove_variable(variable);
         }
         EndNodeAction::Continue
     }

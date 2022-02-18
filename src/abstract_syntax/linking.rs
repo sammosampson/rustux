@@ -49,8 +49,9 @@ impl<'a> AbstractSyntaxTokenStreamVisitor for AbstractSyntaxStreamLinker<'a> {
     fn start_node(&mut self, node_type: &AbstractSyntaxControlType, _context: &mut DataContext) {
         match node_type {
             AbstractSyntaxControlType::Empty => {},
-            AbstractSyntaxControlType::Control => {},
+            AbstractSyntaxControlType::ControlReference => {},
             other => self.linked_stream.start_node(*other),
+            
         }
         self.control = *node_type;
     }
@@ -58,7 +59,7 @@ impl<'a> AbstractSyntaxTokenStreamVisitor for AbstractSyntaxStreamLinker<'a> {
     fn property(&mut self, property: &AbstractSyntaxProperty, _context: &mut DataContext) {
         match self.control {
             AbstractSyntaxControlType::Empty => {},
-            AbstractSyntaxControlType::Control => {
+            AbstractSyntaxControlType::ControlReference => {
                 if property.property_type() == &AbstractSyntaxPropertyType::Path {
                     let relative_location = property.value().get_string_value().unwrap();
                     let control_location = self.root_location.to_relative_location(&relative_location).unwrap();
@@ -73,7 +74,7 @@ impl<'a> AbstractSyntaxTokenStreamVisitor for AbstractSyntaxStreamLinker<'a> {
     fn end_node(&mut self, node_type: &AbstractSyntaxControlType, _context: &mut DataContext) -> EndNodeAction {
         match node_type {
             AbstractSyntaxControlType::Empty => {},
-            AbstractSyntaxControlType::Control => {},
+            AbstractSyntaxControlType::ControlReference => {},
             other => self.linked_stream.end_node(*other),
         }
         self.control = AbstractSyntaxControlType::Unknown;

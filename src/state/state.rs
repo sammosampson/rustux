@@ -1,39 +1,38 @@
 use crate::prelude::*;
+use std::any::{ TypeId, Any };
 
 #[derive(Default)]
 pub struct State {
-    items: HashMap<usize, Box<dyn std::any::Any>>
+    items: HashMap<TypeId, Box<dyn Any>>
 }
 
 impl State {
-    pub fn process<T:std::any::Any + Default>(&mut self, id: usize, processor: Box<dyn FnOnce(&T) -> T>) {
-        let processed_state = if let Some(item) = self.get(id) {
+    pub fn process<T:Any + Default>(&mut self, processor: Box<dyn FnOnce(&T) -> T>) {
+        let id = TypeId::of::<T>();
+        let processed_state = if let Some(item) = self.get(&id) {
             processor(item.downcast_ref::<T>().unwrap())
         } else {
             processor(&T::default())
         };
 
-        self.set(id, processed_state)
+        self.set( processed_state)
     }
 
-    fn set<T:std::any::Any + Default>(&mut self, id: usize, to_set: T) {
+    fn set<T:Any + Default>(&mut self, to_set: T) {
+        let id = TypeId::of::<T>();
         self.items.insert(id, Box::new(to_set));
     }
 
-    pub fn get_local<T:std::any::Any + Default>(&mut self) -> &T {
-        let id = self.get_local_state_id();
-
+    pub fn get_local<T:Any + Default>(&mut self) -> &T {
+        let id = TypeId::of::<T>();
+        
         if !self.items.contains_key(&id) {
-            self.set(id, T::default());
+            self.set(T::default());
         }
-        self.get(id).unwrap().downcast_ref::<T>().unwrap()
+        self.get(&id).unwrap().downcast_ref::<T>().unwrap()
     }
 
-    fn get(&self, id: usize) -> Option<&Box<dyn std::any::Any>> {
-        self.items.get(&id)
-    }
-
-    fn get_local_state_id(&self) -> usize {
-        1
+    fn get(&self, id: &TypeId) -> Option<&Box<dyn Any>> {
+        self.items.get(id)
     }
 }

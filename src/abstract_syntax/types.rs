@@ -1,5 +1,39 @@
 use crate::prelude::*;
 
+
+#[derive(Debug, Clone)]
+pub struct ControlArgument {
+    name: String,
+    value: AbstractSyntaxPropertyValue
+}
+
+impl ControlArgument {
+    pub fn parse(name: String, source_property_value: SourceTokenPropertyValue) -> Result<Self, AbstractSyntaxTokenError> {
+        let ast_property_value =  match source_property_value {
+            SourceTokenPropertyValue::String(value) => AbstractSyntaxPropertyValue::String(value),
+            SourceTokenPropertyValue::Int(value) => AbstractSyntaxPropertyValue::Int(value as i32),
+            SourceTokenPropertyValue::USize(value) => AbstractSyntaxPropertyValue::USize(value),
+            SourceTokenPropertyValue::Float(value) => AbstractSyntaxPropertyValue::Float(value as f32),
+            SourceTokenPropertyValue::Code(value) => AbstractSyntaxPropertyValue::Function(Function::parse(&value)?),
+            SourceTokenPropertyValue::Variable(value) => AbstractSyntaxPropertyValue::VariablePath(VariablePath::parse(value)?),
+            SourceTokenPropertyValue::Array(_) => todo!(),
+        };
+        Ok(Self { name, value: ast_property_value }) 
+    }
+}
+
+pub fn create_control_arguments(arguments: Vec<ControlArgument>) -> ControlArguments {
+    ControlArguments {
+        arguments
+    }
+}    
+
+#[derive(Debug, Clone, Default)]
+pub struct ControlArguments {
+    arguments: Vec<ControlArgument>
+}
+
+
 #[derive(Debug, Clone, Default)]
 pub struct Function {
     name: String,
