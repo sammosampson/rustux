@@ -24,7 +24,19 @@ impl DataArrays {
 
     pub fn get_mut(&mut self, id: DataArrayId) -> Option<&mut Box<dyn DataArray>> {
         self.0.get_mut(id.0)
-    }    
+    }
+       
+    pub fn get_array_item_value(&self, array_id: DataArrayId, position: usize, variable: &VariablePath) -> Result<AbstractSyntaxPropertyValue, DataContextError> {
+        if let Some(array) = self.get(array_id) {
+            if let Some(value) = array.get_array_item_value(position, variable) {
+                return Ok(value);
+            } else {
+                return Err(DataContextError::DataArrayItemDoesNotExist(variable.clone()))        
+            }
+        }
+        
+        Err(DataContextError::DataArrayDoesNotExist)
+    }
 }
 
 pub trait DataArray {

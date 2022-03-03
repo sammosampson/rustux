@@ -1,4 +1,6 @@
 
+use core::panic;
+
 use crate::prelude::*;
 
 
@@ -19,7 +21,8 @@ pub struct AbstractSyntaxStreamLinker<'a> {
     linked_stream: AbstractSyntaxTokenStream,
     positions: Vec<usize>,
     root_location: SourceLocation,
-    control: AbstractSyntaxControlType
+    control: AbstractSyntaxControlType,
+    path: Option<String>
 }
 
 impl<'a> AbstractSyntaxStreamLinker<'a> {
@@ -29,11 +32,51 @@ impl<'a> AbstractSyntaxStreamLinker<'a> {
             linked_stream: AbstractSyntaxTokenStream::default(),
             positions: vec!(),
             root_location,
-            control: AbstractSyntaxControlType::Unknown
+            control: AbstractSyntaxControlType::Unknown,
+            path: None
         }
     }
+
     fn linked_stream(self) -> AbstractSyntaxTokenStream {
         self.linked_stream
+    }
+
+    fn start_scope_node(&mut self) {
+        self.linked_stream.start_node(AbstractSyntaxControlType::Scope)
+    }
+
+    fn start_other_node(&mut self, other: AbstractSyntaxControlType) {
+        self.linked_stream.start_node(other)
+    }
+    
+    fn end_scope_node(&mut self) {
+        self.linked_stream.end_node(AbstractSyntaxControlType::Scope)
+    }
+
+    fn end_other_node(&mut self, other: AbstractSyntaxControlType) {
+        self.linked_stream.end_node(other)
+    }
+
+    fn store_path(&mut self, property: &AbstractSyntaxProperty) {
+        self.path = Some(property.value().get_string_value().unwrap());
+    }
+
+    fn copy_property(&mut self, property: &AbstractSyntaxProperty) {
+        self.linked_stream.property(property.clone())
+    }
+
+    fn append_stream_at_path(&mut self) {
+        if let Some(path) = &self.path.clone() {
+            self.append_linked_stream(&path);
+        } else {
+            panic!()
+        }
+    }
+
+    fn append_linked_stream(&mut self, relative_location: &str) {
+        let control_location = self.root_location.to_relative_location(&relative_location).unwrap();
+        let mut control_stream = link_streams(self.root_location.clone(), control_location, &self.stream_lookup);
+        self.linked_stream.append_stream(&mut control_stream);
     }
 }
 
@@ -49,8 +92,8 @@ impl<'a> AbstractSyntaxTokenStreamVisitor for AbstractSyntaxStreamLinker<'a> {
     fn start_node(&mut self, node_type: &AbstractSyntaxControlType, _context: &mut DataContext) {
         match node_type {
             AbstractSyntaxControlType::Empty => {},
-            AbstractSyntaxControlType::ControlReference => {},
-            other => self.linked_stream.start_node(*other),
+            AbstractSyntaxControlType::ControlReference => self.start_scope_node(),
+            other => self.start_other_node(*other),
             
         }
         self.control = *node_type;
@@ -60,26 +103,28 @@ impl<'a> AbstractSyntaxTokenStreamVisitor for AbstractSyntaxStreamLinker<'a> {
         match self.control {
             AbstractSyntaxControlType::Empty => {},
             AbstractSyntaxControlType::ControlReference => {
-                if property.property_type() == &AbstractSyntaxPropertyType::Path {
-                    let relative_location = property.value().get_string_value().unwrap();
-                    let control_location = self.root_location.to_relative_location(&relative_location).unwrap();
-                    let mut control_stream = link_streams(self.root_location.clone(), control_location, &self.stream_lookup);
-                    self.linked_stream.append_stream(&mut control_stream)
+                match property.property_type() {
+                    AbstractSyntaxPropertyType::Path => self.store_path(property),
+                    AbstractSyntaxPropertyType::ControlArguments => self.copy_property(property),
+                    _ => {}
                 }
             },
-            _=> self.linked_stream.property(property.clone())
+            _=> self.copy_property(property)
         }
     }
 
     fn end_node(&mut self, node_type: &AbstractSyntaxControlType, _context: &mut DataContext) -> EndNodeAction {
         match node_type {
             AbstractSyntaxControlType::Empty => {},
-            AbstractSyntaxControlType::ControlReference => {},
-            other => self.linked_stream.end_node(*other),
+            AbstractSyntaxControlType::ControlReference => {
+                self.append_stream_at_path();
+                self.end_scope_node();
+            }
+            other => self.end_other_node(*other),
         }
         self.control = AbstractSyntaxControlType::Unknown;
         EndNodeAction::Continue
-    }
+    }   
 
     fn token_error(&mut self, _error: &AbstractSyntaxTokenError) {
     }

@@ -93,6 +93,13 @@ impl AbstractSyntaxPropertyValue {
         }
         Err(AbstractSyntaxPropertyValueError::ValueNotExpected(self.clone()))
     }
+    
+    pub fn get_control_arguments_value(&self) -> Result<ControlArguments, AbstractSyntaxPropertyValueError> {
+        if let AbstractSyntaxPropertyValue::ControlArguments(value) = self.clone() {
+            return Ok(value);
+        }
+        Err(AbstractSyntaxPropertyValueError::ValueNotExpected(self.clone()))
+    }
 }
 
 impl From<&SourceTokenPropertyValue> for AbstractSyntaxPropertyValue {

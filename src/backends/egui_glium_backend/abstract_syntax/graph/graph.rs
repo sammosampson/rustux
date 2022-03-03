@@ -44,7 +44,9 @@ impl AbstractSyntaxGraph {
     }
 
     pub fn add_root(&mut self) -> AbstractSyntaxGraphNodeId {
-        self.add_node(AbstractSyntaxGraphNode::root())
+        let id = self.get_next_id();
+        self.add_node(AbstractSyntaxGraphNode::root(id));
+        id
     }
 
     pub fn add_child_node(
@@ -52,8 +54,9 @@ impl AbstractSyntaxGraph {
         parent: AbstractSyntaxGraphNodeId,
         node_type: AbstractSyntaxControlType
     ) -> AbstractSyntaxGraphNodeId {
-        let node = AbstractSyntaxGraphNode::new(node_type, parent);
-        let id = self.add_node(node);
+        let id = self.get_next_id();
+        let node = AbstractSyntaxGraphNode::new(id, node_type, parent);
+        self.add_node(node);
         if let Some(parent_node) = self.get_node_mut(parent) {
             parent_node.children.push(id);
         }        
@@ -66,10 +69,14 @@ impl AbstractSyntaxGraph {
         }
     }
     
-    fn add_node(&mut self, node: AbstractSyntaxGraphNode) -> AbstractSyntaxGraphNodeId {
+    fn get_next_id(&mut self) -> AbstractSyntaxGraphNodeId {
         self.id_cursor = self.id_cursor.next();
-        self.nodes.push(node);
         self.id_cursor
+    }
+
+    fn add_node(&mut self, node: AbstractSyntaxGraphNode) {
+        //println!("{:?}", node);
+        self.nodes.push(node);
     }
 }
 
@@ -82,7 +89,7 @@ impl Default for AbstractSyntaxGraph {
     }
 }
 
-#[derive(Debug, Default, Copy, Clone)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, Hash)]
 pub struct AbstractSyntaxGraphNodeId(usize);
 
 impl AbstractSyntaxGraphNodeId {
@@ -106,6 +113,7 @@ impl From<AbstractSyntaxGraphNodeId> for Option<usize> {
 
 #[derive(Debug)]
 pub struct AbstractSyntaxGraphNode {
+    id: AbstractSyntaxGraphNodeId,
     node_type: AbstractSyntaxControlType,
     parent: AbstractSyntaxGraphNodeId,
     children: Vec::<AbstractSyntaxGraphNodeId>,
@@ -113,8 +121,9 @@ pub struct AbstractSyntaxGraphNode {
 }
 
 impl AbstractSyntaxGraphNode {
-    pub fn root() -> Self {
+    pub fn root(id: AbstractSyntaxGraphNodeId) -> Self {
         Self {
+            id,
             node_type: AbstractSyntaxControlType::Root,
             parent: AbstractSyntaxGraphNodeId::default(),
             children: vec!(),
@@ -122,13 +131,18 @@ impl AbstractSyntaxGraphNode {
         }
     }
 
-    pub fn new(from: AbstractSyntaxControlType, parent: AbstractSyntaxGraphNodeId) -> Self {
+    pub fn new(id: AbstractSyntaxGraphNodeId, from: AbstractSyntaxControlType, parent: AbstractSyntaxGraphNodeId) -> Self {
         Self {
+            id,
             node_type: from,
             parent,
             children: vec!(),
             properties: vec!()
         }
+    }
+
+    pub fn id(&self) -> AbstractSyntaxGraphNodeId {
+        self.id
     }
 
     pub fn node_type(&self) -> AbstractSyntaxControlType {

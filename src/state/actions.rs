@@ -15,7 +15,15 @@ impl RegisteredActions {
         self.actions.insert(action.function_name().to_string(), Box::new(action));
     }
 
-    pub fn get_action_container(&self, function_name: &str) -> Option<&Box<dyn ActionContainer>> {
-        self.actions.get(function_name)
+    pub fn run_action_function(&mut self, scope: &mut DataScope, function: &Function) -> Result<(), DataContextError> {
+        if let Some(container) = self.get_action_container(function.name()) {
+            container.run(scope.state_mut(), &function.arguments())?;
+            return Ok(());
+        }
+        Err(DataContextError::ContainerNotFound)
     }
+    
+    fn get_action_container(&self, function_name: &str) -> Option<&Box<dyn ActionContainer>> {
+        self.actions.get(function_name)
+    }    
 }

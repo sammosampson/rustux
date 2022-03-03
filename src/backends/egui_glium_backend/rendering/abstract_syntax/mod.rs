@@ -39,7 +39,9 @@ impl AbstractSyntaxGraphRenderer {
     pub fn render_root(&mut self, context: &mut DataContext, graph: &AbstractSyntaxGraph, root: &AbstractSyntaxGraphNode, display: &Display, frame: &mut Frame) -> bool {
         self.begin_frame(display);
         self.set_visuals();
+        push_scope(context, root);
         self.render_top_levels(context, graph, graph.get_children(root));
+        pop_scope(context);
         self.end_frame_and_paint(display, frame)
     }
 
@@ -65,14 +67,10 @@ impl AbstractSyntaxGraphRenderer {
         }
     }
 
-    fn render_children(&self, ui: &mut egui::Ui, context: &mut DataContext, graph: &AbstractSyntaxGraph, parent: &AbstractSyntaxGraphNode) {
-        for child in graph.get_children(parent) {
-            self.render_child(ui, context, graph, child)
-        }
-    }
-
     fn render_child(&self, ui: &mut egui::Ui, context: &mut DataContext, graph: &AbstractSyntaxGraph, child: &AbstractSyntaxGraphNode) {
         match child.node_type() {
+            AbstractSyntaxControlType::Scope => 
+                self.set_scope(ui, context, graph, child),
             AbstractSyntaxControlType::Container => 
                 self.render_children(ui, context, graph, child),
             AbstractSyntaxControlType::ScrollArea => 
@@ -99,6 +97,18 @@ impl AbstractSyntaxGraphRenderer {
         }
     }
 
+    fn render_children(&self, ui: &mut egui::Ui, context: &mut DataContext, graph: &AbstractSyntaxGraph, parent: &AbstractSyntaxGraphNode) {
+        for child in graph.get_children(parent) {
+            self.render_child(ui, context, graph, child)
+        }
+    }
+
+    fn set_scope(&self, ui: &mut egui::Ui, context: &mut DataContext, graph: &AbstractSyntaxGraph, node: &AbstractSyntaxGraphNode) {
+        push_scope(context, node);
+        self.render_children(ui, context, graph, node);
+        pop_scope(context);
+    }
+
     fn set_visuals(&mut self) {
         let mut visuals = egui::Visuals::dark();
         visuals.widgets.noninteractive.bg_fill = egui::Color32::from_rgba_premultiplied(0, 0, 0, 220);
@@ -114,4 +124,12 @@ impl AbstractSyntaxGraphRenderer {
         self.egui.paint(&display, target, shapes);
         needs_repaint
     }
+}
+
+fn push_scope(context: &mut DataContext, node: &AbstractSyntaxGraphNode) {
+    context.scopes_mut().push(node.id())
+}
+
+fn pop_scope(context: &mut DataContext) {
+    context.scopes_mut().pop();
 }

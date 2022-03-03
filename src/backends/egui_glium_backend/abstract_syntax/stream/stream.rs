@@ -13,7 +13,7 @@ impl AbstractSyntaxTokenStream {
     }
 
     pub fn start_node(&mut self, node_type: AbstractSyntaxControlType) {
-        println!("start {:?}", node_type);
+        //println!("start {:?}", node_type);
         if node_type == AbstractSyntaxControlType::Root {
             self.1 = true;
         }
@@ -22,7 +22,7 @@ impl AbstractSyntaxTokenStream {
     }
 
     pub fn property(&mut self, property: AbstractSyntaxProperty) {
-        println!("{:?}", property);
+        //println!("{:?}", property);
         self.0.push(Ok(AbstractSyntaxToken::Property(property)));
     }
 
@@ -31,7 +31,7 @@ impl AbstractSyntaxTokenStream {
     }
 
     pub fn end_node(&mut self, node_type: AbstractSyntaxControlType) {
-        println!("end {:?}", node_type);
+        //println!("end {:?}", node_type);
         self.0.push(Ok(AbstractSyntaxToken::EndControl(node_type)));
     }
 

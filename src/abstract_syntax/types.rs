@@ -33,6 +33,15 @@ pub struct ControlArguments {
     arguments: Vec<ControlArgument>
 }
 
+impl From<ControlArguments> for Variables {
+    fn from(args: ControlArguments) -> Self {
+        let mut variables = Variables::default();
+        for arg in args.arguments {
+            variables.set(arg.name, arg.value);
+        }
+        variables
+    }
+}
 
 #[derive(Debug, Clone, Default)]
 pub struct Function {

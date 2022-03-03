@@ -43,7 +43,7 @@ impl AbstractSyntaxTokenStreamVisitor for AbstractSyntaxGraphBuilder {
             strategy = Box::new(PreventBuildAbstractSyntaxGraphStreamStrategy);
         }
 
-        self.current_node = strategy.start_node(self.current_node, &mut self.ast);
+        self.current_node = strategy.start_node(self.current_node, &mut self.ast, context);
         self.strategies.push(strategy);
     }
 
@@ -54,7 +54,7 @@ impl AbstractSyntaxTokenStreamVisitor for AbstractSyntaxGraphBuilder {
     fn end_node(&mut self, _node_type: &AbstractSyntaxControlType, context: &mut DataContext) -> EndNodeAction {
         let mut strategy = self.strategies.pop().unwrap();
         let ending_node = self.current_node;
-        self.current_node = strategy.end_node(ending_node, &mut self.ast);
+        self.current_node = strategy.end_node(ending_node, &mut self.ast, context);
         
         let mut end_node_action = EndNodeAction::Continue;
 
@@ -78,6 +78,10 @@ fn get_strategy(node_type: &AbstractSyntaxControlType) -> Box<dyn BuildAbstractS
     match node_type {
         AbstractSyntaxControlType::Root =>
             Box::new(RootBuildAbstractSyntaxGraphStreamStrategy),
+        AbstractSyntaxControlType::Scope =>
+            Box::new(ScopeBuildAbstractSyntaxGraphStreamStrategy),
+        AbstractSyntaxControlType::Control =>
+            Box::new(EmptyBuildAbstractSyntaxGraphStreamStrategy),
         AbstractSyntaxControlType::For => 
             Box::new(ForBuildAbstractSyntaxGraphStreamStrategy::default()),
         AbstractSyntaxControlType::ForEach => 

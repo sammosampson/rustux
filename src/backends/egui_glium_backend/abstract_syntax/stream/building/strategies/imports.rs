@@ -8,7 +8,7 @@ impl BuildAbstractSyntaxTokenStreamStrategy for ImportBuildAbstractSyntaxTokenSt
         ast.start_node(AbstractSyntaxControlType::Empty);
     }
 
-    fn child_control(&self, ast: &mut AbstractSyntaxTokenStream) {
+    fn child_control(&self, _ast: &mut AbstractSyntaxTokenStream) {
     }
     
     fn end_control(&self, ast: &mut AbstractSyntaxTokenStream, _imports: &SourceImports) {

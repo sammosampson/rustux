@@ -7,7 +7,7 @@ impl BuildAbstractSyntaxTokenStreamStrategy for LetBuildAbstractSyntaxTokenStrea
         ast.start_node(AbstractSyntaxControlType::Let);
     }
     
-    fn child_control(&self, ast: &mut AbstractSyntaxTokenStream) {
+    fn child_control(&self, _ast: &mut AbstractSyntaxTokenStream) {
     }
     
     fn property(&self, _property: &CurrentProperty, _ast: &mut AbstractSyntaxTokenStream) {

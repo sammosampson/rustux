@@ -21,6 +21,7 @@ pub enum AbstractSyntaxControlType {
     Control,
     ControlReference,
     Container,
+    Scope,
     For,
     ForEach,
     Let,

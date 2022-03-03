@@ -8,18 +8,25 @@ pub struct ForEachBuildAbstractSyntaxGraphStreamStrategy {
 }
 
 impl BuildAbstractSyntaxGraphStreamStrategy for ForEachBuildAbstractSyntaxGraphStreamStrategy {
-    fn start_node(&mut self, parent: AbstractSyntaxGraphNodeId, ast: &mut AbstractSyntaxGraph) -> AbstractSyntaxGraphNodeId {
+    fn start_node(&mut self, parent: AbstractSyntaxGraphNodeId, ast: &mut AbstractSyntaxGraph, _context: &mut DataContext) -> AbstractSyntaxGraphNodeId {
         ast.add_child_node(parent, AbstractSyntaxControlType::Container)
     }
 
-    fn end_node(&mut self, node: AbstractSyntaxGraphNodeId, ast: &mut AbstractSyntaxGraph) -> AbstractSyntaxGraphNodeId {
+    fn end_node(&mut self, node: AbstractSyntaxGraphNodeId, ast: &mut AbstractSyntaxGraph, _context: &mut DataContext) -> AbstractSyntaxGraphNodeId {
         ast.get_parent(node)
     }
 
     fn property(&mut self, _node: AbstractSyntaxGraphNodeId, property: AbstractSyntaxProperty, _ast: &mut AbstractSyntaxGraph, context: &mut DataContext) {
         let (variable, function) = property.value().get_function_variable_value().unwrap();
-        let function = context.replace_variable_data_in_function(&function).unwrap();
-        if let AbstractSyntaxPropertyValue::DataArray(array_id, position) = context.run_selector_function(&function).unwrap() {
+
+        let function = context
+            .replace_variable_data_in_function(&function)
+            .unwrap();
+
+        if let AbstractSyntaxPropertyValue::DataArray(array_id, position) = context
+            .run_selector_function(&function)
+            .unwrap() 
+        {
             self.variable_items = Some((variable, array_id));
             self.position = position
         }
@@ -32,7 +39,7 @@ impl BuildAbstractSyntaxGraphStreamStrategy for ForEachBuildAbstractSyntaxGraphS
                     return StartNodeAction::Prevent;
                 }
                 
-                context.set_variable(variable.clone(), AbstractSyntaxPropertyValue::DataArray(*array_id, self.position));
+                context.current_scope_mut().variables_mut().set(variable.clone(), AbstractSyntaxPropertyValue::DataArray(*array_id, self.position));
             }
         }
         StartNodeAction::Continue
@@ -50,7 +57,7 @@ impl BuildAbstractSyntaxGraphStreamStrategy for ForEachBuildAbstractSyntaxGraphS
                     return EndNodeAction::Repeat
                 }
             }
-            context.remove_variable(variable);
+            context.current_scope_mut().variables_mut().remove(variable);
         }
         EndNodeAction::Continue
     }
@@ -64,11 +71,11 @@ pub struct ForBuildAbstractSyntaxGraphStreamStrategy {
 }
 
 impl BuildAbstractSyntaxGraphStreamStrategy for ForBuildAbstractSyntaxGraphStreamStrategy {
-    fn start_node(&mut self, parent: AbstractSyntaxGraphNodeId, ast: &mut AbstractSyntaxGraph) -> AbstractSyntaxGraphNodeId {
+    fn start_node(&mut self, parent: AbstractSyntaxGraphNodeId, ast: &mut AbstractSyntaxGraph, _context: &mut DataContext) -> AbstractSyntaxGraphNodeId {
         ast.add_child_node(parent, AbstractSyntaxControlType::Container)
     }
 
-    fn end_node(&mut self, node: AbstractSyntaxGraphNodeId, ast: &mut AbstractSyntaxGraph) -> AbstractSyntaxGraphNodeId {
+    fn end_node(&mut self, node: AbstractSyntaxGraphNodeId, ast: &mut AbstractSyntaxGraph, _context: &mut DataContext) -> AbstractSyntaxGraphNodeId {
         ast.get_parent(node)
     }
 
@@ -81,7 +88,7 @@ impl BuildAbstractSyntaxGraphStreamStrategy for ForBuildAbstractSyntaxGraphStrea
 
     fn start_child_node(&mut self, _ast: &mut AbstractSyntaxGraph, context: &mut DataContext) -> StartNodeAction {
         if let Some(variable) = &self.variable {
-            context.set_variable(variable.clone(), AbstractSyntaxPropertyValue::USize(self.current_position));
+            context.current_scope_mut().variables_mut().set(variable.clone(), AbstractSyntaxPropertyValue::USize(self.current_position));
         }
         StartNodeAction::Continue
     }
@@ -94,7 +101,7 @@ impl BuildAbstractSyntaxGraphStreamStrategy for ForBuildAbstractSyntaxGraphStrea
             }
         }
         if let Some(variable) = &self.variable {
-            context.remove_variable(variable);
+            context.current_scope_mut().variables_mut().remove(variable);
         }
         EndNodeAction::Continue
     }

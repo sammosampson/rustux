@@ -42,7 +42,7 @@ impl BuildAbstractSyntaxTokenStreamStrategy for ForBuildAbstractSyntaxTokenStrea
         ast.start_node(AbstractSyntaxControlType::For);
     }
     
-    fn child_control(&self, ast: &mut AbstractSyntaxTokenStream) {
+    fn child_control(&self, _ast: &mut AbstractSyntaxTokenStream) {
     }
     
     fn property(&self, _property: &CurrentProperty, _ast: &mut AbstractSyntaxTokenStream) {
