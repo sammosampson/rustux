@@ -30,6 +30,7 @@ impl AbstractSyntaxTokenStreamVisitor for AbstractSyntaxGraphBuilder {
     }
 
     fn start_node(&mut self, node_type: &AbstractSyntaxControlType, context: &mut DataContext) {
+        //println!("<{:?}", node_type);
         let mut action = StartNodeAction::Continue;
 
         if let Some(parent_strategy) = self.strategies.last_mut() {
@@ -48,10 +49,12 @@ impl AbstractSyntaxTokenStreamVisitor for AbstractSyntaxGraphBuilder {
     }
 
     fn property(&mut self, property: &AbstractSyntaxProperty, context: &mut DataContext) {
+        //println!("<{:?}={:?}", property.property_type(), property.value());
         self.strategies.last_mut().unwrap().property(self.current_node, property.clone(), &mut self.ast, context);
     }
 
     fn end_node(&mut self, _node_type: &AbstractSyntaxControlType, context: &mut DataContext) -> EndNodeAction {
+        //println!("{:?}>", _node_type);
         let mut strategy = self.strategies.pop().unwrap();
         let ending_node = self.current_node;
         self.current_node = strategy.end_node(ending_node, &mut self.ast, context);
